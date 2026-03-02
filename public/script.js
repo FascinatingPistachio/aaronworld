@@ -588,7 +588,7 @@ setInterval(pollLastFm, 1000);
   }
 
   function poll() {
-    fetch(`https://neocities-proxy.vercel.app/api/lanyard?id=${DISCORD_ID}`)
+    fetch(`/api/lanyard?id=${DISCORD_ID}`)
       .then(res => res.json())
       .then(renderPresence)
       .catch(() => {
