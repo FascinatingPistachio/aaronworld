@@ -544,13 +544,33 @@
 
 <script src="script.js"></script>
 <script>
-window.addEventListener("load", function () {
-  if (window.twemoji) {
-    twemoji.parse(document.body, {
-      folder: "svg",
-      ext: ".svg"
-    });
-  }
+// ── TWEMOJI SETUP ──
+// Parses the entire page and any dynamically inserted content
+function parseTwemoji(el) {
+  if (!window.twemoji) return;
+  twemoji.parse(el || document.body, {
+    folder: 'svg',
+    ext: '.svg',
+    className: 'emoji'
+  });
+}
+
+window.addEventListener('load', function () {
+  parseTwemoji(document.body);
+
+  // Re-parse dynamic widgets when they update (MutationObserver)
+  const dynamic = ['lanyardWidget', 'lastfmWidget', 'gblist', 'sidebarNowPlaying'];
+  dynamic.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(n) {
+          if (n.nodeType === 1) parseTwemoji(n);
+        });
+      });
+    }).observe(el, { childList: true, subtree: true });
+  });
 });
 </script>
 </body>
