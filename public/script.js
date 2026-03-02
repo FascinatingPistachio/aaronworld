@@ -511,20 +511,71 @@ setInterval(pollLastFm, 1000);
     return `${s}s elapsed`;
   }
 
+  // Known app IDs → icon URLs for games that don't report assets properly
+  const KNOWN_ICONS = {
+    '936929561302675456': 'https://cdn2.steamgriddb.com/icon/d0a21e2c4ca9095e54a289fa5a1b37a4/32/256x256.png', // Genshin Impact
+    'genshin impact':     'https://cdn2.steamgriddb.com/icon/d0a21e2c4ca9095e54a289fa5a1b37a4/32/256x256.png',
+  };
+
   function getLanyardImageUrl(appId, imageKey) {
-    if (!imageKey) return '';
+    if (!imageKey) return null;
+    // External media URL (e.g. Spotify, some games)
     if (imageKey.startsWith('mp:external/')) {
       const path = imageKey.replace('mp:external/', '');
       return `https://media.discordapp.net/external/${path}`;
     }
+    // Already a full URL
     if (imageKey.startsWith('http')) return imageKey;
-    return `https://cdn.discordapp.com/app-assets/${appId}/${imageKey}.png`;
+    // Standard Discord app asset — only valid if we have an appId
+    if (appId) return `https://cdn.discordapp.com/app-assets/${appId}/${imageKey}.png`;
+    return null;
   }
 
-  // Fallback: use Discord's app icon if no large_image asset available
   function getAppIconUrl(appId) {
-    if (!appId) return '';
+    if (!appId) return null;
     return `https://cdn.discordapp.com/app-icons/${appId}/icon.png`;
+  }
+
+  // Build an ordered list of URLs to try for the icon, best first
+  function buildIconCandidates(game) {
+    const appId = game.application_id;
+    const candidates = [];
+
+    // 1. large_image asset
+    const li = getLanyardImageUrl(appId, game.assets?.large_image);
+    if (li) candidates.push(li);
+
+    // 2. small_image asset (if no large_image)
+    if (!game.assets?.large_image) {
+      const si = getLanyardImageUrl(appId, game.assets?.small_image);
+      if (si) candidates.push(si);
+    }
+
+    // 3. Discord app icon
+    const ai = getAppIconUrl(appId);
+    if (ai) candidates.push(ai);
+
+    // 4. Hardcoded known icon by appId or game name
+    const knownById   = appId && KNOWN_ICONS[appId];
+    const knownByName = KNOWN_ICONS[game.name?.toLowerCase()];
+    if (knownById)   candidates.push(knownById);
+    if (knownByName && knownByName !== knownById) candidates.push(knownByName);
+
+    return candidates;
+  }
+
+  // Set img src with automatic fallback chain — tries each URL in order
+  function setImgWithFallbacks(img, candidates, fallbackEmoji) {
+    let idx = 0;
+    function tryNext() {
+      if (idx >= candidates.length) {
+        img.parentElement.innerHTML = fallbackEmoji;
+        return;
+      }
+      img.onerror = tryNext;
+      img.src = candidates[idx++];
+    }
+    tryNext();
   }
 
   function renderPresence(data) {
@@ -554,25 +605,20 @@ setInterval(pollLastFm, 1000);
       return;
     }
 
-    const appId    = game.application_id;
-    // Try large_image first, then small_image, then app icon as fallback
-    const largeImg = getLanyardImageUrl(appId, game.assets?.large_image)
-                  || getLanyardImageUrl(appId, game.assets?.small_image)
-                  || getAppIconUrl(appId);
-    const smallImg = game.assets?.small_image && game.assets?.large_image
-                   ? getLanyardImageUrl(appId, game.assets.small_image)
-                   : '';
-    const startTs  = game.timestamps?.start;
+    const startTs    = game.timestamps?.start;
+    const iconCandidates = buildIconCandidates(game);
+
+    // Show small_image as badge only when we also have a large_image
+    const smallImg = (game.assets?.large_image && game.assets?.small_image)
+      ? getLanyardImageUrl(game.application_id, game.assets.small_image)
+      : null;
 
     function buildHtml() {
       const elapsed = startTs ? getElapsed(startTs) : '';
       return `
         <div class="lanyard-card">
-          <div class="lanyard-icon">
-            ${largeImg
-              ? `<img src="${largeImg}" alt="${esc(game.name)}"
-                  onerror="this.onerror=null;this.src='${getAppIconUrl(appId)}';this.onerror=function(){this.parentElement.innerHTML='🎮'}">`
-              : '🎮'}
+          <div class="lanyard-icon" id="lanyardIconWrap">
+            <img id="lanyardIconImg" alt="${esc(game.name)}">
             ${smallImg ? `<div class="lanyard-small-icon"><img src="${smallImg}" alt=""></div>` : ''}
           </div>
           <div class="lanyard-info">
@@ -583,7 +629,7 @@ setInterval(pollLastFm, 1000);
             <div class="lanyard-game-name">${esc(game.name)}</div>
             ${game.details ? `<div class="lanyard-game-detail">${esc(game.details)}</div>` : ''}
             ${game.state   ? `<div class="lanyard-game-state">${esc(game.state)}</div>`   : ''}
-            ${elapsed      ? `<div class="lanyard-elapsed">⏱ ${elapsed}</div>`           : ''}
+            ${elapsed      ? `<div class="lanyard-elapsed" id="lanyardElapsed">⏱ ${elapsed}</div>` : ''}
           </div>
         </div>`;
     }
@@ -591,12 +637,16 @@ setInterval(pollLastFm, 1000);
     if (currentActivity !== game.name) {
       currentActivity = game.name;
       widget.innerHTML = buildHtml();
+
+      // Wire up the fallback chain after DOM is written
+      const img = document.getElementById('lanyardIconImg');
+      if (img) setImgWithFallbacks(img, iconCandidates, '🎮');
     }
 
     clearInterval(elapsedInterval);
     if (startTs) {
       elapsedInterval = setInterval(() => {
-        const elapsedEl = widget.querySelector('.lanyard-elapsed');
+        const elapsedEl = document.getElementById('lanyardElapsed');
         if (elapsedEl) elapsedEl.textContent = `⏱ ${getElapsed(startTs)}`;
       }, 1000);
     }
@@ -605,9 +655,21 @@ setInterval(pollLastFm, 1000);
   function poll() {
     fetch(`/api/lanyard?id=${DISCORD_ID}`)
       .then(res => res.json())
-      .then(renderPresence)
-      .catch(() => {
-        widget.innerHTML = `<div style="padding:10px;">Presence unavailable</div>`;
+      .then(data => {
+        // Debug: log the raw activity so you can inspect assets/application_id
+        const act = data?.data?.activities?.find(a => a.type === 0);
+        if (act) console.log('[Lanyard] activity:', JSON.stringify({
+          name: act.name,
+          application_id: act.application_id,
+          assets: act.assets,
+          details: act.details,
+          state: act.state
+        }, null, 2));
+        renderPresence(data);
+      })
+      .catch(err => {
+        console.warn('[Lanyard] fetch failed:', err);
+        widget.innerHTML = `<div style="padding:10px 16px;font-family:'Cinzel',serif;font-size:11px;color:var(--ink4);">Presence unavailable</div>`;
       });
   }
 
