@@ -15,6 +15,10 @@
     width: 96px;
     height: 96px;
     margin: 0 auto 0;
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 0;
   }
 
   /* The headphones SVG sits in its own layer wrapping the pfp */
@@ -168,6 +172,7 @@
   </style>
 </head>
 <body>
+<div id="elemTransitionOverlay"></div>
 
 <div class="page">
 
@@ -181,12 +186,12 @@
   <div class="h-eyebrow">✦   Traveler's Personal Journal   ✦</div>
 
   <div class="h-title-row">
-    <img class="h-dendro-icon"
-      src="https://i.ibb.co/fz1vj9B3/Element-Dendro.webp" alt=""
+    <img class="h-elem-icon"
+      src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
       onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:28px'}))">
     <h1 class="h-title">AARON<em>WORLD</em></h1>
-    <img class="h-dendro-icon"
-      src="https://i.ibb.co/fz1vj9B3/Element-Dendro.webp" alt=""
+    <img class="h-elem-icon"
+      src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
       onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:28px'}))">
   </div>
 
@@ -232,7 +237,7 @@
           alt="Aaron"
           onerror="this.src='https://ui-avatars.com/api/?name=Aaron&background=111e08&color=b8d430&size=96&bold=true'">
         <div class="pfp-elem">
-          <img src="https://i.ibb.co/fz1vj9B3/Element-Dendro.webp" alt="Dendro"
+          <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="Element"
             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:12px'}))">
         </div>
         <!-- Headphones: empty, SVG injected by JS -->
@@ -251,6 +256,17 @@
       <div class="stat-row"><span class="stat-l">Region</span><span class="stat-v" id="enka-region">EU</span></div>
       <div class="stat-row"><span class="stat-l">Main</span><span class="stat-v" id="enka-main">Dendro Traveler</span></div>
       <div class="stat-row"><span class="stat-l">Achievements</span><span class="stat-v" id="enka-achieve">—</span></div>
+
+      <!-- Active character card (populated by Enka API) -->
+      <div id="enkaCharacterCard" style="margin:10px 0 4px;">
+        <img class="char-portrait" src="" alt="Character" onerror="this.style.display='none'">
+        <div class="char-info">
+          <div class="char-label"><div class="char-label-dot"></div>Active Character</div>
+          <div class="char-name">—</div>
+          <div class="char-level"></div>
+        </div>
+        <div class="char-constellation">C0</div>
+      </div>
     </div>
 
     <!-- NOW PLAYING — sits inside profile panel below stats, shown on all pages -->
