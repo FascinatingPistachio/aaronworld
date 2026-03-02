@@ -839,7 +839,7 @@ function getCharIconUrl(charInfo) {
     10000003: 'Qiqi',
     10000006: 'Lisa',
     10000007: 'PlayerBoy', // Traveler (male)
-    10000005: 'PlayerGirl',// Traveler (female)
+    10000005: 'PlayerBoy',// Traveler (female)
     10000014: 'Barbara',
     10000015: 'Kaeya',
     10000016: 'Diluc',
