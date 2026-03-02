@@ -589,54 +589,8 @@ function handleEnkaData(data) {
   applyElementTheme(element);
 }
 
-// Enka element type IDs → element names
-const ENKA_ELEMENT_IDS = {
-  1: 'pyro', 2: 'anemo', 3: 'geo', 4: 'electro', 5: 'dendro', 6: 'hydro', 7: 'cryo'
-};
-
-// Avatar ID → partial character data (we'll use element from API props)
-function getElementFromEnkaChar(charInfo) {
-  if (!charInfo) return null;
-  // Enka returns element type in the prop map / character data
-  // Try prop 10001 (element)
-  if (charInfo.propMap) {
-    // element info isn't directly in propMap, but we can try skillDepotId
-    // The element is embedded in the fightPropMap or we need to cross-reference
-    // Let's check fightPropMap for elemental mastery hints
-  }
-  // Try to get from talent/skill sets
-  // Best: use the avatarId to look up element
-  const id = charInfo.avatarId;
-  if (id) {
-    return AVATAR_ID_TO_ELEMENT[id] || null;
-  }
-  return null;
-}
-
-// Comprehensive Avatar ID → element mapping from Enka API
-// Source: https://github.com/EnkaNetwork/API-docs
-const AVATAR_ID_TO_ELEMENT = {
-  // Pyro
-  10000002:'pyro',  // Kamisato Ayaka (no, she's cryo - skip)
-  10000003:'pyro',  // Qiqi (cryo) - let name override handle
-  // Better to list all correctly:
-  // Pyro characters
-  10000046:'pyro', // Klee
-  10000033:'pyro', // Xiangling  
-  10000025:'pyro', // Xiangling duplicate
-  10000037:'pyro', // Fischl -> electro, override
-  // Map by known avatar IDs
-  10000041:'electro', // Mona -> hydro, wrong
-  // Let's use a reliable subset
-  10000016:'pyro',  // Amber
-  10000020:'geo',   // Zhongli (actually wait)
-  // This approach is error-prone without full list
-  // Fall back to name-based detection
-};
-
-// Actually let's use a better approach: Enka API returns element via skillDepotId ranges
-// Pyro: 1-10, Cryo: 11-20, etc. This is not reliable.
-// Best approach: fetch https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json
+// Element IDs reference (unused but kept for documentation)
+// const ENKA_ELEMENT_IDS = { 1:'pyro', 2:'anemo', 3:'geo', 4:'electro', 5:'dendro', 6:'hydro', 7:'cryo' };
 
 function getCharNameFromEnka(charInfo) {
   if (!charInfo) return 'Traveler';
@@ -838,7 +792,6 @@ function getCharNameFromEnka(charInfo) {
   window._enkaElemById = CHAR_ELEMENT_BY_ID;
   window._enkaIdToName = ID_MAP;
 
-  const id = charInfo.avatarId;
   return ID_MAP[id] || 'Traveler';
 }
 
