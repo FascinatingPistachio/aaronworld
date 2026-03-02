@@ -517,7 +517,14 @@ setInterval(pollLastFm, 1000);
       const path = imageKey.replace('mp:external/', '');
       return `https://media.discordapp.net/external/${path}`;
     }
+    if (imageKey.startsWith('http')) return imageKey;
     return `https://cdn.discordapp.com/app-assets/${appId}/${imageKey}.png`;
+  }
+
+  // Fallback: use Discord's app icon if no large_image asset available
+  function getAppIconUrl(appId) {
+    if (!appId) return '';
+    return `https://cdn.discordapp.com/app-icons/${appId}/icon.png`;
   }
 
   function renderPresence(data) {
@@ -529,7 +536,7 @@ setInterval(pollLastFm, 1000);
     const game = activities.find(a => a.type === 0);
 
     const statusLabels = {
-      online: 'Online',
+      online: 'Online · Teyvat',
       idle: 'Away',
       dnd: 'Do Not Disturb',
       offline: 'Offline'
@@ -537,20 +544,24 @@ setInterval(pollLastFm, 1000);
 
     if (!game) {
       widget.innerHTML = `
-        <div style="padding:10px 14px;">
-          <span class="lanyard-status-dot ${status}"></span>
-          ${statusLabels[status] || 'Offline'}
-          <div class="lanyard-idle-msg">
-            Not playing anything right now 🌿
-          </div>
-        </div>`;
+        <div style="padding:12px 16px;display:flex;align-items:center;gap:8px;">
+          <span class="lanyard-status-dot ${status}" style="flex-shrink:0;"></span>
+          <span class="lanyard-status-label">${statusLabels[status] || 'Offline'}</span>
+        </div>
+        <div class="lanyard-idle-msg">Not playing anything right now 🌿</div>`;
       clearInterval(elapsedInterval);
       currentActivity = null;
       return;
     }
 
-    const appId   = game.application_id;
-    const largeImg = getLanyardImageUrl(appId, game.assets?.large_image);
+    const appId    = game.application_id;
+    // Try large_image first, then small_image, then app icon as fallback
+    const largeImg = getLanyardImageUrl(appId, game.assets?.large_image)
+                  || getLanyardImageUrl(appId, game.assets?.small_image)
+                  || getAppIconUrl(appId);
+    const smallImg = game.assets?.small_image && game.assets?.large_image
+                   ? getLanyardImageUrl(appId, game.assets.small_image)
+                   : '';
     const startTs  = game.timestamps?.start;
 
     function buildHtml() {
@@ -559,14 +570,20 @@ setInterval(pollLastFm, 1000);
         <div class="lanyard-card">
           <div class="lanyard-icon">
             ${largeImg
-              ? `<img src="${largeImg}" alt="${esc(game.name)}" onerror="this.parentElement.innerHTML='🎮'">`
+              ? `<img src="${largeImg}" alt="${esc(game.name)}"
+                  onerror="this.onerror=null;this.src='${getAppIconUrl(appId)}';this.onerror=function(){this.parentElement.innerHTML='🎮'}">`
               : '🎮'}
+            ${smallImg ? `<div class="lanyard-small-icon"><img src="${smallImg}" alt=""></div>` : ''}
           </div>
           <div class="lanyard-info">
+            <div class="lanyard-playing-label">
+              <div class="lanyard-playing-dot"></div>
+              Now Playing
+            </div>
             <div class="lanyard-game-name">${esc(game.name)}</div>
-            ${game.details ? `<div>${esc(game.details)}</div>` : ''}
-            ${game.state ? `<div>${esc(game.state)}</div>` : ''}
-            ${elapsed ? `<div class="lanyard-elapsed">⏱ ${elapsed}</div>` : ''}
+            ${game.details ? `<div class="lanyard-game-detail">${esc(game.details)}</div>` : ''}
+            ${game.state   ? `<div class="lanyard-game-state">${esc(game.state)}</div>`   : ''}
+            ${elapsed      ? `<div class="lanyard-elapsed">⏱ ${elapsed}</div>`           : ''}
           </div>
         </div>`;
     }
@@ -580,9 +597,7 @@ setInterval(pollLastFm, 1000);
     if (startTs) {
       elapsedInterval = setInterval(() => {
         const elapsedEl = widget.querySelector('.lanyard-elapsed');
-        if (elapsedEl) {
-          elapsedEl.textContent = `⏱ ${getElapsed(startTs)}`;
-        }
+        if (elapsedEl) elapsedEl.textContent = `⏱ ${getElapsed(startTs)}`;
       }, 1000);
     }
   }
