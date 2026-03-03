@@ -10,393 +10,374 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
 <style>
-  /* ── PFP / HEADPHONES ── */
-  .pfp-outer { position:relative; width:96px; height:96px; margin:0 auto 0; }
-  #pfpHeadphones {
-    position:absolute; top:-32px; left:50%;
-    transform:translateX(-50%) scale(0); width:140px; height:140px;
-    z-index:5; pointer-events:none; opacity:0;
-    transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
-  }
-  #pfpHeadphones.active { transform:translateX(-50%) scale(1); opacity:1; }
-  #pfpVfx {
-    position:absolute; inset:-80px;
-    width:calc(100% + 160px); height:calc(100% + 160px);
-    pointer-events:none; z-index:3; opacity:0; transition:opacity 0.8s;
-  }
-  #pfpVfx.active { opacity:1; }
-  .pfp-img { position:relative; z-index:1; }
-  .pfp-ring { z-index:2; }
-  .pfp-elem { z-index:4; }
-  .pfp-outer.playing .pfp-ring:nth-child(2) { border-color:var(--accent1); opacity:0.9; animation-duration:4s; }
-  .pfp-outer.playing .pfp-ring:nth-child(3) { border-color:var(--accent0); opacity:0.6; animation-duration:7s; }
-  .pfp-outer.playing .pfp-ring:nth-child(4) { border-color:var(--accent1); opacity:0.35; animation-duration:12s; }
-  .pfp-outer.playing .pfp-img { box-shadow:0 0 28px var(--glow-a),0 0 60px var(--glow-a2),0 0 0 3px var(--glow-a); }
+/* ─── HELPERS ──────────────────────────────────── */
+.pfp-outer{position:relative;width:96px;height:96px;margin:0 auto}
+#pfpHeadphones{position:absolute;top:-32px;left:50%;transform:translateX(-50%) scale(0);width:140px;height:140px;z-index:5;pointer-events:none;opacity:0;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s}
+#pfpHeadphones.active{transform:translateX(-50%) scale(1);opacity:1}
+#pfpVfx{position:absolute;inset:-80px;width:calc(100% + 160px);height:calc(100% + 160px);pointer-events:none;z-index:3;opacity:0;transition:opacity .8s}
+#pfpVfx.active{opacity:1}
+.pfp-img{position:relative;z-index:1}.pfp-ring{z-index:2}.pfp-elem{z-index:4}
+.pfp-outer.playing .pfp-ring:nth-child(2){border-color:var(--accent1);opacity:.9;animation-duration:4s}
+.pfp-outer.playing .pfp-ring:nth-child(3){border-color:var(--accent0);opacity:.6;animation-duration:7s}
+.pfp-outer.playing .pfp-ring:nth-child(4){border-color:var(--accent1);opacity:.35;animation-duration:12s}
+.pfp-outer.playing .pfp-img{box-shadow:0 0 28px var(--glow-a),0 0 60px var(--glow-a2),0 0 0 3px var(--glow-a)}
+.sidebar-nowplaying{display:none;flex-direction:column;gap:0;overflow:hidden}
+.sidebar-nowplaying.active{display:flex}
+.snp-inner{display:flex;align-items:center;gap:10px;padding:10px 14px 12px;background:rgba(250,246,235,.85)}
+.snp-art{width:46px;height:46px;flex-shrink:0;border:1px solid rgba(180,150,80,.45);background:var(--ldr-bg2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;position:relative}
+.snp-art img{width:100%;height:100%;object-fit:cover;display:block}
+.snp-text{flex:1;min-width:0}
+.snp-status{display:flex;align-items:center;gap:5px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:var(--ink3);text-transform:uppercase;margin-bottom:3px}
+.snp-dot{width:5px;height:5px;border-radius:50%;background:var(--gold2);box-shadow:0 0 6px rgba(200,168,64,.5);animation:gemPulse 1.4s ease-in-out infinite;flex-shrink:0}
+.snp-title{font-family:'Cinzel',serif;font-size:11.5px;color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.snp-artist{font-family:'Lora',serif;font-size:11px;color:var(--ink3);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snp-eq{display:flex;gap:2px;align-items:flex-end;height:12px;flex-shrink:0}
+.snp-eq span{display:block;width:2.5px;background:var(--gold2);border-radius:1px;animation:eqBar .6s ease-in-out infinite alternate}
+.snp-eq span:nth-child(1){animation-delay:0s;animation-duration:.5s}
+.snp-eq span:nth-child(2){animation-delay:.15s;animation-duration:.7s}
+.snp-eq span:nth-child(3){animation-delay:.05s;animation-duration:.45s}
+.snp-eq span:nth-child(4){animation-delay:.2s;animation-duration:.65s}
+.snp-eq span:nth-child(5){animation-delay:.1s;animation-duration:.55s}
+@keyframes eqBar{from{height:2px}to{height:12px}}
 
-  /* ── SIDEBAR NOW PLAYING ── */
-  .sidebar-nowplaying { display:none; flex-direction:column; gap:0; overflow:hidden; }
-  .sidebar-nowplaying.active { display:flex; }
-  .snp-inner { display:flex; align-items:center; gap:10px; padding:10px 14px 12px; background:rgba(250,246,235,0.85); }
-  .snp-art { width:46px; height:46px; flex-shrink:0; border:1px solid rgba(180,150,80,0.45); background:var(--ldr-bg2); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:18px; position:relative; }
-  .snp-art img { width:100%; height:100%; object-fit:cover; display:block; }
-  .snp-text { flex:1; min-width:0; }
-  .snp-status { display:flex; align-items:center; gap:5px; font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px; color:var(--ink3); text-transform:uppercase; margin-bottom:3px; }
-  .snp-dot { width:5px; height:5px; border-radius:50%; background:var(--gold2); box-shadow:0 0 6px rgba(200,168,64,0.5); animation:gemPulse 1.4s ease-in-out infinite; flex-shrink:0; }
-  .snp-title { font-family:'Cinzel',serif; font-size:11.5px; color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
-  .snp-artist { font-family:'Lora',serif; font-size:11px; color:var(--ink3); font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .snp-eq { display:flex; gap:2px; align-items:flex-end; height:12px; flex-shrink:0; }
-  .snp-eq span { display:block; width:2.5px; background:var(--gold2); border-radius:1px; animation:eqBar 0.6s ease-in-out infinite alternate; }
-  .snp-eq span:nth-child(1){animation-delay:0s;animation-duration:0.5s;}
-  .snp-eq span:nth-child(2){animation-delay:0.15s;animation-duration:0.7s;}
-  .snp-eq span:nth-child(3){animation-delay:0.05s;animation-duration:0.45s;}
-  .snp-eq span:nth-child(4){animation-delay:0.2s;animation-duration:0.65s;}
-  .snp-eq span:nth-child(5){animation-delay:0.1s;animation-duration:0.55s;}
-  @keyframes eqBar { from{height:2px} to{height:12px} }
+/* ═══════════════════════════════════════════════════════════════
+   GENSHIN IMPACT — AUTHENTIC LOADING SCREEN
+   Structure: cinematic art backdrop · central identity · bottom HUD
+   ═══════════════════════════════════════════════════════════════ */
+#gi-loader{
+  position:fixed;inset:0;z-index:99999;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:opacity 1.4s cubic-bezier(.4,0,.2,1),visibility 1.4s;
 
-  /* ══════════════════════════════════════════
-     LOADING SCREEN — Official Edition
-  ══════════════════════════════════════════ */
-  #gi-loader {
-    position:fixed; inset:0; z-index:99999; overflow:hidden;
-    display:flex; flex-direction:column;
-    transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1), visibility 1.2s;
-    /* Atmospheric layered sky — warm dawn parchment */
-    background:
-      radial-gradient(ellipse 140% 60% at 50% -10%, rgba(255,248,225,0.9) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 50% at 20% 80%, rgba(195,178,150,0.5) 0%, transparent 60%),
-      radial-gradient(ellipse 80% 40% at 80% 90%, rgba(185,168,138,0.4) 0%, transparent 55%),
-      linear-gradient(180deg,
-        #ece5d5 0%,
-        #ddd2bc 30%,
-        #cfc5ae 65%,
-        #c4b89e 100%
-      );
-  }
-  #gi-loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
-
-  /* Horizon line — atmospheric depth */
-  .loader-horizon {
-    position:absolute;
-    bottom:18%; left:0; right:0;
-    height:1px;
-    background:linear-gradient(90deg, transparent 0%, rgba(180,155,100,0.25) 20%, rgba(200,170,110,0.4) 50%, rgba(180,155,100,0.25) 80%, transparent 100%);
-    pointer-events:none;
-  }
-  .loader-horizon::before {
-    content:'';
-    position:absolute;
-    bottom:-20px; left:0; right:0;
-    height:40px;
-    background:linear-gradient(180deg, rgba(200,175,130,0.12) 0%, transparent 100%);
-  }
-
-  /* Atmospheric light rays — wider, more dramatic */
-  .loader-rays { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
-  .loader-ray {
-    position:absolute; top:-5%;
-    background:linear-gradient(180deg, rgba(255,248,225,0.7) 0%, rgba(255,248,225,0) 85%);
-    transform-origin:top center;
-    animation:rayFade 7s ease-in-out infinite;
-  }
-  .loader-ray:nth-child(1)  { left:5%;  width:320px; transform:rotate(-22deg); animation-delay:0s;   opacity:0.28; }
-  .loader-ray:nth-child(2)  { left:18%; width:120px; transform:rotate(-10deg); animation-delay:1.2s; opacity:0.20; }
-  .loader-ray:nth-child(3)  { left:34%; width:280px; transform:rotate(-2deg);  animation-delay:2.1s; opacity:0.32; }
-  .loader-ray:nth-child(4)  { left:50%; width:160px; transform:rotate(5deg);   animation-delay:0.7s; opacity:0.22; }
-  .loader-ray:nth-child(5)  { left:62%; width:340px; transform:rotate(14deg);  animation-delay:1.8s; opacity:0.30; }
-  .loader-ray:nth-child(6)  { left:80%; width:90px;  transform:rotate(26deg);  animation-delay:0.4s; opacity:0.18; }
-  .loader-ray:nth-child(7)  { left:90%; width:200px; transform:rotate(35deg);  animation-delay:2.6s; opacity:0.22; }
-  @keyframes rayFade { 0%,100%{opacity:0.12} 50%{opacity:0.55} }
-
-  /* Mist particles */
-  .loader-mist {
-    position:absolute; border-radius:50%;
-    background:rgba(255,255,255,0.55); filter:blur(4px);
-    animation:mistRise linear infinite; pointer-events:none;
-  }
-  @keyframes mistRise {
-    0%   { transform:translateY(0) translateX(0) scale(0.8); opacity:0; }
-    12%  { opacity:0.5; }
-    88%  { opacity:0.2; }
-    100% { transform:translateY(-75vh) translateX(35px) scale(2.8); opacity:0; }
-  }
-
-  /* Ground/terrain vignette */
-  .loader-ground {
-    position:absolute; bottom:0; left:0; right:0; height:32%;
-    background:linear-gradient(180deg,
-      transparent 0%,
-      rgba(185,165,130,0.18) 50%,
-      rgba(170,150,118,0.45) 100%
+  /* Real Genshin background: soft painted sky, warm mist, horizon glow */
+  background:
+    /* Sun/glow source — top-left warmth */
+    radial-gradient(ellipse 70% 55% at 18% 0%,  rgba(255,240,195,.75) 0%, transparent 60%),
+    /* Soft sky zenith */
+    radial-gradient(ellipse 120% 45% at 50% 0%,  rgba(230,218,190,.9) 0%, transparent 52%),
+    /* Horizon amber glow */
+    radial-gradient(ellipse 110% 30% at 50% 62%, rgba(218,188,130,.65) 0%, transparent 55%),
+    /* Distant mist */
+    radial-gradient(ellipse 80% 25% at 75% 80%,  rgba(195,175,145,.5) 0%, transparent 55%),
+    /* Base sky gradient */
+    linear-gradient(175deg,
+      #e8dfc8 0%,
+      #d9ccb0 22%,
+      #cfc0a0 48%,
+      #c5b492 70%,
+      #b8a882 100%
     );
-    pointer-events:none;
-  }
+}
+#gi-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
 
-  /* ── STAGE ── */
-  .loader-stage {
-    flex:1; position:relative;
-    display:flex; align-items:center; justify-content:center;
-  }
+/* ── Cinematic vignette — darkens all four edges like a real scene ── */
+.loader-vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:
+    radial-gradient(ellipse 90% 90% at 50% 50%,transparent 40%,rgba(30,22,10,.55) 100%);
+}
 
-  /* ── TITLE — top-center, large and official ── */
-  .loader-site-title {
-    position:absolute; top:28px; left:50%;
-    transform:translateX(-50%);
-    text-align:center; white-space:nowrap;
-    animation:titleIn 1.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
-    pointer-events:none; z-index:10;
-  }
-  @keyframes titleIn {
-    from { opacity:0; transform:translateX(-50%) translateY(-20px) scale(0.97); }
-    to   { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
-  }
-  .loader-title-eyebrow {
-    font-family:'Cinzel',serif; font-size:8px; letter-spacing:10px;
-    color:rgba(100,75,35,0.55); text-transform:uppercase; margin-bottom:8px;
-  }
-  .loader-site-name {
-    font-family:'Cinzel Decorative',serif;
-    font-size:clamp(24px,4vw,44px); font-weight:700;
-    color:#3a2c14; letter-spacing:7px; line-height:1;
-    text-shadow:
-      0 1px 0 rgba(255,255,255,0.7),
-      0 3px 12px rgba(0,0,0,0.1),
-      0 0 40px rgba(200,168,64,0.15);
-  }
-  .loader-site-name em { color:#9a6e20; font-style:normal; }
-  .loader-site-sub {
-    font-family:'Cinzel',serif; font-size:8.5px; letter-spacing:9px;
-    color:rgba(100,75,35,0.5); text-transform:uppercase; margin-top:9px;
-  }
-  /* Decorative rule under title */
-  .loader-title-rule {
-    display:flex; align-items:center; gap:8px; margin-top:10px; justify-content:center;
-  }
-  .loader-title-rule span {
-    display:block; height:1px; width:60px;
-    background:linear-gradient(90deg, transparent, rgba(180,150,80,0.4));
-  }
-  .loader-title-rule span:last-child {
-    background:linear-gradient(270deg, transparent, rgba(180,150,80,0.4));
-  }
-  .loader-title-rule i {
-    font-style:normal; color:rgba(180,150,80,0.55); font-size:7px;
-  }
+/* ── Bottom fog — ground melts into mist ── */
+.loader-fog{
+  position:absolute;bottom:0;left:0;right:0;height:45%;pointer-events:none;z-index:2;
+  background:linear-gradient(0deg,
+    rgba(180,162,128,.55) 0%,
+    rgba(200,182,148,.2)  35%,
+    transparent 100%
+  );
+}
 
-  /* ── SIGIL CLUSTER ── */
-  .loader-sigil-wrap {
-    position:relative; width:340px; height:340px;
-    display:flex; align-items:center; justify-content:center;
-    animation:sigilIn 1.6s cubic-bezier(0.16,1,0.3,1) 0.4s both;
-  }
-  @keyframes sigilIn {
-    from { opacity:0; transform:scale(0.65) rotate(-8deg); }
-    to   { opacity:1; transform:scale(1) rotate(0deg); }
-  }
+/* ── Light shafts — real Genshin has strong diagonal crepuscular rays ── */
+.loader-rays{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.loader-ray{
+  position:absolute;top:0;transform-origin:top center;
+  background:linear-gradient(180deg,rgba(255,246,215,.55) 0%,transparent 75%);
+  animation:rayPulse 8s ease-in-out infinite;
+}
+.loader-ray:nth-child(1){left:-5%;width:380px;height:100%;transform:rotate(-24deg);animation-delay:0s;opacity:.22}
+.loader-ray:nth-child(2){left:15%;width:180px;height:100%;transform:rotate(-13deg);animation-delay:1.5s;opacity:.16}
+.loader-ray:nth-child(3){left:28%;width:320px;height:100%;transform:rotate(-4deg);animation-delay:2.8s;opacity:.20}
+.loader-ray:nth-child(4){left:48%;width:240px;height:100%;transform:rotate(6deg);animation-delay:.9s;opacity:.15}
+.loader-ray:nth-child(5){left:62%;width:400px;height:100%;transform:rotate(16deg);animation-delay:2.1s;opacity:.22}
+.loader-ray:nth-child(6){left:83%;width:200px;height:100%;transform:rotate(28deg);animation-delay:.4s;opacity:.14}
+@keyframes rayPulse{0%,100%{opacity:.08}50%{opacity:.5}}
 
-  /* Concentric ornamental rings */
-  .loader-sigil-ring {
-    position:absolute; border-radius:50%; border-style:solid;
-    border-color:rgba(180,150,80,0.2); pointer-events:none;
-  }
-  .loader-sigil-ring:nth-child(1) {
-    width:320px; height:320px; border-width:1px;
-    animation:sigilRotate 50s linear infinite;
-  }
-  .loader-sigil-ring:nth-child(2) {
-    width:268px; height:268px; border-width:1.5px;
-    border-style:dashed; border-color:rgba(180,150,80,0.14);
-    animation:sigilRotate 32s linear infinite reverse;
-  }
-  .loader-sigil-ring:nth-child(3) {
-    width:216px; height:216px; border-width:1px;
-    border-color:rgba(180,150,80,0.18);
-    animation:sigilRotate 20s linear infinite;
-  }
-  .loader-sigil-ring:nth-child(4) {
-    width:158px; height:158px; border-width:0.5px;
-    border-color:rgba(180,150,80,0.12);
-    animation:sigilRotate 14s linear infinite reverse;
-  }
-  @keyframes sigilRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+/* ── Floating dust motes ── */
+.loader-mote{
+  position:absolute;border-radius:50%;
+  background:rgba(255,248,210,.8);filter:blur(1.5px);
+  animation:moteDrift linear infinite;pointer-events:none;z-index:4;
+}
+@keyframes moteDrift{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  8%{opacity:1}90%{opacity:.4}
+  100%{transform:translateY(-80vh) translateX(var(--drift,20px));opacity:0}
+}
 
-  /* Diamond tick marks on outer ring */
-  .loader-sigil-ring:nth-child(1)::before {
-    content:'◆  ◆  ◆  ◆  ◆  ◆  ◆  ◆';
-    position:absolute; top:-7px; left:50%;
-    transform:translateX(-50%);
-    font-size:5px; color:rgba(180,150,80,0.4);
-    letter-spacing:35px; white-space:nowrap;
-    width:340px; text-align:center;
-  }
+/* ─────────────────────────────────────────────────
+   STAGE — everything floating over the scene
+───────────────────────────────────────────────── */
+.loader-stage{
+  flex:1;position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:10;
+  gap:0;
+  padding-bottom:2vh;
+}
 
-  /* Cardinal direction marks */
-  .loader-cardinal {
-    position:absolute; font-family:'Cinzel',serif;
-    font-size:7px; letter-spacing:2px;
-    color:rgba(140,110,55,0.45); pointer-events:none;
-    animation:sigilIn 2s cubic-bezier(0.16,1,0.3,1) 0.6s both;
-  }
-  .loader-cardinal.n { top:-18px; left:50%; transform:translateX(-50%); }
-  .loader-cardinal.s { bottom:-18px; left:50%; transform:translateX(-50%); }
-  .loader-cardinal.e { right:-22px; top:50%; transform:translateY(-50%); }
-  .loader-cardinal.w { left:-22px; top:50%; transform:translateY(-50%); }
+/* ── Element emblem — large central medallion ── */
+.loader-medallion{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:220px;height:220px;
+  animation:medallionIn 1.4s cubic-bezier(.16,1,.3,1) .3s both;
+}
+@keyframes medallionIn{from{opacity:0;transform:scale(.7) rotate(-12deg)}to{opacity:1;transform:scale(1) rotate(0)}}
 
-  /* Element orbs */
-  .loader-elem-orb {
-    position:absolute; width:46px; height:46px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(145deg, rgba(255,253,247,0.92), rgba(245,238,215,0.88));
-    border:1.5px solid rgba(200,170,90,0.45);
-    box-shadow:0 2px 14px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(180,150,80,0.1);
-    animation:orbPulse 3s ease-in-out infinite;
-  }
-  .loader-elem-orb img { width:28px; height:28px; object-fit:contain; display:block; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.2)); }
-  @keyframes orbPulse {
-    0%,100% { box-shadow:0 2px 14px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.9); transform:rotate(0deg); }
-    50%     { box-shadow:0 4px 24px rgba(0,0,0,0.18), 0 0 18px var(--orb-glow,rgba(200,180,100,0.55)), inset 0 1px 0 rgba(255,255,255,0.9); }
-  }
+/* Outermost glow halo */
+.loader-medallion::before{
+  content:'';position:absolute;inset:-30px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(232,200,74,.18) 0%,transparent 68%);
+  animation:haloBreath 3s ease-in-out infinite;
+}
+@keyframes haloBreath{0%,100%{opacity:.5;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
 
-  .loader-orbit {
-    position:absolute; width:240px; height:240px;
-    animation:orbitSpin 24s linear infinite; pointer-events:none;
-  }
-  @keyframes orbitSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-  .loader-orbit .loader-elem-orb {
-    animation:orbCounterSpin 24s linear infinite, orbPulse 3s ease-in-out infinite;
-  }
-  @keyframes orbCounterSpin { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
+/* Outer ring — gold, slow rotate */
+.loader-ring-outer{
+  position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid rgba(212,175,55,.5);
+  animation:ringSpin 28s linear infinite;
+}
+/* 8 tick marks via conic-gradient dots */
+.loader-ring-outer::before{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  background:
+    radial-gradient(circle 3px at 50% 4px,  rgba(212,175,55,.9),transparent),
+    radial-gradient(circle 3px at 50% calc(100% - 4px),rgba(212,175,55,.9),transparent),
+    radial-gradient(circle 3px at 4px  50%,  rgba(212,175,55,.9),transparent),
+    radial-gradient(circle 3px at calc(100% - 4px) 50%,rgba(212,175,55,.9),transparent),
+    radial-gradient(circle 2px at 14% 14%,rgba(212,175,55,.6),transparent),
+    radial-gradient(circle 2px at 86% 14%,rgba(212,175,55,.6),transparent),
+    radial-gradient(circle 2px at 14% 86%,rgba(212,175,55,.6),transparent),
+    radial-gradient(circle 2px at 86% 86%,rgba(212,175,55,.6),transparent);
+}
 
-  /* Centre icon — prominent, official */
-  .loader-center-icon {
-    position:absolute; width:80px; height:80px; border-radius:50%;
-    background:linear-gradient(145deg, rgba(255,253,244,0.98), rgba(250,244,220,0.95));
-    border:2px solid rgba(200,170,90,0.55);
-    box-shadow:
-      0 0 0 6px rgba(200,170,90,0.08),
-      0 0 36px rgba(212,168,50,0.35),
-      0 0 70px rgba(212,168,50,0.18),
-      0 6px 24px rgba(0,0,0,0.18),
-      inset 0 1px 0 rgba(255,255,255,0.95);
-    display:flex; align-items:center; justify-content:center; z-index:5;
-    animation:centerGlow 2.8s ease-in-out infinite;
-  }
-  .loader-center-icon img {
-    width:50px; height:50px; object-fit:contain; display:block;
-    filter:drop-shadow(0 0 10px rgba(212,168,50,0.7)) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-    animation:centerIconSpin 16s linear infinite;
-  }
-  @keyframes centerIconSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-  @keyframes centerGlow {
-    0%,100% {
-      box-shadow:0 0 0 6px rgba(200,170,90,0.06),0 0 28px rgba(212,168,50,0.28),0 0 55px rgba(212,168,50,0.12),0 6px 24px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.95);
-    }
-    50% {
-      box-shadow:0 0 0 8px rgba(200,170,90,0.1),0 0 50px rgba(212,168,50,0.5),0 0 100px rgba(212,168,50,0.28),0 6px 24px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.95);
-    }
-  }
+/* Middle ring — dashed, counter-rotate */
+.loader-ring-mid{
+  position:absolute;inset:18px;border-radius:50%;
+  border:1px dashed rgba(212,175,55,.28);
+  animation:ringSpin 18s linear infinite reverse;
+}
 
-  /* ── BOTTOM STRIP ── */
-  .loader-strip {
-    flex-shrink:0; position:relative; z-index:2;
-    background:rgba(250,246,235,0.95);
-    border-top:1px solid rgba(180,150,80,0.35);
-    backdrop-filter:blur(8px);
-    padding:0;
-  }
-  /* Gold rule at very top of strip */
-  .loader-strip::before {
-    content:'';
-    position:absolute; top:0; left:0; right:0; height:2px;
-    background:linear-gradient(90deg,
-      transparent 0%,
-      rgba(200,168,64,0.3) 15%,
-      rgba(232,200,74,0.7) 50%,
-      rgba(200,168,64,0.3) 85%,
-      transparent 100%
-    );
-  }
+/* Inner ring — solid, faster */
+.loader-ring-inner{
+  position:absolute;inset:36px;border-radius:50%;
+  border:1px solid rgba(212,175,55,.22);
+  animation:ringSpin 11s linear infinite;
+}
+/* Rune marks on inner ring */
+.loader-ring-inner::before{
+  content:'✦  ✦  ✦  ✦';
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  font-size:5px;letter-spacing:20px;white-space:nowrap;
+  color:rgba(212,175,55,.45);
+}
 
-  .loader-strip-inner {
-    padding:12px 44px 16px;
-    display:flex; flex-direction:column; gap:10px;
-  }
+@keyframes ringSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-  .loader-strip-row {
-    display:flex; align-items:center;
-    justify-content:space-between; gap:28px;
-  }
+/* The big element icon in the centre */
+.loader-emblem{
+  position:relative;z-index:5;
+  width:96px;height:96px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 38% 32%,rgba(255,252,235,.98),rgba(245,235,200,.94) 60%,rgba(230,215,170,.9));
+  border:2px solid rgba(212,175,55,.7);
+  box-shadow:
+    0 0 0 5px rgba(212,175,55,.1),
+    0 0 0 8px rgba(212,175,55,.05),
+    0 0 40px rgba(212,175,55,.4),
+    0 0 90px rgba(212,175,55,.2),
+    0 8px 32px rgba(0,0,0,.3),
+    inset 0 2px 0 rgba(255,255,255,.9),
+    inset 0 -2px 0 rgba(180,145,40,.15);
+  animation:emblemGlow 2.6s ease-in-out infinite;
+}
+.loader-emblem img{
+  width:62px;height:62px;object-fit:contain;
+  filter:drop-shadow(0 0 12px rgba(212,175,55,.8)) drop-shadow(0 2px 6px rgba(0,0,0,.35));
+  animation:emblemSpin 20s linear infinite;
+}
+@keyframes emblemSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes emblemGlow{
+  0%,100%{box-shadow:0 0 0 5px rgba(212,175,55,.08),0 0 0 8px rgba(212,175,55,.04),0 0 32px rgba(212,175,55,.32),0 0 70px rgba(212,175,55,.14),0 8px 32px rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.9),inset 0 -2px 0 rgba(180,145,40,.15)}
+  50%{box-shadow:0 0 0 7px rgba(212,175,55,.13),0 0 0 12px rgba(212,175,55,.07),0 0 60px rgba(212,175,55,.55),0 0 130px rgba(212,175,55,.28),0 8px 32px rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.9),inset 0 -2px 0 rgba(180,145,40,.15)}
+}
 
-  .loader-tip-wrap { flex:1; min-width:0; }
-  .loader-tip-label {
-    font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:4px;
-    color:rgba(120,90,40,0.55); text-transform:uppercase; margin-bottom:4px;
-  }
-  .loader-tip {
-    font-family:'IM Fell English',serif; font-style:italic;
-    font-size:13px; color:rgba(55,40,18,0.72);
-    line-height:1.55; letter-spacing:0.1px;
-  }
+/* ── SITE IDENTITY — below medallion ── */
+.loader-identity{
+  position:relative;z-index:10;margin-top:28px;text-align:center;
+  animation:identityIn 1.8s cubic-bezier(.16,1,.3,1) .55s both;
+}
+@keyframes identityIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 
-  /* Version + copyright area — bottom right */
-  .loader-meta {
-    flex-shrink:0; text-align:right;
-    display:flex; flex-direction:column; gap:4px; align-items:flex-end;
-  }
-  .loader-meta-gem {
-    width:10px; height:10px; border-radius:50%; align-self:center;
-    background:radial-gradient(circle at 35% 35%, #f0d878, #a87820);
-    box-shadow:0 0 8px rgba(212,168,50,0.6);
-    animation:gemPulseL 2.2s ease-in-out infinite;
-    margin-bottom:2px;
-  }
-  @keyframes gemPulseL {
-    0%,100%{box-shadow:0 0 4px rgba(212,168,50,0.4);}
-    50%{box-shadow:0 0 14px rgba(212,168,50,0.85);}
-  }
-  .loader-meta-name {
-    font-family:'Cinzel Decorative',serif; font-size:9px; letter-spacing:3px;
-    color:rgba(90,65,25,0.7); white-space:nowrap;
-  }
-  .loader-meta-sub {
-    font-family:'Cinzel',serif; font-size:6px; letter-spacing:3px;
-    color:rgba(100,75,35,0.45); text-transform:uppercase; white-space:nowrap;
-  }
+.loader-eyebrow{
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:11px;
+  color:rgba(50,36,14,.45);text-transform:uppercase;margin-bottom:10px;
+}
+.loader-wordmark{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(30px,5vw,52px);font-weight:700;
+  color:#2c2008;letter-spacing:8px;line-height:1;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.55),
+    0 2px 0 rgba(255,255,255,.2),
+    0 6px 20px rgba(0,0,0,.18),
+    0 0 60px rgba(212,175,55,.2);
+}
+.loader-wordmark em{color:#8a5e10;font-style:normal}
+.loader-divider{
+  display:flex;align-items:center;gap:12px;
+  margin:12px auto;max-width:320px;
+}
+.loader-divider-line{
+  flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(180,148,50,.55));
+}
+.loader-divider-line:last-child{
+  background:linear-gradient(270deg,transparent,rgba(180,148,50,.55));
+}
+.loader-divider-gem{
+  width:6px;height:6px;
+  background:linear-gradient(135deg,#f0d870,#a87820);
+  transform:rotate(45deg);
+  box-shadow:0 0 10px rgba(212,175,55,.7),0 0 20px rgba(212,175,55,.35);
+  animation:gemBreath 2.4s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes gemBreath{0%,100%{box-shadow:0 0 6px rgba(212,175,55,.5),0 0 14px rgba(212,175,55,.25)}50%{box-shadow:0 0 16px rgba(212,175,55,.9),0 0 32px rgba(212,175,55,.5)}}
+.loader-subtitle{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:8px;
+  color:rgba(50,36,14,.5);text-transform:uppercase;
+}
 
-  /* Progress row */
-  .loader-progress-row {
-    display:flex; align-items:center; gap:14px;
-  }
-  .loader-bar-wrap {
-    flex:1; position:relative; height:2px;
-    background:rgba(180,150,80,0.18); overflow:visible;
-  }
-  .loader-bar-fill {
-    height:100%; width:0%;
-    background:linear-gradient(90deg, #b89030, #c8a840, #e8c84a, #f0d870);
-    transition:width 0.55s cubic-bezier(0.4,0,0.2,1);
-    position:relative;
-  }
-  /* Bright leading edge */
-  .loader-bar-fill::after {
-    content:''; position:absolute;
-    right:-1px; top:-2.5px; width:3px; height:7px;
-    background:#fffce8;
-    box-shadow:0 0 8px #e8c84a, 0 0 16px rgba(232,200,74,0.7);
-    border-radius:1px;
-  }
-  /* Shimmer sweep */
-  .loader-bar-fill::before {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-    animation:barSweep 1.8s ease-in-out infinite;
-  }
-  @keyframes barSweep { from{transform:translateX(-100%)} to{transform:translateX(500%)} }
+/* ─────────────────────────────────────────────────
+   BOTTOM HUD — dark frosted panel, exactly like real Genshin
+───────────────────────────────────────────────── */
+.loader-hud{
+  flex-shrink:0;position:relative;z-index:20;
+  /* Real Genshin: dark translucent glass panel */
+  background:rgba(14,11,6,.78);
+  backdrop-filter:blur(12px) saturate(1.3);
+  -webkit-backdrop-filter:blur(12px) saturate(1.3);
+}
 
-  .loader-status {
-    font-family:'Cinzel',serif; font-size:7px; letter-spacing:3px;
-    color:rgba(100,75,35,0.6); text-transform:uppercase;
-    white-space:nowrap; flex-shrink:0; min-width:100px; text-align:right;
-  }
+/* Thin gold line across top of HUD */
+.loader-hud::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(212,175,55,.25) 10%,
+    rgba(232,200,74,.65) 50%,
+    rgba(212,175,55,.25) 90%,
+    transparent 100%
+  );
+}
+/* Very subtle inner highlight */
+.loader-hud::after{
+  content:'';position:absolute;top:1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,240,180,.08),transparent);
+}
+
+.loader-hud-inner{
+  padding:14px 48px 18px;
+  display:flex;flex-direction:column;gap:11px;
+}
+
+/* Top row: tip (left) + branding (right) */
+.loader-hud-top{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;gap:32px;
+}
+
+.loader-tip-block{flex:1;min-width:0}
+.loader-tip-label{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:4px;
+  color:rgba(212,175,55,.55);text-transform:uppercase;margin-bottom:5px;
+  display:flex;align-items:center;gap:6px;
+}
+.loader-tip-label::before{
+  content:'';display:block;width:18px;height:1px;
+  background:rgba(212,175,55,.4);
+}
+.loader-tip-text{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:14px;color:rgba(240,228,200,.82);
+  line-height:1.6;letter-spacing:.1px;
+}
+.loader-tip-attr{
+  margin-top:5px;font-family:'Cinzel',serif;font-size:7.5px;
+  letter-spacing:2px;color:rgba(212,175,55,.45);
+}
+
+.loader-brand{
+  flex-shrink:0;text-align:right;
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+  padding-top:2px;
+}
+.loader-brand-gem-row{
+  display:flex;align-items:center;gap:5px;margin-bottom:2px;
+}
+.loader-brand-gem{
+  width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#f5e080,#a87820);
+  box-shadow:0 0 8px rgba(212,175,55,.7);
+  animation:gemBreath 2.2s ease-in-out infinite;
+}
+.loader-brand-name{
+  font-family:'Cinzel Decorative',serif;font-size:11px;
+  letter-spacing:3px;color:rgba(235,215,155,.85);
+  white-space:nowrap;
+}
+.loader-brand-sub{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:4px;
+  color:rgba(200,175,110,.45);text-transform:uppercase;white-space:nowrap;
+}
+
+/* Bottom row: progress bar + status */
+.loader-hud-bar{
+  display:flex;align-items:center;gap:16px;
+}
+.loader-bar-track{
+  flex:1;height:2px;position:relative;
+  background:rgba(255,255,255,.08);
+}
+/* Actual progress bar */
+.loader-bar-fill{
+  height:100%;width:0%;position:relative;
+  background:linear-gradient(90deg,rgba(180,140,30,.6) 0%,#c8a840 40%,#e8c84a 75%,#f5e080 100%);
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+}
+/* Bright spark at leading edge */
+.loader-bar-fill::after{
+  content:'';position:absolute;right:-1px;top:-3px;
+  width:2px;height:8px;
+  background:#fff9d0;
+  box-shadow:0 0 10px #f0d060,0 0 22px rgba(240,200,60,.8),0 0 40px rgba(240,200,60,.4);
+  border-radius:1px;
+}
+/* Shimmer */
+.loader-bar-fill::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+  animation:barShimmer 1.6s ease-in-out infinite;
+}
+@keyframes barShimmer{from{transform:translateX(-100%)}to{transform:translateX(600%)}  }
+.loader-status-text{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:3px;
+  color:rgba(200,175,110,.6);text-transform:uppercase;
+  white-space:nowrap;flex-shrink:0;min-width:110px;text-align:right;
+}
 </style>
 </head>
 <body>
@@ -404,75 +385,82 @@
 <!-- ════ GENSHIN LOADING SCREEN ════ -->
 <div id="gi-loader">
 
-  <!-- Atmospheric light rays -->
+  <!-- Cinematic vignette -->
+  <div class="loader-vignette"></div>
+
+  <!-- Ground fog -->
+  <div class="loader-fog"></div>
+
+  <!-- Crepuscular light shafts -->
   <div class="loader-rays">
-    <div class="loader-ray"></div><div class="loader-ray"></div>
-    <div class="loader-ray"></div><div class="loader-ray"></div>
-    <div class="loader-ray"></div><div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
     <div class="loader-ray"></div>
   </div>
 
-  <!-- Horizon depth -->
-  <div class="loader-horizon"></div>
+  <!-- Dust motes — JS will add more dynamically -->
+  <div class="loader-mote" style="left:12%;width:4px;height:4px;animation-duration:12s;animation-delay:0s;--drift:-15px"></div>
+  <div class="loader-mote" style="left:35%;width:3px;height:3px;animation-duration:18s;animation-delay:2s;--drift:25px"></div>
+  <div class="loader-mote" style="left:58%;width:5px;height:5px;animation-duration:14s;animation-delay:1s;--drift:10px"></div>
+  <div class="loader-mote" style="left:75%;width:3px;height:3px;animation-duration:20s;animation-delay:4s;--drift:-20px"></div>
+  <div class="loader-mote" style="left:90%;width:4px;height:4px;animation-duration:16s;animation-delay:1.5s;--drift:8px"></div>
 
-  <!-- Ground vignette -->
-  <div class="loader-ground"></div>
-
-  <!-- Site title — top centre -->
-  <div class="loader-site-title">
-    <div class="loader-title-eyebrow">✦ &nbsp; Personal Journal &nbsp; ✦</div>
-    <div class="loader-site-name">AARON<em>WORLD</em></div>
-    <div class="loader-site-sub">Traveler's Journal</div>
-    <div class="loader-title-rule">
-      <span></span><i>◆</i><span></span>
-    </div>
-  </div>
-
-  <!-- Main stage -->
+  <!-- Stage: medallion + identity -->
   <div class="loader-stage">
-    <div class="loader-sigil-wrap" id="loaderSigil">
-      <div class="loader-sigil-ring"></div>
-      <div class="loader-sigil-ring"></div>
-      <div class="loader-sigil-ring"></div>
-      <div class="loader-sigil-ring"></div>
 
-      <!-- Cardinal marks -->
-      <div class="loader-cardinal n">N</div>
-      <div class="loader-cardinal s">S</div>
-      <div class="loader-cardinal e">E</div>
-      <div class="loader-cardinal w">W</div>
-
-      <!-- Orbiting element icons -->
-      <div class="loader-orbit" id="loaderOrbit"></div>
-
-      <!-- Centre element icon -->
-      <div class="loader-center-icon" id="loaderCenterIcon">
+    <!-- Central element medallion -->
+    <div class="loader-medallion" id="loaderMedallion">
+      <div class="loader-ring-outer"></div>
+      <div class="loader-ring-mid"></div>
+      <div class="loader-ring-inner"></div>
+      <div class="loader-emblem" id="loaderCenterIcon">
         <img id="loaderElemIcon"
           src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp"
           alt="Element" onerror="this.style.display='none'">
       </div>
     </div>
+
+    <!-- Site wordmark -->
+    <div class="loader-identity">
+      <div class="loader-eyebrow">✦ &nbsp;&nbsp; Traveler's Journal &nbsp;&nbsp; ✦</div>
+      <div class="loader-wordmark">AARON<em>WORLD</em></div>
+      <div class="loader-divider">
+        <div class="loader-divider-line"></div>
+        <div class="loader-divider-gem"></div>
+        <div class="loader-divider-gem" style="animation-delay:.4s"></div>
+        <div class="loader-divider-gem" style="animation-delay:.8s"></div>
+        <div class="loader-divider-line"></div>
+      </div>
+      <div class="loader-subtitle">Region: EU &nbsp;·&nbsp; AR 27 &nbsp;·&nbsp; Dendro Main</div>
+    </div>
+
   </div>
 
-  <!-- Bottom strip -->
-  <div class="loader-strip">
-    <div class="loader-strip-inner">
-      <div class="loader-strip-row">
-        <div class="loader-tip-wrap">
+  <!-- Bottom HUD — dark frosted glass -->
+  <div class="loader-hud">
+    <div class="loader-hud-inner">
+      <div class="loader-hud-top">
+        <div class="loader-tip-block">
           <div class="loader-tip-label">Traveler's Tip</div>
-          <div class="loader-tip" id="loaderTip">"The pursuit of knowledge requires crossing many frontiers."</div>
+          <div class="loader-tip-text" id="loaderTip">"The pursuit of knowledge requires crossing many frontiers."</div>
+          <div class="loader-tip-attr" id="loaderTipAttr">— Alhaitham</div>
         </div>
-        <div class="loader-meta">
-          <div class="loader-meta-gem"></div>
-          <div class="loader-meta-name">AARONWORLD</div>
-          <div class="loader-meta-sub">Teyvat · EU</div>
+        <div class="loader-brand">
+          <div class="loader-brand-gem-row">
+            <div class="loader-brand-gem"></div>
+            <div class="loader-brand-name">AARONWORLD</div>
+          </div>
+          <div class="loader-brand-sub">Teyvat &nbsp;·&nbsp; EU Server</div>
         </div>
       </div>
-      <div class="loader-progress-row">
-        <div class="loader-bar-wrap">
+      <div class="loader-hud-bar">
+        <div class="loader-bar-track">
           <div class="loader-bar-fill" id="loaderBarFill"></div>
         </div>
-        <div class="loader-status" id="loaderStatus">Initialising…</div>
+        <div class="loader-status-text" id="loaderStatus">Initialising…</div>
       </div>
     </div>
   </div>
@@ -931,62 +919,32 @@ window.addEventListener('load', function () {
   const barFill   = document.getElementById('loaderBarFill');
   const statusEl  = document.getElementById('loaderStatus');
   const tipEl     = document.getElementById('loaderTip');
-  const orbit     = document.getElementById('loaderOrbit');
+  const tipAttr   = document.getElementById('loaderTipAttr');
 
   const tips = [
-    '"The pursuit of knowledge requires crossing many frontiers." — Alhaitham',
-    '"The forest whispers to those who listen." — Sumeru Proverb',
-    '"Even the smallest leaf holds the secrets of the world." — Collei',
-    '"Adventure is out there, Traveler. The world awaits." — Paimon',
-    '"Every journey begins with a single step into the unknown."',
-    '"The wind carries whispers of distant lands and forgotten dreams."',
+    { text: '"The pursuit of knowledge requires crossing many frontiers."', attr: '— Alhaitham' },
+    { text: '"The forest whispers to those who listen."', attr: '— Sumeru Proverb' },
+    { text: '"Even the smallest leaf holds the secrets of the world."', attr: '— Collei' },
+    { text: '"Adventure is out there, Traveler. The world awaits."', attr: '— Paimon' },
+    { text: '"Every journey begins with a single step into the unknown."', attr: '— Teyvat Traveler' },
+    { text: '"The wind carries whispers of distant lands and forgotten dreams."', attr: '— Unknown' },
+    { text: '"A true scholar does not fear questions — they fear stopping."', attr: '— House of Daena' },
   ];
-  tipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
+  const tip = tips[Math.floor(Math.random() * tips.length)];
+  if (tipEl)   tipEl.textContent   = tip.text;
+  if (tipAttr) tipAttr.textContent = tip.attr;
 
-  // Build 7 orbiting element icon orbs
-  const elements = [
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Fire.png',     glow: 'rgba(255,107,32,0.5)',   name: 'pyro'    },
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Water.png',    glow: 'rgba(40,180,232,0.5)',   name: 'hydro'   },
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Wind.png',     glow: 'rgba(64,216,160,0.5)',   name: 'anemo'   },
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Electric.png', glow: 'rgba(192,96,255,0.5)',   name: 'electro' },
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Grass.png',    glow: 'rgba(184,212,48,0.5)',   name: 'dendro'  },
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Ice.png',      glow: 'rgba(144,216,240,0.5)',  name: 'cryo'    },
-    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Rock.png',     glow: 'rgba(232,192,32,0.5)',   name: 'geo'     },
-  ];
-
-  const orbitRadius = 108; // px from center of orbit div
-  if (orbit) {
-    elements.forEach((el, i) => {
-      const angle = (i / elements.length) * Math.PI * 2 - Math.PI / 2;
-      const x = orbitRadius * Math.cos(angle);
-      const y = orbitRadius * Math.sin(angle);
-      const orb = document.createElement('div');
-      orb.className = 'loader-elem-orb';
-      orb.style.setProperty('--orb-glow', el.glow);
-      orb.style.left = `calc(50% + ${x}px - 22px)`;
-      orb.style.top  = `calc(50% + ${y}px - 22px)`;
-      // counter-rotate so icon stays upright as orbit spins
-      orb.style.animation = `orbCounterSpin 22s linear infinite, orbPulse 3s ease-in-out ${(i * 3/7).toFixed(2)}s infinite`;
-      const img = document.createElement('img');
-      img.src = el.icon;
-      img.alt = el.name;
-      img.onerror = () => { orb.innerHTML = '✦'; orb.style.fontSize = '18px'; orb.style.color = '#c8a840'; };
-      orb.appendChild(img);
-      orbit.appendChild(orb);
-    });
-  }
-
-  // Spawn atmospheric mist particles
-  for (let i = 0; i < 18; i++) {
+  // Spawn extra atmospheric dust motes
+  for (let i = 0; i < 12; i++) {
     const m = document.createElement('div');
-    m.className = 'loader-mist';
-    m.style.left     = (5 + Math.random() * 90) + 'vw';
-    m.style.bottom   = (Math.random() * 20) + '%';
-    m.style.width    = (4 + Math.random() * 8) + 'px';
-    m.style.height   = m.style.width;
-    m.style.animationDuration  = (8 + Math.random() * 14) + 's';
-    m.style.animationDelay     = (Math.random() * 12) + 's';
-    m.style.opacity  = '0';
+    m.className = 'loader-mote';
+    m.style.left   = (3 + Math.random() * 94) + 'vw';
+    m.style.bottom = (Math.random() * 30) + '%';
+    const sz = (2 + Math.random() * 5) + 'px';
+    m.style.width  = sz; m.style.height = sz;
+    m.style.animationDuration = (10 + Math.random() * 18) + 's';
+    m.style.animationDelay    = (Math.random() * 14) + 's';
+    m.style.setProperty('--drift', (Math.random() > .5 ? 1 : -1) * (10 + Math.random() * 30) + 'px');
     loader.appendChild(m);
   }
 
