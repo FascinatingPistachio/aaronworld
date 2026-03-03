@@ -10,485 +10,392 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
 <style>
-  /* ── HEADPHONES WRAP ── */
-  .pfp-outer {
-    position: relative;
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 0;
-  }
+  /* ── PFP / HEADPHONES ── */
+  .pfp-outer { position:relative; width:96px; height:96px; margin:0 auto 0; }
   #pfpHeadphones {
-    position: absolute;
-    top: -32px;
-    left: 50%;
-    transform: translateX(-50%) scale(0);
-    width: 140px;
-    height: 140px;
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0;
-    transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+    position:absolute; top:-32px; left:50%;
+    transform:translateX(-50%) scale(0); width:140px; height:140px;
+    z-index:5; pointer-events:none; opacity:0;
+    transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
   }
-  #pfpHeadphones.active {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
-  }
+  #pfpHeadphones.active { transform:translateX(-50%) scale(1); opacity:1; }
   #pfpVfx {
-    position: absolute;
-    inset: -80px;
-    width: calc(100% + 160px);
-    height: calc(100% + 160px);
-    pointer-events: none;
-    z-index: 3;
-    opacity: 0;
-    transition: opacity 0.8s;
+    position:absolute; inset:-80px;
+    width:calc(100% + 160px); height:calc(100% + 160px);
+    pointer-events:none; z-index:3; opacity:0; transition:opacity 0.8s;
   }
-  #pfpVfx.active { opacity: 1; }
-  .pfp-img { position: relative; z-index: 1; }
-  .pfp-ring { z-index: 2; }
-  .pfp-elem { z-index: 4; }
-  .pfp-outer.playing .pfp-ring:nth-child(2) { border-color: var(--accent1); opacity: 0.9; animation-duration: 4s; }
-  .pfp-outer.playing .pfp-ring:nth-child(3) { border-color: var(--accent0); opacity: 0.6; animation-duration: 7s; }
-  .pfp-outer.playing .pfp-ring:nth-child(4) { border-color: var(--accent1); opacity: 0.35; animation-duration: 12s; }
-  .pfp-outer.playing .pfp-img {
-    box-shadow: 0 0 28px var(--glow-a), 0 0 60px rgba(184,212,48,0.2), 0 0 0 3px rgba(184,212,48,0.15);
-  }
+  #pfpVfx.active { opacity:1; }
+  .pfp-img { position:relative; z-index:1; }
+  .pfp-ring { z-index:2; }
+  .pfp-elem { z-index:4; }
+  .pfp-outer.playing .pfp-ring:nth-child(2) { border-color:var(--accent1); opacity:0.9; animation-duration:4s; }
+  .pfp-outer.playing .pfp-ring:nth-child(3) { border-color:var(--accent0); opacity:0.6; animation-duration:7s; }
+  .pfp-outer.playing .pfp-ring:nth-child(4) { border-color:var(--accent1); opacity:0.35; animation-duration:12s; }
+  .pfp-outer.playing .pfp-img { box-shadow:0 0 28px var(--glow-a),0 0 60px var(--glow-a2),0 0 0 3px var(--glow-a); }
 
-  /* ── SIDEBAR NOW PLAYING CARD ── */
-  .sidebar-nowplaying {
-    display: none;
-    flex-direction: column;
-    gap: 0;
-    overflow: hidden;
-  }
-  .sidebar-nowplaying.active { display: flex; }
-  .snp-inner {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px 12px;
-    background: rgba(250,246,235,0.6);
-  }
-  .snp-art {
-    width: 46px; height: 46px; flex-shrink: 0;
-    border: 1px solid var(--g2); background: var(--d4);
-    overflow: hidden; display: flex; align-items: center;
-    justify-content: center; font-size: 18px; position: relative;
-  }
-  .snp-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .snp-text { flex: 1; min-width: 0; }
-  .snp-status {
-    display: flex; align-items: center; gap: 5px;
-    font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px;
-    color: var(--d1); text-transform: uppercase; margin-bottom: 3px;
-  }
-  .snp-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--d1); box-shadow: 0 0 6px var(--glow-d);
-    animation: gemPulse 1.4s ease-in-out infinite; flex-shrink: 0;
-  }
-  .snp-title { font-family: 'Cinzel', serif; font-size: 11.5px; color: var(--ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
-  .snp-artist { font-family: 'Lora', serif; font-size: 11px; color: var(--ink3); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .snp-eq { display: flex; gap: 2px; align-items: flex-end; height: 12px; flex-shrink: 0; }
-  .snp-eq span { display: block; width: 2.5px; background: var(--d1); border-radius: 1px; box-shadow: 0 0 3px var(--glow-d); animation: eqBar 0.6s ease-in-out infinite alternate; }
-  .snp-eq span:nth-child(1) { animation-delay: 0s;    animation-duration: 0.5s; }
-  .snp-eq span:nth-child(2) { animation-delay: 0.15s; animation-duration: 0.7s; }
-  .snp-eq span:nth-child(3) { animation-delay: 0.05s; animation-duration: 0.45s; }
-  .snp-eq span:nth-child(4) { animation-delay: 0.2s;  animation-duration: 0.65s; }
-  .snp-eq span:nth-child(5) { animation-delay: 0.1s;  animation-duration: 0.55s; }
-  @keyframes eqBar { from { height: 2px; } to { height: 12px; } }
+  /* ── SIDEBAR NOW PLAYING ── */
+  .sidebar-nowplaying { display:none; flex-direction:column; gap:0; overflow:hidden; }
+  .sidebar-nowplaying.active { display:flex; }
+  .snp-inner { display:flex; align-items:center; gap:10px; padding:10px 14px 12px; background:rgba(250,246,235,0.85); }
+  .snp-art { width:46px; height:46px; flex-shrink:0; border:1px solid rgba(180,150,80,0.45); background:var(--ldr-bg2); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:18px; position:relative; }
+  .snp-art img { width:100%; height:100%; object-fit:cover; display:block; }
+  .snp-text { flex:1; min-width:0; }
+  .snp-status { display:flex; align-items:center; gap:5px; font-family:'Cinzel',serif; font-size:8px; letter-spacing:3px; color:var(--ink3); text-transform:uppercase; margin-bottom:3px; }
+  .snp-dot { width:5px; height:5px; border-radius:50%; background:var(--gold2); box-shadow:0 0 6px rgba(200,168,64,0.5); animation:gemPulse 1.4s ease-in-out infinite; flex-shrink:0; }
+  .snp-title { font-family:'Cinzel',serif; font-size:11.5px; color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
+  .snp-artist { font-family:'Lora',serif; font-size:11px; color:var(--ink3); font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .snp-eq { display:flex; gap:2px; align-items:flex-end; height:12px; flex-shrink:0; }
+  .snp-eq span { display:block; width:2.5px; background:var(--gold2); border-radius:1px; animation:eqBar 0.6s ease-in-out infinite alternate; }
+  .snp-eq span:nth-child(1){animation-delay:0s;animation-duration:0.5s;}
+  .snp-eq span:nth-child(2){animation-delay:0.15s;animation-duration:0.7s;}
+  .snp-eq span:nth-child(3){animation-delay:0.05s;animation-duration:0.45s;}
+  .snp-eq span:nth-child(4){animation-delay:0.2s;animation-duration:0.65s;}
+  .snp-eq span:nth-child(5){animation-delay:0.1s;animation-duration:0.55s;}
+  @keyframes eqBar { from{height:2px} to{height:12px} }
 
-  /* ══════════════════════════════════════════════════════
-     GENSHIN IMPACT LOADING SCREEN — accurate recreation
-     Light, parchment-white background with art feel,
-     7 element icons orbiting a central sigil,
-     gold bottom strip with progress bar + tip text.
-  ══════════════════════════════════════════════════════ */
+  /* ══════════════════════════════════════════
+     LOADING SCREEN — Official Edition
+  ══════════════════════════════════════════ */
   #gi-loader {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    overflow: hidden;
-    /* The real Genshin loading screen is a light, desaturated atmospheric scene */
+    position:fixed; inset:0; z-index:99999; overflow:hidden;
+    display:flex; flex-direction:column;
+    transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1), visibility 1.2s;
+    /* Atmospheric layered sky — warm dawn parchment */
     background:
-      radial-gradient(ellipse 110% 80% at 50% 10%,  #f0ece2 0%, #ddd6c8 40%, #c8bfb0 100%);
-    display: flex;
-    flex-direction: column;
-    transition: opacity 1s ease, visibility 1s ease;
+      radial-gradient(ellipse 140% 60% at 50% -10%, rgba(255,248,225,0.9) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 50% at 20% 80%, rgba(195,178,150,0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 40% at 80% 90%, rgba(185,168,138,0.4) 0%, transparent 55%),
+      linear-gradient(180deg,
+        #ece5d5 0%,
+        #ddd2bc 30%,
+        #cfc5ae 65%,
+        #c4b89e 100%
+      );
   }
-  #gi-loader.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+  #gi-loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+
+  /* Horizon line — atmospheric depth */
+  .loader-horizon {
+    position:absolute;
+    bottom:18%; left:0; right:0;
+    height:1px;
+    background:linear-gradient(90deg, transparent 0%, rgba(180,155,100,0.25) 20%, rgba(200,170,110,0.4) 50%, rgba(180,155,100,0.25) 80%, transparent 100%);
+    pointer-events:none;
+  }
+  .loader-horizon::before {
+    content:'';
+    position:absolute;
+    bottom:-20px; left:0; right:0;
+    height:40px;
+    background:linear-gradient(180deg, rgba(200,175,130,0.12) 0%, transparent 100%);
   }
 
-  /* Atmospheric light rays from top — like Genshin */
-  .loader-rays {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
+  /* Atmospheric light rays — wider, more dramatic */
+  .loader-rays { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
   .loader-ray {
-    position: absolute;
-    top: -10%;
-    width: 2px;
-    height: 120%;
-    background: linear-gradient(180deg, rgba(255,248,230,0.55) 0%, rgba(255,248,230,0) 100%);
-    transform-origin: top center;
-    animation: rayFade 6s ease-in-out infinite;
+    position:absolute; top:-5%;
+    background:linear-gradient(180deg, rgba(255,248,225,0.7) 0%, rgba(255,248,225,0) 85%);
+    transform-origin:top center;
+    animation:rayFade 7s ease-in-out infinite;
   }
-  .loader-ray:nth-child(1)  { left: 8%;  width: 180px; transform: rotate(-18deg); animation-delay: 0s;    opacity: 0.4; }
-  .loader-ray:nth-child(2)  { left: 22%; width: 80px;  transform: rotate(-8deg);  animation-delay: 0.8s;  opacity: 0.3; }
-  .loader-ray:nth-child(3)  { left: 38%; width: 240px; transform: rotate(2deg);   animation-delay: 1.4s;  opacity: 0.45; }
-  .loader-ray:nth-child(4)  { left: 55%; width: 100px; transform: rotate(10deg);  animation-delay: 0.4s;  opacity: 0.35; }
-  .loader-ray:nth-child(5)  { left: 70%; width: 200px; transform: rotate(20deg);  animation-delay: 1.8s;  opacity: 0.4; }
-  .loader-ray:nth-child(6)  { left: 85%; width: 70px;  transform: rotate(30deg);  animation-delay: 1.1s;  opacity: 0.25; }
-  @keyframes rayFade {
-    0%,100% { opacity: 0.2; }
-    50%     { opacity: 0.7; }
-  }
+  .loader-ray:nth-child(1)  { left:5%;  width:320px; transform:rotate(-22deg); animation-delay:0s;   opacity:0.28; }
+  .loader-ray:nth-child(2)  { left:18%; width:120px; transform:rotate(-10deg); animation-delay:1.2s; opacity:0.20; }
+  .loader-ray:nth-child(3)  { left:34%; width:280px; transform:rotate(-2deg);  animation-delay:2.1s; opacity:0.32; }
+  .loader-ray:nth-child(4)  { left:50%; width:160px; transform:rotate(5deg);   animation-delay:0.7s; opacity:0.22; }
+  .loader-ray:nth-child(5)  { left:62%; width:340px; transform:rotate(14deg);  animation-delay:1.8s; opacity:0.30; }
+  .loader-ray:nth-child(6)  { left:80%; width:90px;  transform:rotate(26deg);  animation-delay:0.4s; opacity:0.18; }
+  .loader-ray:nth-child(7)  { left:90%; width:200px; transform:rotate(35deg);  animation-delay:2.6s; opacity:0.22; }
+  @keyframes rayFade { 0%,100%{opacity:0.12} 50%{opacity:0.55} }
 
-  /* Subtle misty particles drifting upward — like Genshin's ambience */
+  /* Mist particles */
   .loader-mist {
-    position: absolute;
-    bottom: 12%;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.6);
-    filter: blur(3px);
-    animation: mistRise linear infinite;
-    pointer-events: none;
+    position:absolute; border-radius:50%;
+    background:rgba(255,255,255,0.55); filter:blur(4px);
+    animation:mistRise linear infinite; pointer-events:none;
   }
   @keyframes mistRise {
-    0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0; }
-    15%  { opacity: 0.6; }
-    85%  { opacity: 0.3; }
-    100% { transform: translateY(-70vh) translateX(40px) scale(2.5); opacity: 0; }
+    0%   { transform:translateY(0) translateX(0) scale(0.8); opacity:0; }
+    12%  { opacity:0.5; }
+    88%  { opacity:0.2; }
+    100% { transform:translateY(-75vh) translateX(35px) scale(2.8); opacity:0; }
   }
 
-  /* Ground gradient — lighter at top, subtle fog at bottom edge */
+  /* Ground/terrain vignette */
   .loader-ground {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 35%;
-    background: linear-gradient(180deg,
+    position:absolute; bottom:0; left:0; right:0; height:32%;
+    background:linear-gradient(180deg,
       transparent 0%,
-      rgba(210,200,185,0.3) 60%,
-      rgba(195,183,165,0.6) 100%
+      rgba(185,165,130,0.18) 50%,
+      rgba(170,150,118,0.45) 100%
     );
-    pointer-events: none;
+    pointer-events:none;
   }
 
-  /* ── MAIN CONTENT AREA (fills above the bottom strip) ── */
+  /* ── STAGE ── */
   .loader-stage {
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    flex:1; position:relative;
+    display:flex; align-items:center; justify-content:center;
   }
 
-  /* ── CENTRAL ELEMENT SIGIL CLUSTER ── */
-  .loader-sigil-wrap {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: sigilIn 1.4s cubic-bezier(0.16,1,0.3,1) both;
-  }
-  @keyframes sigilIn {
-    from { opacity: 0; transform: scale(0.7); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-
-  /* Large faint sigil circle */
-  .loader-sigil-ring {
-    position: absolute;
-    border-radius: 50%;
-    border-style: solid;
-    border-color: rgba(180,150,80,0.22);
-    pointer-events: none;
-  }
-  .loader-sigil-ring:nth-child(1) {
-    width: 280px; height: 280px;
-    border-width: 1px;
-    animation: sigilRotate 40s linear infinite;
-  }
-  .loader-sigil-ring:nth-child(2) {
-    width: 230px; height: 230px;
-    border-width: 1.5px;
-    border-style: dashed;
-    border-color: rgba(180,150,80,0.15);
-    animation: sigilRotate 28s linear infinite reverse;
-  }
-  .loader-sigil-ring:nth-child(3) {
-    width: 180px; height: 180px;
-    border-width: 1px;
-    border-color: rgba(180,150,80,0.18);
-    animation: sigilRotate 18s linear infinite;
-  }
-  @keyframes sigilRotate {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-
-  /* Tick marks on outer ring */
-  .loader-sigil-ring:nth-child(1)::before {
-    content: '◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆';
-    position: absolute;
-    top: -8px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 5px;
-    color: rgba(180,150,80,0.35);
-    letter-spacing: 32px;
-    white-space: nowrap;
-    width: 300px;
-    text-align: center;
-  }
-
-  /* 7 element icons orbiting — using JS to position */
-  .loader-elem-orb {
-    position: absolute;
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,252,245,0.85);
-    border: 1.5px solid rgba(200,170,90,0.4);
-    box-shadow:
-      0 2px 12px rgba(0,0,0,0.12),
-      inset 0 1px 0 rgba(255,255,255,0.8);
-    transition: box-shadow 0.3s;
-    animation: orbPulse 3s ease-in-out infinite;
-  }
-  .loader-elem-orb img {
-    width: 26px; height: 26px;
-    object-fit: contain;
-    display: block;
-  }
-  .loader-elem-orb:nth-child(5)  { animation-delay: 0s; }
-  .loader-elem-orb:nth-child(6)  { animation-delay: 0.43s; }
-  .loader-elem-orb:nth-child(7)  { animation-delay: 0.86s; }
-  .loader-elem-orb:nth-child(8)  { animation-delay: 1.29s; }
-  .loader-elem-orb:nth-child(9)  { animation-delay: 1.72s; }
-  .loader-elem-orb:nth-child(10) { animation-delay: 2.15s; }
-  .loader-elem-orb:nth-child(11) { animation-delay: 2.58s; }
-  @keyframes orbPulse {
-    0%,100% { box-shadow: 0 2px 12px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8); }
-    50%     { box-shadow: 0 4px 20px rgba(0,0,0,0.18), 0 0 14px var(--orb-glow, rgba(200,180,100,0.5)), inset 0 1px 0 rgba(255,255,255,0.8); }
-  }
-
-  /* Central icon — large, glowing */
-  .loader-center-icon {
-    position: absolute;
-    width: 72px; height: 72px;
-    border-radius: 50%;
-    background: rgba(255,252,240,0.95);
-    border: 2px solid rgba(200,170,90,0.5);
-    box-shadow:
-      0 0 30px rgba(212,168,50,0.3),
-      0 0 60px rgba(212,168,50,0.15),
-      0 4px 20px rgba(0,0,0,0.15),
-      inset 0 1px 0 rgba(255,255,255,0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    animation: centerGlow 2.5s ease-in-out infinite;
-  }
-  .loader-center-icon img {
-    width: 46px; height: 46px;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 0 8px rgba(212,168,50,0.6));
-    animation: centerIconSpin 12s linear infinite;
-  }
-  @keyframes centerIconSpin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-  @keyframes centerGlow {
-    0%,100% { box-shadow: 0 0 24px rgba(212,168,50,0.25), 0 0 50px rgba(212,168,50,0.1), 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9); }
-    50%     { box-shadow: 0 0 40px rgba(212,168,50,0.45), 0 0 80px rgba(212,168,50,0.25), 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9); }
-  }
-
-  /* Orbit path — animates the orbs around the center */
-  .loader-orbit {
-    position: absolute;
-    width: 220px; height: 220px;
-    animation: orbitSpin 22s linear infinite;
-    pointer-events: none;
-  }
-  @keyframes orbitSpin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-  /* Counter-rotate each orb so it stays upright */
-  .loader-orbit .loader-elem-orb {
-    animation: orbCounterSpin 22s linear infinite, orbPulse 3s ease-in-out infinite;
-  }
-  @keyframes orbCounterSpin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(-360deg); }
-  }
-
-  /* ── SITE TITLE in loader (top-left, like Genshin puts studio name) ── */
+  /* ── TITLE — top-center, large and official ── */
   .loader-site-title {
-    position: absolute;
-    top: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    animation: titleIn 1.6s cubic-bezier(0.16,1,0.3,1) 0.3s both;
-    pointer-events: none;
+    position:absolute; top:28px; left:50%;
+    transform:translateX(-50%);
+    text-align:center; white-space:nowrap;
+    animation:titleIn 1.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+    pointer-events:none; z-index:10;
   }
   @keyframes titleIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    from { opacity:0; transform:translateX(-50%) translateY(-20px) scale(0.97); }
+    to   { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+  }
+  .loader-title-eyebrow {
+    font-family:'Cinzel',serif; font-size:8px; letter-spacing:10px;
+    color:rgba(100,75,35,0.55); text-transform:uppercase; margin-bottom:8px;
   }
   .loader-site-name {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(20px, 3.5vw, 36px);
-    font-weight: 700;
-    color: #3a2c14;
-    letter-spacing: 6px;
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(24px,4vw,44px); font-weight:700;
+    color:#3a2c14; letter-spacing:7px; line-height:1;
     text-shadow:
-      0 1px 0 rgba(255,255,255,0.6),
-      0 2px 8px rgba(0,0,0,0.1);
-    line-height: 1;
+      0 1px 0 rgba(255,255,255,0.7),
+      0 3px 12px rgba(0,0,0,0.1),
+      0 0 40px rgba(200,168,64,0.15);
   }
-  .loader-site-name em { color: #a07830; font-style: normal; }
+  .loader-site-name em { color:#9a6e20; font-style:normal; }
   .loader-site-sub {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    letter-spacing: 8px;
-    color: rgba(100,75,35,0.6);
-    text-transform: uppercase;
-    margin-top: 7px;
+    font-family:'Cinzel',serif; font-size:8.5px; letter-spacing:9px;
+    color:rgba(100,75,35,0.5); text-transform:uppercase; margin-top:9px;
+  }
+  /* Decorative rule under title */
+  .loader-title-rule {
+    display:flex; align-items:center; gap:8px; margin-top:10px; justify-content:center;
+  }
+  .loader-title-rule span {
+    display:block; height:1px; width:60px;
+    background:linear-gradient(90deg, transparent, rgba(180,150,80,0.4));
+  }
+  .loader-title-rule span:last-child {
+    background:linear-gradient(270deg, transparent, rgba(180,150,80,0.4));
+  }
+  .loader-title-rule i {
+    font-style:normal; color:rgba(180,150,80,0.55); font-size:7px;
   }
 
-  /* ── BOTTOM STRIP — exactly like real Genshin ── */
-  .loader-strip {
-    flex-shrink: 0;
-    background: rgba(250,246,235,0.92);
-    border-top: 1px solid rgba(180,150,80,0.3);
-    backdrop-filter: blur(4px);
-    padding: 14px 40px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    position: relative;
-    z-index: 2;
+  /* ── SIGIL CLUSTER ── */
+  .loader-sigil-wrap {
+    position:relative; width:340px; height:340px;
+    display:flex; align-items:center; justify-content:center;
+    animation:sigilIn 1.6s cubic-bezier(0.16,1,0.3,1) 0.4s both;
   }
+  @keyframes sigilIn {
+    from { opacity:0; transform:scale(0.65) rotate(-8deg); }
+    to   { opacity:1; transform:scale(1) rotate(0deg); }
+  }
+
+  /* Concentric ornamental rings */
+  .loader-sigil-ring {
+    position:absolute; border-radius:50%; border-style:solid;
+    border-color:rgba(180,150,80,0.2); pointer-events:none;
+  }
+  .loader-sigil-ring:nth-child(1) {
+    width:320px; height:320px; border-width:1px;
+    animation:sigilRotate 50s linear infinite;
+  }
+  .loader-sigil-ring:nth-child(2) {
+    width:268px; height:268px; border-width:1.5px;
+    border-style:dashed; border-color:rgba(180,150,80,0.14);
+    animation:sigilRotate 32s linear infinite reverse;
+  }
+  .loader-sigil-ring:nth-child(3) {
+    width:216px; height:216px; border-width:1px;
+    border-color:rgba(180,150,80,0.18);
+    animation:sigilRotate 20s linear infinite;
+  }
+  .loader-sigil-ring:nth-child(4) {
+    width:158px; height:158px; border-width:0.5px;
+    border-color:rgba(180,150,80,0.12);
+    animation:sigilRotate 14s linear infinite reverse;
+  }
+  @keyframes sigilRotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* Diamond tick marks on outer ring */
+  .loader-sigil-ring:nth-child(1)::before {
+    content:'◆  ◆  ◆  ◆  ◆  ◆  ◆  ◆';
+    position:absolute; top:-7px; left:50%;
+    transform:translateX(-50%);
+    font-size:5px; color:rgba(180,150,80,0.4);
+    letter-spacing:35px; white-space:nowrap;
+    width:340px; text-align:center;
+  }
+
+  /* Cardinal direction marks */
+  .loader-cardinal {
+    position:absolute; font-family:'Cinzel',serif;
+    font-size:7px; letter-spacing:2px;
+    color:rgba(140,110,55,0.45); pointer-events:none;
+    animation:sigilIn 2s cubic-bezier(0.16,1,0.3,1) 0.6s both;
+  }
+  .loader-cardinal.n { top:-18px; left:50%; transform:translateX(-50%); }
+  .loader-cardinal.s { bottom:-18px; left:50%; transform:translateX(-50%); }
+  .loader-cardinal.e { right:-22px; top:50%; transform:translateY(-50%); }
+  .loader-cardinal.w { left:-22px; top:50%; transform:translateY(-50%); }
+
+  /* Element orbs */
+  .loader-elem-orb {
+    position:absolute; width:46px; height:46px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(145deg, rgba(255,253,247,0.92), rgba(245,238,215,0.88));
+    border:1.5px solid rgba(200,170,90,0.45);
+    box-shadow:0 2px 14px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(180,150,80,0.1);
+    animation:orbPulse 3s ease-in-out infinite;
+  }
+  .loader-elem-orb img { width:28px; height:28px; object-fit:contain; display:block; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.2)); }
+  @keyframes orbPulse {
+    0%,100% { box-shadow:0 2px 14px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.9); transform:rotate(0deg); }
+    50%     { box-shadow:0 4px 24px rgba(0,0,0,0.18), 0 0 18px var(--orb-glow,rgba(200,180,100,0.55)), inset 0 1px 0 rgba(255,255,255,0.9); }
+  }
+
+  .loader-orbit {
+    position:absolute; width:240px; height:240px;
+    animation:orbitSpin 24s linear infinite; pointer-events:none;
+  }
+  @keyframes orbitSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .loader-orbit .loader-elem-orb {
+    animation:orbCounterSpin 24s linear infinite, orbPulse 3s ease-in-out infinite;
+  }
+  @keyframes orbCounterSpin { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
+
+  /* Centre icon — prominent, official */
+  .loader-center-icon {
+    position:absolute; width:80px; height:80px; border-radius:50%;
+    background:linear-gradient(145deg, rgba(255,253,244,0.98), rgba(250,244,220,0.95));
+    border:2px solid rgba(200,170,90,0.55);
+    box-shadow:
+      0 0 0 6px rgba(200,170,90,0.08),
+      0 0 36px rgba(212,168,50,0.35),
+      0 0 70px rgba(212,168,50,0.18),
+      0 6px 24px rgba(0,0,0,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.95);
+    display:flex; align-items:center; justify-content:center; z-index:5;
+    animation:centerGlow 2.8s ease-in-out infinite;
+  }
+  .loader-center-icon img {
+    width:50px; height:50px; object-fit:contain; display:block;
+    filter:drop-shadow(0 0 10px rgba(212,168,50,0.7)) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    animation:centerIconSpin 16s linear infinite;
+  }
+  @keyframes centerIconSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes centerGlow {
+    0%,100% {
+      box-shadow:0 0 0 6px rgba(200,170,90,0.06),0 0 28px rgba(212,168,50,0.28),0 0 55px rgba(212,168,50,0.12),0 6px 24px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+    50% {
+      box-shadow:0 0 0 8px rgba(200,170,90,0.1),0 0 50px rgba(212,168,50,0.5),0 0 100px rgba(212,168,50,0.28),0 6px 24px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+  }
+
+  /* ── BOTTOM STRIP ── */
+  .loader-strip {
+    flex-shrink:0; position:relative; z-index:2;
+    background:rgba(250,246,235,0.95);
+    border-top:1px solid rgba(180,150,80,0.35);
+    backdrop-filter:blur(8px);
+    padding:0;
+  }
+  /* Gold rule at very top of strip */
   .loader-strip::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212,168,50,0.5), transparent);
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,
+      transparent 0%,
+      rgba(200,168,64,0.3) 15%,
+      rgba(232,200,74,0.7) 50%,
+      rgba(200,168,64,0.3) 85%,
+      transparent 100%
+    );
+  }
+
+  .loader-strip-inner {
+    padding:12px 44px 16px;
+    display:flex; flex-direction:column; gap:10px;
   }
 
   .loader-strip-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
+    display:flex; align-items:center;
+    justify-content:space-between; gap:28px;
   }
 
-  .loader-tip {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: rgba(60,45,20,0.65);
-    line-height: 1.5;
-    flex: 1;
-    letter-spacing: 0.2px;
-  }
+  .loader-tip-wrap { flex:1; min-width:0; }
   .loader-tip-label {
-    font-family: 'Cinzel', serif;
-    font-size: 7px;
-    letter-spacing: 3px;
-    color: rgba(120,90,40,0.5);
-    text-transform: uppercase;
-    margin-bottom: 3px;
+    font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:4px;
+    color:rgba(120,90,40,0.55); text-transform:uppercase; margin-bottom:4px;
+  }
+  .loader-tip {
+    font-family:'IM Fell English',serif; font-style:italic;
+    font-size:13px; color:rgba(55,40,18,0.72);
+    line-height:1.55; letter-spacing:0.1px;
   }
 
-  /* The thin loading bar — like Genshin's exactly */
-  .loader-bar-wrap {
-    position: relative;
-    height: 2px;
-    background: rgba(180,150,80,0.18);
-    overflow: visible;
+  /* Version + copyright area — bottom right */
+  .loader-meta {
+    flex-shrink:0; text-align:right;
+    display:flex; flex-direction:column; gap:4px; align-items:flex-end;
   }
-  .loader-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #c8a840, #e8c84a, #f0d870);
-    width: 0%;
-    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
-    position: relative;
-  }
-  .loader-bar-fill::after {
-    content: '';
-    position: absolute;
-    right: -1px; top: -2px;
-    width: 3px; height: 6px;
-    background: #fffbe0;
-    box-shadow: 0 0 6px #e8c84a, 0 0 12px rgba(232,200,74,0.6);
-    border-radius: 1px;
-  }
-  /* Subtle sweep animation */
-  .loader-bar-fill::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    animation: barSweep 2s ease-in-out infinite;
-  }
-  @keyframes barSweep {
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(400%); }
-  }
-
-  .loader-status {
-    font-family: 'Cinzel', serif;
-    font-size: 7.5px;
-    letter-spacing: 3px;
-    color: rgba(100,75,35,0.55);
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* Genshin logo area — bottom right of the strip */
-  .loader-gi-logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    opacity: 0.5;
-    flex-shrink: 0;
-  }
-  .loader-gi-logo-text {
-    font-family: 'Cinzel', serif;
-    font-size: 8px;
-    letter-spacing: 3px;
-    color: rgba(80,60,25,0.7);
-    text-transform: uppercase;
-  }
-  .loader-gi-logo-gem {
-    width: 10px; height: 10px;
-    background: radial-gradient(circle at 35% 35%, #f0d878, #a87820);
-    border-radius: 50%;
-    box-shadow: 0 0 6px rgba(212,168,50,0.5);
-    animation: gemPulseL 2s ease-in-out infinite;
-    flex-shrink: 0;
+  .loader-meta-gem {
+    width:10px; height:10px; border-radius:50%; align-self:center;
+    background:radial-gradient(circle at 35% 35%, #f0d878, #a87820);
+    box-shadow:0 0 8px rgba(212,168,50,0.6);
+    animation:gemPulseL 2.2s ease-in-out infinite;
+    margin-bottom:2px;
   }
   @keyframes gemPulseL {
-    0%,100% { box-shadow: 0 0 4px rgba(212,168,50,0.4); }
-    50%     { box-shadow: 0 0 12px rgba(212,168,50,0.8); }
+    0%,100%{box-shadow:0 0 4px rgba(212,168,50,0.4);}
+    50%{box-shadow:0 0 14px rgba(212,168,50,0.85);}
+  }
+  .loader-meta-name {
+    font-family:'Cinzel Decorative',serif; font-size:9px; letter-spacing:3px;
+    color:rgba(90,65,25,0.7); white-space:nowrap;
+  }
+  .loader-meta-sub {
+    font-family:'Cinzel',serif; font-size:6px; letter-spacing:3px;
+    color:rgba(100,75,35,0.45); text-transform:uppercase; white-space:nowrap;
+  }
+
+  /* Progress row */
+  .loader-progress-row {
+    display:flex; align-items:center; gap:14px;
+  }
+  .loader-bar-wrap {
+    flex:1; position:relative; height:2px;
+    background:rgba(180,150,80,0.18); overflow:visible;
+  }
+  .loader-bar-fill {
+    height:100%; width:0%;
+    background:linear-gradient(90deg, #b89030, #c8a840, #e8c84a, #f0d870);
+    transition:width 0.55s cubic-bezier(0.4,0,0.2,1);
+    position:relative;
+  }
+  /* Bright leading edge */
+  .loader-bar-fill::after {
+    content:''; position:absolute;
+    right:-1px; top:-2.5px; width:3px; height:7px;
+    background:#fffce8;
+    box-shadow:0 0 8px #e8c84a, 0 0 16px rgba(232,200,74,0.7);
+    border-radius:1px;
+  }
+  /* Shimmer sweep */
+  .loader-bar-fill::before {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    animation:barSweep 1.8s ease-in-out infinite;
+  }
+  @keyframes barSweep { from{transform:translateX(-100%)} to{transform:translateX(500%)} }
+
+  .loader-status {
+    font-family:'Cinzel',serif; font-size:7px; letter-spacing:3px;
+    color:rgba(100,75,35,0.6); text-transform:uppercase;
+    white-space:nowrap; flex-shrink:0; min-width:100px; text-align:right;
   }
 </style>
 </head>
@@ -497,69 +404,79 @@
 <!-- ════ GENSHIN LOADING SCREEN ════ -->
 <div id="gi-loader">
 
-  <!-- Light rays (atmospheric) -->
+  <!-- Atmospheric light rays -->
   <div class="loader-rays">
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
+    <div class="loader-ray"></div><div class="loader-ray"></div>
+    <div class="loader-ray"></div><div class="loader-ray"></div>
+    <div class="loader-ray"></div><div class="loader-ray"></div>
     <div class="loader-ray"></div>
   </div>
 
-  <!-- Ground fog gradient -->
+  <!-- Horizon depth -->
+  <div class="loader-horizon"></div>
+
+  <!-- Ground vignette -->
   <div class="loader-ground"></div>
 
-  <!-- Site title top-center -->
+  <!-- Site title — top centre -->
   <div class="loader-site-title">
+    <div class="loader-title-eyebrow">✦ &nbsp; Personal Journal &nbsp; ✦</div>
     <div class="loader-site-name">AARON<em>WORLD</em></div>
-    <div class="loader-site-sub">✦ &nbsp; Traveler's Journal &nbsp; ✦</div>
+    <div class="loader-site-sub">Traveler's Journal</div>
+    <div class="loader-title-rule">
+      <span></span><i>◆</i><span></span>
+    </div>
   </div>
 
-  <!-- Main stage — element sigil + orbiting icons -->
+  <!-- Main stage -->
   <div class="loader-stage">
     <div class="loader-sigil-wrap" id="loaderSigil">
-      <!-- Concentric ornamental rings -->
+      <div class="loader-sigil-ring"></div>
       <div class="loader-sigil-ring"></div>
       <div class="loader-sigil-ring"></div>
       <div class="loader-sigil-ring"></div>
 
-      <!-- Orbiting element icons — 7 total, positioned by JS -->
-      <div class="loader-orbit" id="loaderOrbit">
-        <!-- orbs injected by JS -->
-      </div>
+      <!-- Cardinal marks -->
+      <div class="loader-cardinal n">N</div>
+      <div class="loader-cardinal s">S</div>
+      <div class="loader-cardinal e">E</div>
+      <div class="loader-cardinal w">W</div>
 
-      <!-- Center icon (Dendro default, changes to active element) -->
+      <!-- Orbiting element icons -->
+      <div class="loader-orbit" id="loaderOrbit"></div>
+
+      <!-- Centre element icon -->
       <div class="loader-center-icon" id="loaderCenterIcon">
         <img id="loaderElemIcon"
           src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp"
-          alt="Element"
-          onerror="this.style.display='none'">
+          alt="Element" onerror="this.style.display='none'">
       </div>
     </div>
   </div>
 
-  <!-- Bottom strip — exactly like real Genshin -->
+  <!-- Bottom strip -->
   <div class="loader-strip">
-    <div class="loader-strip-row">
-      <div style="flex:1;min-width:0;">
-        <div class="loader-tip-label">Traveler's Tip</div>
-        <div class="loader-tip" id="loaderTip">
-          "The pursuit of knowledge requires crossing many frontiers." — Alhaitham
+    <div class="loader-strip-inner">
+      <div class="loader-strip-row">
+        <div class="loader-tip-wrap">
+          <div class="loader-tip-label">Traveler's Tip</div>
+          <div class="loader-tip" id="loaderTip">"The pursuit of knowledge requires crossing many frontiers."</div>
+        </div>
+        <div class="loader-meta">
+          <div class="loader-meta-gem"></div>
+          <div class="loader-meta-name">AARONWORLD</div>
+          <div class="loader-meta-sub">Teyvat · EU</div>
         </div>
       </div>
-      <div class="loader-gi-logo">
-        <div class="loader-gi-logo-gem"></div>
-        <div class="loader-gi-logo-text">Teyvat</div>
+      <div class="loader-progress-row">
+        <div class="loader-bar-wrap">
+          <div class="loader-bar-fill" id="loaderBarFill"></div>
+        </div>
+        <div class="loader-status" id="loaderStatus">Initialising…</div>
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div class="loader-bar-wrap" style="flex:1;">
-        <div class="loader-bar-fill" id="loaderBarFill"></div>
-      </div>
-      <div class="loader-status" id="loaderStatus">Loading…</div>
     </div>
   </div>
+
 </div>
 
 <div id="elemTransitionOverlay"></div>

@@ -983,3 +983,193 @@ html[data-element="cryo"]    .gi-blockquote::before { color: #3888aa !important;
 html[data-element="anemo"]   .gi-blockquote::before { color: #0a7850 !important; }
 html[data-element="electro"] .gi-blockquote::before { color: #6010b8 !important; }
 
+
+/* ════════════════════════════════════════════════
+   OFFICIAL POLISH PASS
+   Elevating every detail for a premium feel
+════════════════════════════════════════════════ */
+
+/* ── Richer body texture — subtle noise grain ── */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+
+/* ── Panel: stronger gold frame, inner parchment glow ── */
+.gi-panel {
+  border-color:rgba(180,150,80,0.6) !important;
+  outline-color:rgba(180,150,80,0.12) !important;
+  box-shadow:
+    0 0 0 1px rgba(220,185,90,0.1),
+    0 0 0 5px rgba(120,85,16,0.06),
+    0 10px 40px rgba(80,55,15,0.2),
+    inset 0 0 80px rgba(255,248,220,0.35) !important;
+}
+.gi-panel:hover {
+  border-color:rgba(200,168,64,0.7) !important;
+  box-shadow:
+    0 0 0 1px rgba(220,185,90,0.15),
+    0 0 0 5px rgba(120,85,16,0.08),
+    0 14px 50px rgba(80,55,15,0.25),
+    inset 0 0 80px rgba(255,248,220,0.45) !important;
+}
+
+/* ── Corner ornament diamonds — more prominent ── */
+.gi-panel::before, .gi-panel::after {
+  font-size:10px !important;
+  color:rgba(180,150,80,0.85) !important;
+  text-shadow:0 0 12px rgba(200,168,64,0.4) !important;
+}
+
+/* ── Panel head: double rule for premium look ── */
+.gi-head {
+  padding:10px 18px !important;
+  border-bottom:none !important;
+  box-shadow:0 1px 0 rgba(180,150,80,0.35), 0 2px 0 rgba(180,150,80,0.1);
+}
+html[data-element] .gi-head {
+  box-shadow:0 1px 0 rgba(200,168,64,0.5), 0 2px 0 rgba(200,168,64,0.15);
+}
+
+/* ── Head title: slightly larger, tighter tracking ── */
+.gi-head-title {
+  font-size:9.5px !important;
+  letter-spacing:5px !important;
+  font-weight:600 !important;
+}
+
+/* ── Header: layered borders for depth ── */
+.site-header {
+  border:1.5px solid rgba(180,150,80,0.5) !important;
+  border-top:none !important;
+  box-shadow:
+    0 0 0 1px rgba(220,185,90,0.08),
+    0 0 0 5px rgba(120,85,16,0.05),
+    0 10px 40px rgba(80,55,15,0.18),
+    inset 0 0 60px rgba(255,248,220,0.3) !important;
+  background:rgba(252,248,238,0.72) !important;
+}
+
+/* ── H-title: more dramatic size range ── */
+.h-title {
+  font-size:clamp(26px,5vw,48px) !important;
+  letter-spacing:6px !important;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.7),
+    0 3px 14px rgba(0,0,0,0.08),
+    0 0 60px rgba(200,168,64,0.12) !important;
+}
+
+/* ── Eyebrow: slightly more visible ── */
+.h-eyebrow {
+  color:rgba(90,65,25,0.65) !important;
+  letter-spacing:10px !important;
+}
+
+/* ── Nav: stronger presence ── */
+nav {
+  border-color:rgba(180,150,80,0.55) !important;
+  border-top:1px solid rgba(180,150,80,0.55) !important;
+  box-shadow:
+    0 8px 24px rgba(80,55,15,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.5) !important;
+}
+nav a {
+  font-size:9.5px !important;
+  letter-spacing:4px !important;
+  padding:13px 26px !important;
+  color:rgba(90,65,25,0.8) !important;
+}
+nav a:hover, nav a.active { color:#3a2c14 !important; }
+nav a::after { height:2.5px !important; }
+
+/* ── Profile name: more impactful ── */
+.pname {
+  font-size:20px !important;
+  letter-spacing:4px !important;
+  color:#2a1e0a !important;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+}
+
+/* ── Stat rows: cleaner separator ── */
+.stat-row { border-bottom-color:rgba(180,150,80,0.18) !important; padding:7px 0 !important; }
+.stat-l { letter-spacing:2px !important; color:rgba(90,65,25,0.7) !important; }
+.stat-v { font-size:14px !important; color:#3a2c14 !important; }
+
+/* ── Blockquote: stronger left rule ── */
+.gi-blockquote {
+  border-left-width:3.5px !important;
+  border-left-color:rgba(180,150,80,0.6) !important;
+  background:rgba(253,248,230,0.6) !important;
+  box-shadow:inset 2px 0 0 rgba(255,255,255,0.4) !important;
+  font-size:15px !important;
+}
+
+/* ── Dossier: stronger cell dividers ── */
+.dossier-row {
+  border-bottom-color:rgba(180,150,80,0.18) !important;
+  border-right-color:rgba(180,150,80,0.18) !important;
+  padding:10px 14px !important;
+}
+.d-label { letter-spacing:2.5px !important; color:rgba(90,65,25,0.7) !important; font-size:7.5px !important; }
+.d-val   { font-size:13.5px !important; }
+
+/* ── Anime cards: richer poster area ── */
+.acard { border-radius:1px !important; }
+.aposter-img { border-bottom:1px solid rgba(180,150,80,0.2); }
+.abody { background:rgba(253,248,228,0.6) !important; border-top-color:rgba(180,150,80,0.25) !important; }
+.atitle { font-size:11px !important; letter-spacing:0.8px !important; }
+
+/* ── Console cards: richer feel ── */
+.console-card { border-radius:1px !important; }
+.console-name { letter-spacing:3px !important; }
+.c-label { letter-spacing:2px !important; color:rgba(90,65,25,0.7) !important; }
+.c-val { color:#3a2c14 !important; }
+
+/* ── Footer: cleaner ── */
+footer { border-top:1px solid rgba(180,150,80,0.2); padding-top:22px !important; }
+.footer-copy { letter-spacing:4px !important; color:rgba(90,65,25,0.55) !important; }
+
+/* ── Gold rule: thicker, more visible ── */
+.gold-rule { color:rgba(160,120,48,0.8) !important; }
+.gold-rule::before, .gold-rule::after {
+  background:linear-gradient(90deg, transparent, rgba(160,120,48,0.55), transparent) !important;
+}
+
+/* ── Scrollbar: more polished ── */
+::-webkit-scrollbar { width:5px !important; }
+::-webkit-scrollbar-track { background:rgba(221,214,200,0.6) !important; }
+::-webkit-scrollbar-thumb { background:rgba(160,130,60,0.5) !important; border-radius:3px !important; }
+::-webkit-scrollbar-thumb:hover { background:rgba(160,130,60,0.8) !important; }
+
+/* ── Panel body padding ── */
+.panel-body { padding:18px 20px !important; }
+
+/* ── p.bt readability ── */
+p.bt { font-size:14.5px !important; line-height:2 !important; color:#4a3418 !important; }
+
+/* ── Lanyard card: parchment polish ── */
+.lanyard-card {
+  border-radius:2px !important;
+  border-color:rgba(180,150,80,0.45) !important;
+  box-shadow:0 3px 14px rgba(80,55,15,0.12), inset 0 0 30px rgba(255,248,220,0.25) !important;
+}
+
+/* ── Guestbook entries ── */
+.gbentry {
+  border-radius:1px !important;
+  box-shadow:0 2px 8px rgba(80,55,15,0.08) !important;
+}
+
+/* ── Input/textarea ── */
+.gbform-grid input, .gbform-grid textarea {
+  border-radius:1px !important;
+  font-size:13.5px !important;
+}
+
+/* ── Twemoji slightly larger ── */
+img.emoji { height:1.25em !important; width:1.25em !important; }
+
