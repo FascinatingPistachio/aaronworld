@@ -98,21 +98,23 @@
   .snp-eq span:nth-child(5) { animation-delay: 0.1s;  animation-duration: 0.55s; }
   @keyframes eqBar { from { height: 2px; } to { height: 12px; } }
 
-  /* ══════════════════════════════════════════
-     GENSHIN LOADING SCREEN
-  ══════════════════════════════════════════ */
+  /* ══════════════════════════════════════════════════════
+     GENSHIN IMPACT LOADING SCREEN — accurate recreation
+     Light, parchment-white background with art feel,
+     7 element icons orbiting a central sigil,
+     gold bottom strip with progress bar + tip text.
+  ══════════════════════════════════════════════════════ */
   #gi-loader {
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: #0a0c0a;
+    overflow: hidden;
+    /* The real Genshin loading screen is a light, desaturated atmospheric scene */
+    background:
+      radial-gradient(ellipse 110% 80% at 50% 10%,  #f0ece2 0%, #ddd6c8 40%, #c8bfb0 100%);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    padding-bottom: 80px;
-    overflow: hidden;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
+    transition: opacity 1s ease, visibility 1s ease;
   }
   #gi-loader.hidden {
     opacity: 0;
@@ -120,244 +122,373 @@
     pointer-events: none;
   }
 
-  /* Big background art area */
-  .loader-bg {
+  /* Atmospheric light rays from top — like Genshin */
+  .loader-rays {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 40%, rgba(184,212,48,0.06) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 70% at 20% 50%, rgba(90,144,24,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 30% 60% at 80% 30%, rgba(90,144,24,0.05) 0%, transparent 60%),
-      #060a04;
+    overflow: hidden;
+    pointer-events: none;
   }
-
-  /* Animated hex grid overlay */
-  .loader-hex-bg {
+  .loader-ray {
     position: absolute;
-    inset: 0;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='69'%3E%3Cpath d='M40 1 L79 21 L79 48 L40 68 L1 48 L1 21 Z' fill='none' stroke='%23b8d430' stroke-width='0.8'/%3E%3C/svg%3E");
-    background-size: 80px 69px;
-    animation: hexDrift 60s linear infinite;
+    top: -10%;
+    width: 2px;
+    height: 120%;
+    background: linear-gradient(180deg, rgba(255,248,230,0.55) 0%, rgba(255,248,230,0) 100%);
+    transform-origin: top center;
+    animation: rayFade 6s ease-in-out infinite;
   }
-  @keyframes hexDrift {
-    from { background-position: 0 0; }
-    to   { background-position: 160px 138px; }
+  .loader-ray:nth-child(1)  { left: 8%;  width: 180px; transform: rotate(-18deg); animation-delay: 0s;    opacity: 0.4; }
+  .loader-ray:nth-child(2)  { left: 22%; width: 80px;  transform: rotate(-8deg);  animation-delay: 0.8s;  opacity: 0.3; }
+  .loader-ray:nth-child(3)  { left: 38%; width: 240px; transform: rotate(2deg);   animation-delay: 1.4s;  opacity: 0.45; }
+  .loader-ray:nth-child(4)  { left: 55%; width: 100px; transform: rotate(10deg);  animation-delay: 0.4s;  opacity: 0.35; }
+  .loader-ray:nth-child(5)  { left: 70%; width: 200px; transform: rotate(20deg);  animation-delay: 1.8s;  opacity: 0.4; }
+  .loader-ray:nth-child(6)  { left: 85%; width: 70px;  transform: rotate(30deg);  animation-delay: 1.1s;  opacity: 0.25; }
+  @keyframes rayFade {
+    0%,100% { opacity: 0.2; }
+    50%     { opacity: 0.7; }
   }
 
-  /* Genshin-style logo area */
-  .loader-logo {
+  /* Subtle misty particles drifting upward — like Genshin's ambience */
+  .loader-mist {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -58%);
-    text-align: center;
-    animation: loaderLogoIn 1.2s cubic-bezier(0.16,1,0.3,1) both;
+    bottom: 12%;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    filter: blur(3px);
+    animation: mistRise linear infinite;
+    pointer-events: none;
   }
-  @keyframes loaderLogoIn {
-    from { opacity: 0; transform: translate(-50%, -65%) scale(0.92); }
-    to   { opacity: 1; transform: translate(-50%, -58%) scale(1); }
+  @keyframes mistRise {
+    0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0; }
+    15%  { opacity: 0.6; }
+    85%  { opacity: 0.3; }
+    100% { transform: translateY(-70vh) translateX(40px) scale(2.5); opacity: 0; }
   }
 
-  .loader-elem-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    display: block;
-    filter: drop-shadow(0 0 20px rgba(184,212,48,0.8)) drop-shadow(0 0 50px rgba(184,212,48,0.4));
-    animation: loaderElemSpin 8s linear infinite, loaderElemGlow 2.5s ease-in-out infinite;
+  /* Ground gradient — lighter at top, subtle fog at bottom edge */
+  .loader-ground {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 35%;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(210,200,185,0.3) 60%,
+      rgba(195,183,165,0.6) 100%
+    );
+    pointer-events: none;
   }
-  @keyframes loaderElemSpin {
+
+  /* ── MAIN CONTENT AREA (fills above the bottom strip) ── */
+  .loader-stage {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── CENTRAL ELEMENT SIGIL CLUSTER ── */
+  .loader-sigil-wrap {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: sigilIn 1.4s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes sigilIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Large faint sigil circle */
+  .loader-sigil-ring {
+    position: absolute;
+    border-radius: 50%;
+    border-style: solid;
+    border-color: rgba(180,150,80,0.22);
+    pointer-events: none;
+  }
+  .loader-sigil-ring:nth-child(1) {
+    width: 280px; height: 280px;
+    border-width: 1px;
+    animation: sigilRotate 40s linear infinite;
+  }
+  .loader-sigil-ring:nth-child(2) {
+    width: 230px; height: 230px;
+    border-width: 1.5px;
+    border-style: dashed;
+    border-color: rgba(180,150,80,0.15);
+    animation: sigilRotate 28s linear infinite reverse;
+  }
+  .loader-sigil-ring:nth-child(3) {
+    width: 180px; height: 180px;
+    border-width: 1px;
+    border-color: rgba(180,150,80,0.18);
+    animation: sigilRotate 18s linear infinite;
+  }
+  @keyframes sigilRotate {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
   }
-  @keyframes loaderElemGlow {
-    0%,100% { filter: drop-shadow(0 0 16px rgba(184,212,48,0.6)) drop-shadow(0 0 40px rgba(184,212,48,0.3)); }
-    50%     { filter: drop-shadow(0 0 30px rgba(184,212,48,1.0)) drop-shadow(0 0 70px rgba(184,212,48,0.6)); }
+
+  /* Tick marks on outer ring */
+  .loader-sigil-ring:nth-child(1)::before {
+    content: '◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆';
+    position: absolute;
+    top: -8px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 5px;
+    color: rgba(180,150,80,0.35);
+    letter-spacing: 32px;
+    white-space: nowrap;
+    width: 300px;
+    text-align: center;
   }
 
-  .loader-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(28px, 5vw, 52px);
-    font-weight: 700;
-    color: #e8d890;
-    letter-spacing: 8px;
-    text-shadow:
-      0 0 30px rgba(240,216,120,0.7),
-      0 0 80px rgba(184,212,48,0.3),
-      0 2px 0 rgba(0,0,0,0.5);
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-  .loader-title em {
-    color: #b8d430;
-    font-style: normal;
-  }
-
-  .loader-subtitle {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 10px;
-    color: rgba(184,212,48,0.7);
-    text-transform: uppercase;
-    margin-top: 10px;
-  }
-
-  /* Decorative horizontal lines (like Genshin) */
-  .loader-divider {
+  /* 7 element icons orbiting — using JS to position */
+  .loader-elem-orb {
+    position: absolute;
+    width: 44px; height: 44px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 12px;
-    width: min(500px, 80vw);
-    margin: 16px auto 0;
+    justify-content: center;
+    background: rgba(255,252,245,0.85);
+    border: 1.5px solid rgba(200,170,90,0.4);
+    box-shadow:
+      0 2px 12px rgba(0,0,0,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: box-shadow 0.3s;
+    animation: orbPulse 3s ease-in-out infinite;
   }
-  .loader-divider-line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212,168,50,0.6), transparent);
+  .loader-elem-orb img {
+    width: 26px; height: 26px;
+    object-fit: contain;
+    display: block;
   }
-  .loader-divider-gem {
-    width: 8px; height: 8px;
-    background: radial-gradient(circle at 35% 35%, #e8d890, #a87820);
+  .loader-elem-orb:nth-child(5)  { animation-delay: 0s; }
+  .loader-elem-orb:nth-child(6)  { animation-delay: 0.43s; }
+  .loader-elem-orb:nth-child(7)  { animation-delay: 0.86s; }
+  .loader-elem-orb:nth-child(8)  { animation-delay: 1.29s; }
+  .loader-elem-orb:nth-child(9)  { animation-delay: 1.72s; }
+  .loader-elem-orb:nth-child(10) { animation-delay: 2.15s; }
+  .loader-elem-orb:nth-child(11) { animation-delay: 2.58s; }
+  @keyframes orbPulse {
+    0%,100% { box-shadow: 0 2px 12px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8); }
+    50%     { box-shadow: 0 4px 20px rgba(0,0,0,0.18), 0 0 14px var(--orb-glow, rgba(200,180,100,0.5)), inset 0 1px 0 rgba(255,255,255,0.8); }
+  }
+
+  /* Central icon — large, glowing */
+  .loader-center-icon {
+    position: absolute;
+    width: 72px; height: 72px;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(212,168,50,0.8);
-    animation: gemPulse2 2s ease-in-out infinite;
+    background: rgba(255,252,240,0.95);
+    border: 2px solid rgba(200,170,90,0.5);
+    box-shadow:
+      0 0 30px rgba(212,168,50,0.3),
+      0 0 60px rgba(212,168,50,0.15),
+      0 4px 20px rgba(0,0,0,0.15),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    animation: centerGlow 2.5s ease-in-out infinite;
+  }
+  .loader-center-icon img {
+    width: 46px; height: 46px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(212,168,50,0.6));
+    animation: centerIconSpin 12s linear infinite;
+  }
+  @keyframes centerIconSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes centerGlow {
+    0%,100% { box-shadow: 0 0 24px rgba(212,168,50,0.25), 0 0 50px rgba(212,168,50,0.1), 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9); }
+    50%     { box-shadow: 0 0 40px rgba(212,168,50,0.45), 0 0 80px rgba(212,168,50,0.25), 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9); }
+  }
+
+  /* Orbit path — animates the orbs around the center */
+  .loader-orbit {
+    position: absolute;
+    width: 220px; height: 220px;
+    animation: orbitSpin 22s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes orbitSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  /* Counter-rotate each orb so it stays upright */
+  .loader-orbit .loader-elem-orb {
+    animation: orbCounterSpin 22s linear infinite, orbPulse 3s ease-in-out infinite;
+  }
+  @keyframes orbCounterSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
+  }
+
+  /* ── SITE TITLE in loader (top-left, like Genshin puts studio name) ── */
+  .loader-site-title {
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    animation: titleIn 1.6s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+    pointer-events: none;
+  }
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .loader-site-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(20px, 3.5vw, 36px);
+    font-weight: 700;
+    color: #3a2c14;
+    letter-spacing: 6px;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.6),
+      0 2px 8px rgba(0,0,0,0.1);
+    line-height: 1;
+  }
+  .loader-site-name em { color: #a07830; font-style: normal; }
+  .loader-site-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 8px;
+    color: rgba(100,75,35,0.6);
+    text-transform: uppercase;
+    margin-top: 7px;
+  }
+
+  /* ── BOTTOM STRIP — exactly like real Genshin ── */
+  .loader-strip {
     flex-shrink: 0;
-  }
-  @keyframes gemPulse2 {
-    0%,100% { box-shadow: 0 0 6px rgba(212,168,50,0.6); }
-    50%     { box-shadow: 0 0 20px rgba(212,168,50,1.0), 0 0 40px rgba(212,168,50,0.4); }
-  }
-
-  /* Corner ornaments */
-  .loader-corner {
-    position: absolute;
-    width: 70px; height: 70px;
-    border-color: rgba(212,168,50,0.35);
-    border-style: solid;
-    transition: none;
-  }
-  .loader-corner.tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
-  .loader-corner.tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
-  .loader-corner.bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
-  .loader-corner.br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
-
-  .loader-corner.tl::before,
-  .loader-corner.tr::before,
-  .loader-corner.bl::before,
-  .loader-corner.br::before {
-    content: '';
-    position: absolute;
-    width: 40px; height: 40px;
-    border-color: rgba(184,212,48,0.2);
-    border-style: solid;
-  }
-  .loader-corner.tl::before { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
-  .loader-corner.tr::before { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
-  .loader-corner.bl::before { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
-  .loader-corner.br::before { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
-
-  /* Bottom loading bar - Genshin style */
-  .loader-bottom {
+    background: rgba(250,246,235,0.92);
+    border-top: 1px solid rgba(180,150,80,0.3);
+    backdrop-filter: blur(4px);
+    padding: 14px 40px 18px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    width: min(460px, 85vw);
+    gap: 10px;
     position: relative;
     z-index: 2;
+  }
+  .loader-strip::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,168,50,0.5), transparent);
+  }
+
+  .loader-strip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
   }
 
   .loader-tip {
     font-family: 'IM Fell English', serif;
     font-style: italic;
-    font-size: 14px;
-    color: rgba(237,227,180,0.55);
-    text-align: center;
-    line-height: 1.6;
-    letter-spacing: 0.3px;
+    font-size: 13px;
+    color: rgba(60,45,20,0.65);
+    line-height: 1.5;
+    flex: 1;
+    letter-spacing: 0.2px;
+  }
+  .loader-tip-label {
+    font-family: 'Cinzel', serif;
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: rgba(120,90,40,0.5);
+    text-transform: uppercase;
+    margin-bottom: 3px;
   }
 
+  /* The thin loading bar — like Genshin's exactly */
   .loader-bar-wrap {
-    width: 100%;
-    height: 3px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(212,168,50,0.2);
     position: relative;
-    overflow: hidden;
+    height: 2px;
+    background: rgba(180,150,80,0.18);
+    overflow: visible;
   }
   .loader-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, rgba(184,212,48,0.6), #b8d430, rgba(240,240,120,0.9));
+    background: linear-gradient(90deg, #c8a840, #e8c84a, #f0d870);
     width: 0%;
-    transition: width 0.4s ease;
-    box-shadow: 0 0 12px rgba(184,212,48,0.8), 0 0 4px rgba(184,212,48,1.0);
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
     position: relative;
   }
   .loader-bar-fill::after {
     content: '';
     position: absolute;
-    right: 0;
-    top: -1px;
-    width: 4px;
-    height: calc(100% + 2px);
-    background: white;
-    filter: blur(1px);
-    opacity: 0.9;
+    right: -1px; top: -2px;
+    width: 3px; height: 6px;
+    background: #fffbe0;
+    box-shadow: 0 0 6px #e8c84a, 0 0 12px rgba(232,200,74,0.6);
+    border-radius: 1px;
   }
-  .loader-bar-shimmer {
+  /* Subtle sweep animation */
+  .loader-bar-fill::before {
+    content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
-    animation: shimmer 1.5s ease-in-out infinite;
-    background-size: 200% 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: barSweep 2s ease-in-out infinite;
   }
-  @keyframes shimmer {
-    from { background-position: -200% 0; }
-    to   { background-position: 200% 0; }
+  @keyframes barSweep {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(400%); }
   }
 
   .loader-status {
     font-family: 'Cinzel', serif;
-    font-size: 8px;
-    letter-spacing: 5px;
-    color: rgba(184,212,48,0.6);
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    color: rgba(100,75,35,0.55);
     text-transform: uppercase;
-    animation: loaderStatusBlink 2s ease-in-out infinite;
-  }
-  @keyframes loaderStatusBlink {
-    0%,100% { opacity: 0.4; }
-    50%     { opacity: 1.0; }
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  /* Floating particles in loader */
-  .loader-particle {
-    position: absolute;
-    pointer-events: none;
-    font-size: 14px;
-    opacity: 0;
-    animation: loaderParticleFloat linear infinite;
-  }
-  @keyframes loaderParticleFloat {
-    0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
-    10%  { opacity: 0.5; }
-    90%  { opacity: 0.2; }
-    100% { opacity: 0; transform: translateY(-100px) rotate(180deg) translateX(30px); }
-  }
-
-  /* Scanning line effect (Genshin loading screen has subtle scan lines) */
-  .loader-scanlines {
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.05) 2px,
-      rgba(0,0,0,0.05) 4px
-    );
-    pointer-events: none;
+  /* Genshin logo area — bottom right of the strip */
+  .loader-gi-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     opacity: 0.5;
+    flex-shrink: 0;
+  }
+  .loader-gi-logo-text {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: rgba(80,60,25,0.7);
+    text-transform: uppercase;
+  }
+  .loader-gi-logo-gem {
+    width: 10px; height: 10px;
+    background: radial-gradient(circle at 35% 35%, #f0d878, #a87820);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(212,168,50,0.5);
+    animation: gemPulseL 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes gemPulseL {
+    0%,100% { box-shadow: 0 0 4px rgba(212,168,50,0.4); }
+    50%     { box-shadow: 0 0 12px rgba(212,168,50,0.8); }
   }
 </style>
 </head>
@@ -365,43 +496,69 @@
 
 <!-- ════ GENSHIN LOADING SCREEN ════ -->
 <div id="gi-loader">
-  <div class="loader-bg"></div>
-  <div class="loader-hex-bg"></div>
-  <div class="loader-scanlines"></div>
 
-  <!-- Corner ornaments -->
-  <div class="loader-corner tl"></div>
-  <div class="loader-corner tr"></div>
-  <div class="loader-corner bl"></div>
-  <div class="loader-corner br"></div>
+  <!-- Light rays (atmospheric) -->
+  <div class="loader-rays">
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+    <div class="loader-ray"></div>
+  </div>
 
-  <!-- Center logo -->
-  <div class="loader-logo">
-    <img id="loaderElemIcon"
-      class="loader-elem-icon"
-      src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp"
-      alt="Element"
-      onerror="this.style.display='none'">
-    <div class="loader-title">AARON<em>WORLD</em></div>
-    <div class="loader-subtitle">✦ &nbsp; Traveler's Journal &nbsp; ✦</div>
-    <div class="loader-divider">
-      <div class="loader-divider-line"></div>
-      <div class="loader-divider-gem"></div>
-      <div class="loader-divider-line"></div>
+  <!-- Ground fog gradient -->
+  <div class="loader-ground"></div>
+
+  <!-- Site title top-center -->
+  <div class="loader-site-title">
+    <div class="loader-site-name">AARON<em>WORLD</em></div>
+    <div class="loader-site-sub">✦ &nbsp; Traveler's Journal &nbsp; ✦</div>
+  </div>
+
+  <!-- Main stage — element sigil + orbiting icons -->
+  <div class="loader-stage">
+    <div class="loader-sigil-wrap" id="loaderSigil">
+      <!-- Concentric ornamental rings -->
+      <div class="loader-sigil-ring"></div>
+      <div class="loader-sigil-ring"></div>
+      <div class="loader-sigil-ring"></div>
+
+      <!-- Orbiting element icons — 7 total, positioned by JS -->
+      <div class="loader-orbit" id="loaderOrbit">
+        <!-- orbs injected by JS -->
+      </div>
+
+      <!-- Center icon (Dendro default, changes to active element) -->
+      <div class="loader-center-icon" id="loaderCenterIcon">
+        <img id="loaderElemIcon"
+          src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp"
+          alt="Element"
+          onerror="this.style.display='none'">
+      </div>
     </div>
   </div>
 
-  <!-- Bottom bar -->
-  <div class="loader-bottom">
-    <div class="loader-tip" id="loaderTip">
-      "The pursuit of knowledge requires crossing many frontiers." — Alhaitham
-    </div>
-    <div class="loader-bar-wrap">
-      <div class="loader-bar-fill" id="loaderBarFill">
-        <div class="loader-bar-shimmer"></div>
+  <!-- Bottom strip — exactly like real Genshin -->
+  <div class="loader-strip">
+    <div class="loader-strip-row">
+      <div style="flex:1;min-width:0;">
+        <div class="loader-tip-label">Traveler's Tip</div>
+        <div class="loader-tip" id="loaderTip">
+          "The pursuit of knowledge requires crossing many frontiers." — Alhaitham
+        </div>
+      </div>
+      <div class="loader-gi-logo">
+        <div class="loader-gi-logo-gem"></div>
+        <div class="loader-gi-logo-text">Teyvat</div>
       </div>
     </div>
-    <div class="loader-status" id="loaderStatus">Loading World Data...</div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="loader-bar-wrap" style="flex:1;">
+        <div class="loader-bar-fill" id="loaderBarFill"></div>
+      </div>
+      <div class="loader-status" id="loaderStatus">Loading…</div>
+    </div>
   </div>
 </div>
 
@@ -853,10 +1010,11 @@ window.addEventListener('load', function () {
 
 // ── GENSHIN LOADING SCREEN ──
 (function() {
-  const loader      = document.getElementById('gi-loader');
-  const barFill     = document.getElementById('loaderBarFill');
-  const statusEl    = document.getElementById('loaderStatus');
-  const tipEl       = document.getElementById('loaderTip');
+  const loader    = document.getElementById('gi-loader');
+  const barFill   = document.getElementById('loaderBarFill');
+  const statusEl  = document.getElementById('loaderStatus');
+  const tipEl     = document.getElementById('loaderTip');
+  const orbit     = document.getElementById('loaderOrbit');
 
   const tips = [
     '"The pursuit of knowledge requires crossing many frontiers." — Alhaitham',
@@ -868,54 +1026,84 @@ window.addEventListener('load', function () {
   ];
   tipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
 
+  // Build 7 orbiting element icon orbs
+  const elements = [
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Fire.png',     glow: 'rgba(255,107,32,0.5)',   name: 'pyro'    },
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Water.png',    glow: 'rgba(40,180,232,0.5)',   name: 'hydro'   },
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Wind.png',     glow: 'rgba(64,216,160,0.5)',   name: 'anemo'   },
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Electric.png', glow: 'rgba(192,96,255,0.5)',   name: 'electro' },
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Grass.png',    glow: 'rgba(184,212,48,0.5)',   name: 'dendro'  },
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Ice.png',      glow: 'rgba(144,216,240,0.5)',  name: 'cryo'    },
+    { icon: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Rock.png',     glow: 'rgba(232,192,32,0.5)',   name: 'geo'     },
+  ];
+
+  const orbitRadius = 108; // px from center of orbit div
+  if (orbit) {
+    elements.forEach((el, i) => {
+      const angle = (i / elements.length) * Math.PI * 2 - Math.PI / 2;
+      const x = orbitRadius * Math.cos(angle);
+      const y = orbitRadius * Math.sin(angle);
+      const orb = document.createElement('div');
+      orb.className = 'loader-elem-orb';
+      orb.style.setProperty('--orb-glow', el.glow);
+      orb.style.left = `calc(50% + ${x}px - 22px)`;
+      orb.style.top  = `calc(50% + ${y}px - 22px)`;
+      // counter-rotate so icon stays upright as orbit spins
+      orb.style.animation = `orbCounterSpin 22s linear infinite, orbPulse 3s ease-in-out ${(i * 3/7).toFixed(2)}s infinite`;
+      const img = document.createElement('img');
+      img.src = el.icon;
+      img.alt = el.name;
+      img.onerror = () => { orb.innerHTML = '✦'; orb.style.fontSize = '18px'; orb.style.color = '#c8a840'; };
+      orb.appendChild(img);
+      orbit.appendChild(orb);
+    });
+  }
+
+  // Spawn atmospheric mist particles
+  for (let i = 0; i < 18; i++) {
+    const m = document.createElement('div');
+    m.className = 'loader-mist';
+    m.style.left     = (5 + Math.random() * 90) + 'vw';
+    m.style.bottom   = (Math.random() * 20) + '%';
+    m.style.width    = (4 + Math.random() * 8) + 'px';
+    m.style.height   = m.style.width;
+    m.style.animationDuration  = (8 + Math.random() * 14) + 's';
+    m.style.animationDelay     = (Math.random() * 12) + 's';
+    m.style.opacity  = '0';
+    loader.appendChild(m);
+  }
+
   const stages = [
-    { pct: 18,  label: 'Initialising World Data…' },
-    { pct: 38,  label: 'Loading Teyvat Map…' },
-    { pct: 55,  label: 'Fetching Character Data…' },
-    { pct: 72,  label: 'Syncing Adventure Rank…' },
-    { pct: 88,  label: 'Preparing Journal…' },
-    { pct: 100, label: 'Entering AARONWORLD…' },
+    { pct: 15,  label: 'Initialising…' },
+    { pct: 32,  label: 'Loading Teyvat…' },
+    { pct: 51,  label: 'Fetching Character…' },
+    { pct: 68,  label: 'Syncing Journal…' },
+    { pct: 84,  label: 'Preparing World…' },
+    { pct: 100, label: 'Entering…' },
   ];
 
   let stageIdx = 0;
   function nextStage() {
     if (stageIdx >= stages.length) return;
     const s = stages[stageIdx++];
-    barFill.style.width = s.pct + '%';
-    statusEl.textContent = s.label;
+    barFill.style.width   = s.pct + '%';
+    statusEl.textContent  = s.label;
     if (stageIdx < stages.length) {
-      setTimeout(nextStage, 300 + Math.random() * 400);
+      setTimeout(nextStage, 300 + Math.random() * 420);
     } else {
-      // Done — dismiss loader
-      setTimeout(dismissLoader, 600);
+      setTimeout(dismissLoader, 700);
     }
   }
-  setTimeout(nextStage, 200);
+  setTimeout(nextStage, 400);
 
   function dismissLoader() {
     loader.classList.add('hidden');
     document.body.style.overflow = '';
   }
 
-  // Safety: always dismiss after 5s max
-  setTimeout(dismissLoader, 5000);
-
-  // Prevent scroll while loading
+  // Safety dismiss after 6s
+  setTimeout(dismissLoader, 6000);
   document.body.style.overflow = 'hidden';
-
-  // Spawn loader particles
-  const loaderParticles = ['🍃','🌿','🍀','✦','◆','🌱'];
-  for (let i = 0; i < 12; i++) {
-    const p = document.createElement('div');
-    p.className = 'loader-particle';
-    p.textContent = loaderParticles[Math.floor(Math.random() * loaderParticles.length)];
-    p.style.left = (5 + Math.random() * 90) + 'vw';
-    p.style.bottom = (Math.random() * 40) + 'px';
-    p.style.animationDuration = (3 + Math.random() * 5) + 's';
-    p.style.animationDelay = (Math.random() * 4) + 's';
-    p.style.fontSize = (10 + Math.random() * 10) + 'px';
-    loader.appendChild(p);
-  }
 })();
 
 // ── FAVICON: set to element icon after Genshin data loads ──

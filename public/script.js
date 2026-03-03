@@ -140,11 +140,13 @@ function applyElementTheme(element) {
 
   // Update loader element icon if still visible
   const loaderIcon = document.getElementById('loaderElemIcon');
+  const loaderCenter = document.getElementById('loaderCenterIcon');
   if (loaderIcon) {
     loaderIcon.src = theme.iconUrl;
-    // Update glow color inline
-    loaderIcon.style.filter =
-      `drop-shadow(0 0 20px ${theme.glow}) drop-shadow(0 0 50px ${theme.glow})`;
+  }
+  if (loaderCenter) {
+    loaderCenter.style.boxShadow =
+      `0 0 30px ${theme.glow}, 0 0 60px ${theme.glow.replace('0.5','0.2')}, 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9)`;
   }
 
   // Set favicon to element icon
