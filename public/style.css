@@ -791,3 +791,195 @@ footer { margin-top: 22px; text-align: center; padding: 16px 20px; position: rel
 /* ── TWEMOJI ── */
 img.emoji { height: 1.2em; width: 1.2em; margin: 0 0.05em 0 0.1em; vertical-align: -0.2em; display: inline-block; pointer-events: none; }
 .leaf img.emoji { height: 1em; width: 1em; margin: 0; vertical-align: 0; }
+
+/* ════════════════════════════════════════════════
+   READABILITY & CONTRAST FIXES
+   Rule: element accent colours are for decoration
+   (borders, glows, dots, icons). All body text on
+   parchment panels always uses ink vars.
+════════════════════════════════════════════════ */
+
+/* ── ELEMENT ICON VISIBILITY — always on a dark circle ── */
+.pfp-elem {
+  /* Force a solid dark backing so icons are always visible */
+  background: #2a2010 !important;
+  border-color: rgba(180,150,80,0.7) !important;
+}
+html[data-element] .pfp-elem {
+  background: var(--accent4) !important;
+  border-color: var(--accent2) !important;
+}
+
+/* Header element icons — add a subtle backing so they read on parchment */
+.h-elem-icon {
+  background: rgba(58,44,20,0.12);
+  border-radius: 50%;
+  padding: 3px;
+  box-sizing: content-box;
+}
+
+/* ── PARCHMENT PANEL TEXT — ink always, no element overrides ── */
+
+/* Character card: keep parchment bg opaque enough, text always dark */
+html[data-element] #enkaCharacterCard {
+  background: rgba(253,246,224,0.82) !important;
+}
+html[data-element] .char-name   { color: var(--ink) !important; text-shadow: none !important; }
+html[data-element] .char-label  { color: var(--ink3) !important; }
+html[data-element] .char-level  { color: var(--ink3) !important; }
+html[data-element] .char-constellation { color: var(--gold2) !important; }
+
+/* Lanyard card: give it a solid parchment bg, not near-transparent */
+html[data-element] .lanyard-card {
+  background: rgba(253,246,224,0.85) !important;
+}
+html[data-element] .lanyard-game-name   { color: var(--ink) !important; text-shadow: none !important; }
+html[data-element] .lanyard-game-detail { color: var(--ink2) !important; opacity: 1 !important; }
+html[data-element] .lanyard-game-state  { color: var(--ink3) !important; }
+html[data-element] .lanyard-status-label { color: var(--ink3) !important; }
+html[data-element] .lanyard-playing-label { color: var(--ink3) !important; }
+html[data-element] .lanyard-elapsed      { color: var(--ink4) !important; }
+
+/* Sidebar now playing: always parchment bg, ink text */
+html[data-element] .snp-inner { background: rgba(250,246,235,0.85) !important; }
+/* snp-status label: use a mid-dark tone, not raw accent which may be too light */
+html[data-element] .snp-status { color: var(--ink3) !important; }
+.snp-title  { color: var(--ink) !important; }
+.snp-artist { color: var(--ink3) !important; }
+
+/* Media card text always ink */
+html[data-element] .media-status { color: var(--ink3) !important; }
+html[data-element] .media-title  { color: var(--ink) !important; }
+html[data-element] .media-sub    { color: var(--ink3) !important; }
+
+/* Blockquote text always readable */
+html[data-element] .gi-blockquote { color: var(--ink2) !important; }
+
+/* p.bt strong — only use accent3 if it's dark enough; use ink3 as fallback */
+html[data-element] p.bt strong { color: var(--ink3) !important; }
+
+/* Guestbook names — ink3 is safe on parchment */
+html[data-element] .gb-name { color: var(--ink3) !important; }
+html[data-element] .gb-ok   { color: var(--ink3) !important; border-color: rgba(180,150,80,0.5) !important; }
+
+/* Anime rank badge text when element active — light accent0 on dark bg should be fine, but ensure bg is dark enough */
+html[data-element] .a-rank {
+  /* keep dark bg so bright accent0 text is readable */
+}
+/* hydro/cryo/anemo: accent0 is very light, accent3/4 is very dark — fine */
+/* pyro/dendro: accent0 is warm light, accent4 is very dark — fine */
+
+/* ── ELEMENT ICON CONTRAST IN VARIOUS CONTAINERS ── */
+
+/* d-icon (dossier) — default state: always slightly darker than panel bg */
+.d-icon {
+  background: linear-gradient(135deg, rgba(210,195,155,0.95), rgba(195,180,140,0.9)) !important;
+  border-color: rgba(180,150,80,0.5) !important;
+}
+html[data-element] .d-icon {
+  background: linear-gradient(135deg, var(--accent3), var(--accent4)) !important;
+  border-color: var(--accent2) !important;
+}
+
+/* elem-badge default: always contrasting */
+.elem-badge {
+  background: linear-gradient(135deg, #3a2c14, #5a3e1e) !important;
+  border-color: rgba(180,150,80,0.55) !important;
+  color: var(--gold0) !important;
+}
+html[data-element] .elem-badge {
+  background: linear-gradient(135deg, var(--accent4), var(--accent3)) !important;
+  border-color: var(--accent2) !important;
+  color: var(--accent0) !important;
+}
+
+/* ── GI-HEAD TITLE visibility ── */
+/* Default (no element): panel head is cream, so use dark ink */
+.gi-head-title { color: var(--ink3) !important; text-shadow: 0 1px 0 rgba(255,255,255,0.5) !important; }
+/* With element: head-bg is dark, so use gold */
+html[data-element] .gi-head-title { color: var(--gold0) !important; text-shadow: 0 0 12px rgba(240,216,120,0.4) !important; }
+
+/* ── CONSOLE HEAD text when element ── */
+html[data-element] .console-name { color: var(--gold0) !important; }
+html[data-element] .console-sub  { color: rgba(240,216,120,0.75) !important; }
+
+/* ── VISITOR COUNTER LABEL ── */
+.counter-lbl { color: var(--ink3) !important; opacity: 1 !important; }
+
+/* ── INK4 READABILITY — bump opacity slightly ── */
+.par, .h-eyebrow, .gb-date, .lanyard-elapsed, .footer-copy {
+  opacity: 1 !important;
+}
+.par      { color: rgba(80,55,20,0.75) !important; }
+.h-eyebrow { color: rgba(80,55,20,0.7) !important; }
+.h-tagline { color: rgba(70,48,18,0.75) !important; }
+.gb-date  { color: rgba(80,55,20,0.65) !important; }
+.footer-copy { color: rgba(80,55,20,0.65) !important; }
+.gi-loading  { color: rgba(80,55,20,0.7) !important; }
+.gi-empty    { color: rgba(80,55,20,0.7) !important; }
+.lanyard-idle-msg { color: rgba(80,55,20,0.7) !important; }
+
+/* ── LINKS in console rows — darker for parchment ── */
+.c-val a { color: var(--ink3) !important; }
+html[data-element] .c-val a { color: var(--accent2) !important; }
+/* For hydro/cryo/anemo where accent2 may be light on cream: */
+html[data-element="hydro"]   .c-val a { color: #006aaa !important; }
+html[data-element="cryo"]    .c-val a { color: #3a8aaa !important; }
+html[data-element="anemo"]   .c-val a { color: #0a8860 !important; }
+html[data-element="electro"] .c-val a { color: #6a10c0 !important; }
+
+/* ── GB-OK STATUS (element active) use darker readable tones ── */
+html[data-element="hydro"]   .gb-ok { color: #006aaa !important; border-color: #006aaa !important; }
+html[data-element="cryo"]    .gb-ok { color: #3a8aaa !important; border-color: #3a8aaa !important; }
+html[data-element="anemo"]   .gb-ok { color: #0a8860 !important; border-color: #0a8860!important; }
+html[data-element="electro"] .gb-ok { color: #6a10c0 !important; border-color: #6a10c0 !important; }
+
+/* ── SNP-STATUS (element active) use always-readable tones ── */
+html[data-element="hydro"]   .snp-status { color: #0070b8 !important; }
+html[data-element="cryo"]    .snp-status { color: #3888aa !important; }
+html[data-element="anemo"]   .snp-status { color: #0a7850 !important; }
+html[data-element="electro"] .snp-status { color: #6010b8 !important; }
+html[data-element="dendro"]  .snp-status { color: #4a7818 !important; }
+html[data-element="pyro"]    .snp-status { color: #aa3000 !important; }
+html[data-element="geo"]     .snp-status { color: #906800 !important; }
+
+/* ── CHAR LABEL (element active) readable on parchment ── */
+html[data-element="hydro"]   .char-label { color: #0070b8 !important; }
+html[data-element="cryo"]    .char-label { color: #3888aa !important; }
+html[data-element="anemo"]   .char-label { color: #0a7850 !important; }
+html[data-element="electro"] .char-label { color: #6010b8 !important; }
+html[data-element="dendro"]  .char-label { color: #4a7818 !important; }
+html[data-element="pyro"]    .char-label { color: #aa3000 !important; }
+html[data-element="geo"]     .char-label { color: #906800 !important; }
+
+/* ── PLAYING/STATUS LABELS — readable on parchment ── */
+html[data-element="hydro"]   .lanyard-playing-label,
+html[data-element="hydro"]   .lanyard-status-label  { color: #0070b8 !important; }
+html[data-element="cryo"]    .lanyard-playing-label,
+html[data-element="cryo"]    .lanyard-status-label  { color: #3888aa !important; }
+html[data-element="anemo"]   .lanyard-playing-label,
+html[data-element="anemo"]   .lanyard-status-label  { color: #0a7850 !important; }
+html[data-element="electro"] .lanyard-playing-label,
+html[data-element="electro"] .lanyard-status-label  { color: #6010b8 !important; }
+html[data-element="dendro"]  .lanyard-playing-label,
+html[data-element="dendro"]  .lanyard-status-label  { color: #4a7818 !important; }
+html[data-element="pyro"]    .lanyard-playing-label,
+html[data-element="pyro"]    .lanyard-status-label  { color: #aa3000 !important; }
+html[data-element="geo"]     .lanyard-playing-label,
+html[data-element="geo"]     .lanyard-status-label  { color: #906800 !important; }
+
+/* ── MEDIA STATUS label readable on parchment ── */
+html[data-element="hydro"]   .media-status { color: #0070b8 !important; }
+html[data-element="cryo"]    .media-status { color: #3888aa !important; }
+html[data-element="anemo"]   .media-status { color: #0a7850 !important; }
+html[data-element="electro"] .media-status { color: #6010b8 !important; }
+html[data-element="dendro"]  .media-status { color: #4a7818 !important; }
+html[data-element="pyro"]    .media-status { color: #aa3000 !important; }
+html[data-element="geo"]     .media-status { color: #906800 !important; }
+
+/* ── BLOCKQUOTE opening quote mark ── */
+html[data-element="hydro"]   .gi-blockquote::before { color: #0070b8 !important; }
+html[data-element="cryo"]    .gi-blockquote::before { color: #3888aa !important; }
+html[data-element="anemo"]   .gi-blockquote::before { color: #0a7850 !important; }
+html[data-element="electro"] .gi-blockquote::before { color: #6010b8 !important; }
+
