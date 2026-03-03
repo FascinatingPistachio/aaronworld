@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AARONWORLD — Traveler's Journal</title>
-  <link rel="icon" type="image/webp" href="https://i.ibb.co/fz1vj9B3/Element-Dendro.webp">
+  <!-- Favicon: blank until element loads -->
+  <link rel="icon" id="faviconLink" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
@@ -15,16 +16,9 @@
     width: 96px;
     height: 96px;
     margin: 0 auto 0;
-    position: relative;
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 0;
   }
-
-  /* The headphones SVG sits in its own layer wrapping the pfp */
   #pfpHeadphones {
     position: absolute;
-    /* wide enough to show ear cups on both sides, tall enough for the band over the top */
     top: -32px;
     left: 50%;
     transform: translateX(-50%) scale(0);
@@ -39,8 +33,6 @@
     transform: translateX(-50%) scale(1);
     opacity: 1;
   }
-
-  /* Canvas sits behind headphones but above pfp rings */
   #pfpVfx {
     position: absolute;
     inset: -80px;
@@ -52,13 +44,9 @@
     transition: opacity 0.8s;
   }
   #pfpVfx.active { opacity: 1; }
-
-  /* pfp image stays at z-index 1, headphones at z-index 5 so cups appear over pfp edges */
   .pfp-img { position: relative; z-index: 1; }
   .pfp-ring { z-index: 2; }
   .pfp-elem { z-index: 4; }
-
-  /* Playing state ring glow */
   .pfp-outer.playing .pfp-ring:nth-child(2) { border-color: var(--d1); opacity: 0.9; animation-duration: 4s; }
   .pfp-outer.playing .pfp-ring:nth-child(3) { border-color: var(--d0); opacity: 0.6; animation-duration: 7s; }
   .pfp-outer.playing .pfp-ring:nth-child(4) { border-color: var(--d1); opacity: 0.35; animation-duration: 12s; }
@@ -73,9 +61,7 @@
     gap: 0;
     overflow: hidden;
   }
-  .sidebar-nowplaying.active {
-    display: flex;
-  }
+  .sidebar-nowplaying.active { display: flex; }
   .snp-inner {
     display: flex;
     align-items: center;
@@ -84,94 +70,341 @@
     background: linear-gradient(135deg, rgba(17,30,8,0.6), rgba(14,28,8,0.4));
   }
   .snp-art {
-    width: 46px;
-    height: 46px;
-    flex-shrink: 0;
-    border: 1px solid var(--g2);
-    background: var(--d4);
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    position: relative;
+    width: 46px; height: 46px; flex-shrink: 0;
+    border: 1px solid var(--g2); background: var(--d4);
+    overflow: hidden; display: flex; align-items: center;
+    justify-content: center; font-size: 18px; position: relative;
   }
-  .snp-art img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .snp-text {
-    flex: 1;
-    min-width: 0;
-  }
+  .snp-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .snp-text { flex: 1; min-width: 0; }
   .snp-status {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-family: 'Cinzel', serif;
-    font-size: 8px;
-    letter-spacing: 3px;
-    color: var(--d1);
-    text-transform: uppercase;
-    margin-bottom: 3px;
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px;
+    color: var(--d1); text-transform: uppercase; margin-bottom: 3px;
   }
   .snp-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--d1);
-    box-shadow: 0 0 6px var(--glow-d);
-    animation: gemPulse 1.4s ease-in-out infinite;
-    flex-shrink: 0;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--d1); box-shadow: 0 0 6px var(--glow-d);
+    animation: gemPulse 1.4s ease-in-out infinite; flex-shrink: 0;
   }
-  .snp-title {
-    font-family: 'Cinzel', serif;
-    font-size: 11.5px;
-    color: var(--ink);
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-  }
-  .snp-artist {
-    font-family: 'Lora', serif;
-    font-size: 11px;
-    color: var(--ink3);
-    font-style: italic;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  /* EQ bars */
-  .snp-eq {
-    display: flex;
-    gap: 2px;
-    align-items: flex-end;
-    height: 12px;
-    flex-shrink: 0;
-  }
-  .snp-eq span {
-    display: block;
-    width: 2.5px;
-    background: var(--d1);
-    border-radius: 1px;
-    box-shadow: 0 0 3px var(--glow-d);
-    animation: eqBar 0.6s ease-in-out infinite alternate;
-  }
+  .snp-title { font-family: 'Cinzel', serif; font-size: 11.5px; color: var(--ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+  .snp-artist { font-family: 'Lora', serif; font-size: 11px; color: var(--ink3); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .snp-eq { display: flex; gap: 2px; align-items: flex-end; height: 12px; flex-shrink: 0; }
+  .snp-eq span { display: block; width: 2.5px; background: var(--d1); border-radius: 1px; box-shadow: 0 0 3px var(--glow-d); animation: eqBar 0.6s ease-in-out infinite alternate; }
   .snp-eq span:nth-child(1) { animation-delay: 0s;    animation-duration: 0.5s; }
   .snp-eq span:nth-child(2) { animation-delay: 0.15s; animation-duration: 0.7s; }
   .snp-eq span:nth-child(3) { animation-delay: 0.05s; animation-duration: 0.45s; }
   .snp-eq span:nth-child(4) { animation-delay: 0.2s;  animation-duration: 0.65s; }
   .snp-eq span:nth-child(5) { animation-delay: 0.1s;  animation-duration: 0.55s; }
-  @keyframes eqBar {
-    from { height: 2px; }
-    to   { height: 12px; }
+  @keyframes eqBar { from { height: 2px; } to { height: 12px; } }
+
+  /* ══════════════════════════════════════════
+     GENSHIN LOADING SCREEN
+  ══════════════════════════════════════════ */
+  #gi-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #0a0c0a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 80px;
+    overflow: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
   }
-  </style>
+  #gi-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Big background art area */
+  .loader-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 40%, rgba(184,212,48,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 70% at 20% 50%, rgba(90,144,24,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 60% at 80% 30%, rgba(90,144,24,0.05) 0%, transparent 60%),
+      #060a04;
+  }
+
+  /* Animated hex grid overlay */
+  .loader-hex-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='69'%3E%3Cpath d='M40 1 L79 21 L79 48 L40 68 L1 48 L1 21 Z' fill='none' stroke='%23b8d430' stroke-width='0.8'/%3E%3C/svg%3E");
+    background-size: 80px 69px;
+    animation: hexDrift 60s linear infinite;
+  }
+  @keyframes hexDrift {
+    from { background-position: 0 0; }
+    to   { background-position: 160px 138px; }
+  }
+
+  /* Genshin-style logo area */
+  .loader-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -58%);
+    text-align: center;
+    animation: loaderLogoIn 1.2s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes loaderLogoIn {
+    from { opacity: 0; transform: translate(-50%, -65%) scale(0.92); }
+    to   { opacity: 1; transform: translate(-50%, -58%) scale(1); }
+  }
+
+  .loader-elem-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    display: block;
+    filter: drop-shadow(0 0 20px rgba(184,212,48,0.8)) drop-shadow(0 0 50px rgba(184,212,48,0.4));
+    animation: loaderElemSpin 8s linear infinite, loaderElemGlow 2.5s ease-in-out infinite;
+  }
+  @keyframes loaderElemSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes loaderElemGlow {
+    0%,100% { filter: drop-shadow(0 0 16px rgba(184,212,48,0.6)) drop-shadow(0 0 40px rgba(184,212,48,0.3)); }
+    50%     { filter: drop-shadow(0 0 30px rgba(184,212,48,1.0)) drop-shadow(0 0 70px rgba(184,212,48,0.6)); }
+  }
+
+  .loader-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    color: #e8d890;
+    letter-spacing: 8px;
+    text-shadow:
+      0 0 30px rgba(240,216,120,0.7),
+      0 0 80px rgba(184,212,48,0.3),
+      0 2px 0 rgba(0,0,0,0.5);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .loader-title em {
+    color: #b8d430;
+    font-style: normal;
+  }
+
+  .loader-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 10px;
+    color: rgba(184,212,48,0.7);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* Decorative horizontal lines (like Genshin) */
+  .loader-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(500px, 80vw);
+    margin: 16px auto 0;
+  }
+  .loader-divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,168,50,0.6), transparent);
+  }
+  .loader-divider-gem {
+    width: 8px; height: 8px;
+    background: radial-gradient(circle at 35% 35%, #e8d890, #a87820);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(212,168,50,0.8);
+    animation: gemPulse2 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes gemPulse2 {
+    0%,100% { box-shadow: 0 0 6px rgba(212,168,50,0.6); }
+    50%     { box-shadow: 0 0 20px rgba(212,168,50,1.0), 0 0 40px rgba(212,168,50,0.4); }
+  }
+
+  /* Corner ornaments */
+  .loader-corner {
+    position: absolute;
+    width: 70px; height: 70px;
+    border-color: rgba(212,168,50,0.35);
+    border-style: solid;
+    transition: none;
+  }
+  .loader-corner.tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
+  .loader-corner.tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
+  .loader-corner.bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
+  .loader-corner.br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
+
+  .loader-corner.tl::before,
+  .loader-corner.tr::before,
+  .loader-corner.bl::before,
+  .loader-corner.br::before {
+    content: '';
+    position: absolute;
+    width: 40px; height: 40px;
+    border-color: rgba(184,212,48,0.2);
+    border-style: solid;
+  }
+  .loader-corner.tl::before { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+  .loader-corner.tr::before { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
+  .loader-corner.bl::before { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
+  .loader-corner.br::before { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+
+  /* Bottom loading bar - Genshin style */
+  .loader-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: min(460px, 85vw);
+    position: relative;
+    z-index: 2;
+  }
+
+  .loader-tip {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(237,227,180,0.55);
+    text-align: center;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+  }
+
+  .loader-bar-wrap {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(212,168,50,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .loader-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(184,212,48,0.6), #b8d430, rgba(240,240,120,0.9));
+    width: 0%;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 12px rgba(184,212,48,0.8), 0 0 4px rgba(184,212,48,1.0);
+    position: relative;
+  }
+  .loader-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 4px;
+    height: calc(100% + 2px);
+    background: white;
+    filter: blur(1px);
+    opacity: 0.9;
+  }
+  .loader-bar-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+    animation: shimmer 1.5s ease-in-out infinite;
+    background-size: 200% 100%;
+  }
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to   { background-position: 200% 0; }
+  }
+
+  .loader-status {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 5px;
+    color: rgba(184,212,48,0.6);
+    text-transform: uppercase;
+    animation: loaderStatusBlink 2s ease-in-out infinite;
+  }
+  @keyframes loaderStatusBlink {
+    0%,100% { opacity: 0.4; }
+    50%     { opacity: 1.0; }
+  }
+
+  /* Floating particles in loader */
+  .loader-particle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 14px;
+    opacity: 0;
+    animation: loaderParticleFloat linear infinite;
+  }
+  @keyframes loaderParticleFloat {
+    0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-100px) rotate(180deg) translateX(30px); }
+  }
+
+  /* Scanning line effect (Genshin loading screen has subtle scan lines) */
+  .loader-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+    pointer-events: none;
+    opacity: 0.5;
+  }
+</style>
 </head>
 <body>
+
+<!-- ════ GENSHIN LOADING SCREEN ════ -->
+<div id="gi-loader">
+  <div class="loader-bg"></div>
+  <div class="loader-hex-bg"></div>
+  <div class="loader-scanlines"></div>
+
+  <!-- Corner ornaments -->
+  <div class="loader-corner tl"></div>
+  <div class="loader-corner tr"></div>
+  <div class="loader-corner bl"></div>
+  <div class="loader-corner br"></div>
+
+  <!-- Center logo -->
+  <div class="loader-logo">
+    <img id="loaderElemIcon"
+      class="loader-elem-icon"
+      src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp"
+      alt="Element"
+      onerror="this.style.display='none'">
+    <div class="loader-title">AARON<em>WORLD</em></div>
+    <div class="loader-subtitle">✦ &nbsp; Traveler's Journal &nbsp; ✦</div>
+    <div class="loader-divider">
+      <div class="loader-divider-line"></div>
+      <div class="loader-divider-gem"></div>
+      <div class="loader-divider-line"></div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="loader-bottom">
+    <div class="loader-tip" id="loaderTip">
+      "The pursuit of knowledge requires crossing many frontiers." — Alhaitham
+    </div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar-fill" id="loaderBarFill">
+        <div class="loader-bar-shimmer"></div>
+      </div>
+    </div>
+    <div class="loader-status" id="loaderStatus">Loading World Data...</div>
+  </div>
+</div>
+
 <div id="elemTransitionOverlay"></div>
 
 <div class="page">
@@ -183,7 +416,7 @@
   <div class="hc2 hc2-tl"></div><div class="hc2 hc2-tr"></div>
   <div class="hc2 hc2-bl"></div><div class="hc2 hc2-br"></div>
 
-  <div class="h-eyebrow">✦   Traveler's Personal Journal   ✦</div>
+  <div class="h-eyebrow">✦   Traveler's Personal Journal   ✦</div>
 
   <div class="h-title-row">
     <img class="h-elem-icon"
@@ -195,10 +428,10 @@
       onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:28px'}))">
   </div>
 
-  <div class="h-tagline">✦   Welcome to my corner of the web — may the wind lead you   ✦</div>
+  <div class="h-tagline">✦   Welcome to my corner of the web — may the wind lead you   ✦</div>
 
   <div class="gold-rule" style="max-width:480px;margin:10px auto 0;" id="enka-header-bar">
-    WL 2  ✦  AR 27  ✦  DENDRO MAIN  ✦  EU
+    WL 2  ✦  AR 27  ✦  DENDRO MAIN  ✦  EU
   </div>
 </div>
 
@@ -207,7 +440,6 @@
   <a href="#" class="active" onclick="showSec('home',this);return false;">Home</a>
   <a href="#" onclick="showSec('about',this);return false;">About</a>
   <a href="#" onclick="showSec('anime',this);return false;">Anime List</a>
-  <a href="#" onclick="showSec('guestbook',this);return false;">Guestbook</a>
   <a href="#" onclick="showSec('showcase',this);return false;">Showcase</a>
   <a href="#" onclick="showSec('setup',this);return false;">Setup</a>
 </nav>
@@ -226,7 +458,6 @@
     </div>
     <div class="panel-body" style="text-align:center">
 
-      <!-- PFP with headphones wrapping around it -->
       <div class="pfp-outer" id="pfpOuter">
         <canvas id="pfpVfx"></canvas>
         <div class="pfp-ring"></div>
@@ -240,7 +471,6 @@
           <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="Element"
             onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:12px'}))">
         </div>
-        <!-- Headphones: empty, SVG injected by JS -->
         <div id="pfpHeadphones"></div>
       </div>
 
@@ -257,7 +487,6 @@
       <div class="stat-row"><span class="stat-l">Main</span><span class="stat-v" id="enka-main">Dendro Traveler</span></div>
       <div class="stat-row"><span class="stat-l">Achievements</span><span class="stat-v" id="enka-achieve">—</span></div>
 
-      <!-- Active character card (populated by Enka API) -->
       <div id="enkaCharacterCard" style="margin:10px 0 4px;">
         <img class="char-portrait" src="" alt="Character" onerror="this.style.display='none'">
         <div class="char-info">
@@ -269,7 +498,6 @@
       </div>
     </div>
 
-    <!-- NOW PLAYING — sits inside profile panel below stats, shown on all pages -->
     <div class="sidebar-nowplaying" id="sidebarNowPlaying">
       <div class="gold-rule" style="margin:0 14px;">♪</div>
       <div class="snp-inner">
@@ -285,22 +513,6 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- Visitor Counter -->
-  <div class="gi-panel">
-    <div class="gi-head">
-      <div class="gi-head-gem"></div>
-      <div class="gi-head-title">Visitor Log</div>
-      <div class="gi-head-line"></div>
-    </div>
-    <div class="panel-body counter-wrap">
-      <div class="counter-lbl">Travelers Welcomed</div>
-      <div class="counter-digits" id="cDigits">
-        <div class="digit">-</div><div class="digit">-</div><div class="digit">-</div>
-        <div class="digit">-</div><div class="digit">-</div><div class="digit">-</div>
-      </div>
-    </div>
   </div>
 
 </aside>
@@ -343,7 +555,6 @@
       </div>
     </div>
 
-    <!-- Traveler's Dossier -->
     <div class="gi-panel">
       <div class="gi-head">
         <div class="gi-head-gem"></div>
@@ -394,29 +605,6 @@
           <div class="acard"><div class="a-rank">14</div><div class="aposter-img"><img src="https://i.ibb.co/4qVhyKw/d17d7148c6-jpg.webp" alt="Seven Deadly Sins" loading="lazy"></div><div class="abody"><div class="atitle">Seven Deadly Sins</div></div></div>
           <div class="acard"><div class="a-rank">15</div><div class="aposter-img"><img src="https://i.ibb.co/JjWKXfR5/af633add9b-jpg.webp" alt="My Hero Academia" loading="lazy"></div><div class="abody"><div class="atitle">My Hero Academia</div></div></div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GUESTBOOK -->
-  <div id="guestbook" class="section">
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Guestbook</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt" style="margin-bottom:14px;">Leave a message, fellow traveler! I read every entry 🌿</p>
-        <div id="gblist"></div>
-        <div class="gold-rule" style="margin:14px 0 10px;">✦   Leave a Message   ✦</div>
-        <div class="gbform-grid">
-          <input id="gbN" type="text" placeholder="Your name" maxlength="40">
-          <input id="gbS" type="text" placeholder="Your site (optional)" maxlength="80">
-          <textarea id="gbM" placeholder="Your message..." maxlength="400"></textarea>
-          <button class="gb-btn" onclick="submitGB()">✦   Sign the Guestbook   ✦</button>
-        </div>
-        <div class="gb-ok" id="gbOK">✦   Your message has been recorded, Traveler   ✦</div>
       </div>
     </div>
   </div>
@@ -628,19 +816,15 @@
 <!-- ════ FOOTER ════ -->
 <footer class="gi-panel">
   <div class="footer-badges">
-
     <a href="https://brave.com" target="_blank" rel="noopener">
       <img src="https://cyber.dabamos.de/88x31/brave.gif" width="88" height="31" alt="get brave browser" onerror="this.style.display='none'">
     </a>
-
     <a href="https://wiibrew.org/wiki/Homebrew_Channel" target="_blank" rel="noopener">
       <img src="https://1dkreally.neocities.org/graphics/buttons/homebrewchannel.gif" width="88" height="31" alt="homebrew channel" onerror="this.style.display='none'">
     </a>
-
   </div>
-
   <div class="footer-copy">
-    © AARONWORLD — Hand-crafted in the forests of Sumeru  ✦  All rights reserved
+    © AARONWORLD — Hand-crafted in the forests of Sumeru  ✦  All rights reserved
   </div>
 </footer>
 
@@ -649,32 +833,116 @@
 <script src="script.js"></script>
 <script>
 // ── TWEMOJI SETUP ──
-// Parses the entire page and any dynamically inserted content
 function parseTwemoji(el) {
   if (!window.twemoji) return;
-  twemoji.parse(el || document.body, {
-    folder: 'svg',
-    ext: '.svg',
-    className: 'emoji'
-  });
+  twemoji.parse(el || document.body, { folder: 'svg', ext: '.svg', className: 'emoji' });
 }
-
 window.addEventListener('load', function () {
   parseTwemoji(document.body);
-
-  // Re-parse dynamic widgets when they update (MutationObserver)
-  const dynamic = ['lanyardWidget', 'lastfmWidget', 'gblist', 'sidebarNowPlaying'];
+  const dynamic = ['lanyardWidget', 'lastfmWidget', 'sidebarNowPlaying'];
   dynamic.forEach(function(id) {
     const el = document.getElementById(id);
     if (!el) return;
     new MutationObserver(function(mutations) {
       mutations.forEach(function(m) {
-        m.addedNodes.forEach(function(n) {
-          if (n.nodeType === 1) parseTwemoji(n);
-        });
+        m.addedNodes.forEach(function(n) { if (n.nodeType === 1) parseTwemoji(n); });
       });
     }).observe(el, { childList: true, subtree: true });
   });
 });
+
+// ── GENSHIN LOADING SCREEN ──
+(function() {
+  const loader      = document.getElementById('gi-loader');
+  const barFill     = document.getElementById('loaderBarFill');
+  const statusEl    = document.getElementById('loaderStatus');
+  const tipEl       = document.getElementById('loaderTip');
+
+  const tips = [
+    '"The pursuit of knowledge requires crossing many frontiers." — Alhaitham',
+    '"The forest whispers to those who listen." — Sumeru Proverb',
+    '"Even the smallest leaf holds the secrets of the world." — Collei',
+    '"Adventure is out there, Traveler. The world awaits." — Paimon',
+    '"Every journey begins with a single step into the unknown."',
+    '"The wind carries whispers of distant lands and forgotten dreams."',
+  ];
+  tipEl.textContent = tips[Math.floor(Math.random() * tips.length)];
+
+  const stages = [
+    { pct: 18,  label: 'Initialising World Data…' },
+    { pct: 38,  label: 'Loading Teyvat Map…' },
+    { pct: 55,  label: 'Fetching Character Data…' },
+    { pct: 72,  label: 'Syncing Adventure Rank…' },
+    { pct: 88,  label: 'Preparing Journal…' },
+    { pct: 100, label: 'Entering AARONWORLD…' },
+  ];
+
+  let stageIdx = 0;
+  function nextStage() {
+    if (stageIdx >= stages.length) return;
+    const s = stages[stageIdx++];
+    barFill.style.width = s.pct + '%';
+    statusEl.textContent = s.label;
+    if (stageIdx < stages.length) {
+      setTimeout(nextStage, 300 + Math.random() * 400);
+    } else {
+      // Done — dismiss loader
+      setTimeout(dismissLoader, 600);
+    }
+  }
+  setTimeout(nextStage, 200);
+
+  function dismissLoader() {
+    loader.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  // Safety: always dismiss after 5s max
+  setTimeout(dismissLoader, 5000);
+
+  // Prevent scroll while loading
+  document.body.style.overflow = 'hidden';
+
+  // Spawn loader particles
+  const loaderParticles = ['🍃','🌿','🍀','✦','◆','🌱'];
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'loader-particle';
+    p.textContent = loaderParticles[Math.floor(Math.random() * loaderParticles.length)];
+    p.style.left = (5 + Math.random() * 90) + 'vw';
+    p.style.bottom = (Math.random() * 40) + 'px';
+    p.style.animationDuration = (3 + Math.random() * 5) + 's';
+    p.style.animationDelay = (Math.random() * 4) + 's';
+    p.style.fontSize = (10 + Math.random() * 10) + 'px';
+    loader.appendChild(p);
+  }
+})();
+
+// ── FAVICON: set to element icon after Genshin data loads ──
+window._setFaviconToElement = function(iconUrl) {
+  if (!iconUrl) return;
+  const link = document.getElementById('faviconLink');
+  if (!link) return;
+  // Use a canvas to convert to PNG for favicon
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32; canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, 32, 32);
+      link.href = canvas.toDataURL('image/png');
+    } catch(e) {
+      // CORS fallback: just set URL directly
+      link.href = iconUrl;
+    }
+  };
+  img.onerror = function() {
+    link.href = iconUrl;
+  };
+  img.src = iconUrl;
+};
 </script>
 </body>
+</html>
