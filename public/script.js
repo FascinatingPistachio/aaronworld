@@ -524,6 +524,9 @@ function handleEnkaData(data) {
 
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('enka-ar', info.level || '—');
+  // Also update showcase card AR
+  const gcAr = document.getElementById('gc-ar');
+  if (gcAr) gcAr.textContent = info.level || '—';
   set('enka-wl', info.worldLevel !== undefined ? info.worldLevel : '—');
   set('enka-region', 'EU');
   set('enka-achieve', info.finishAchievementNum || '—');
