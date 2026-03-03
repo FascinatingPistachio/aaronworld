@@ -138,6 +138,20 @@ function applyElementTheme(element) {
     }
   });
 
+  // Update loader element icon if still visible
+  const loaderIcon = document.getElementById('loaderElemIcon');
+  if (loaderIcon) {
+    loaderIcon.src = theme.iconUrl;
+    // Update glow color inline
+    loaderIcon.style.filter =
+      `drop-shadow(0 0 20px ${theme.glow}) drop-shadow(0 0 50px ${theme.glow})`;
+  }
+
+  // Set favicon to element icon
+  if (window._setFaviconToElement) {
+    window._setFaviconToElement(theme.iconUrl);
+  }
+
   respawnParticles(theme.particles);
   buildHeadphonesSVG();
 
@@ -171,57 +185,9 @@ function showSec(id, link) {
   link.classList.add('active');
 }
 
-/* ── VISITOR COUNTER ── */
-(function() {
-  const el = document.getElementById('cDigits');
-  if (!el) return;
-  const show = n => {
-    el.innerHTML = String(Math.max(0, n)).padStart(6, '0')
-      .split('').map(d => `<div class="digit">${d}</div>`).join('');
-  };
-  const stored = parseInt(sessionStorage.getItem('aw_cnt') || '0');
-  show(stored + 1);
-  sessionStorage.setItem('aw_cnt', stored + 1);
-  const img = new Image();
-  img.src = 'https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=aaronworld-neocities&count_bg=%230a1206&title_bg=%230a1206&edge_flat=true';
-})();
+/* visitor counter removed */
 
-/* ── GUESTBOOK ── */
-(function() {
-  const list = document.getElementById('gblist');
-  if (!list) return;
-  const entries = JSON.parse(localStorage.getItem('aw_gb') || '[]');
-  if (entries.length) {
-    entries.forEach(e => list.insertAdjacentHTML('beforeend', gbHTML(e)));
-  } else {
-    list.innerHTML = `<div class="gb-empty">No messages yet — be the first to sign! 🌿</div>`;
-  }
-})();
-
-function gbHTML(e) {
-  return `<div class="gbentry">
-    <div class="gb-top"><span class="gb-name">${esc(e.n)}</span><span class="gb-date">${e.d}</span></div>
-    <div class="gb-msg">${esc(e.m)}</div>
-  </div>`;
-}
-
-function submitGB() {
-  const n = document.getElementById('gbN').value.trim();
-  const m = document.getElementById('gbM').value.trim();
-  if (!n || !m) return;
-  const entry = { n, m, d: new Date().toISOString().slice(0, 10) };
-  const stored = JSON.parse(localStorage.getItem('aw_gb') || '[]');
-  stored.push(entry);
-  localStorage.setItem('aw_gb', JSON.stringify(stored.slice(0, 50)));
-  const list = document.getElementById('gblist');
-  const empty = list.querySelector('.gb-empty');
-  if (empty) empty.remove();
-  list.insertAdjacentHTML('beforeend', gbHTML(entry));
-  ['gbN','gbS','gbM'].forEach(id => document.getElementById(id).value = '');
-  const ok = document.getElementById('gbOK');
-  ok.style.display = 'block';
-  setTimeout(() => ok.style.display = 'none', 3500);
-}
+/* guestbook removed */
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
