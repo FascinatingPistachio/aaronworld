@@ -12,7 +12,7 @@ const ELEMENT_THEMES = {
     name: 'Dendro', color: '#b8d430', glow: 'rgba(184,212,48,0.45)',
     particles: ['🍃','🌿','🍀','🌱','🍃','🌿'],
     badgeText: 'Dendro Main',
-    iconUrl: 'https://i.ibb.co/fz1vj9B3/Element_Dendro.webp',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Grass.png',
     headColors: ['#b8d430','#d8f070','#5a9018','#b8d430'],
     particleColors: ['#b8d430','#7acc50','#d8f070','#5a9018','#a8e840','#e8ff90'],
   },
@@ -20,7 +20,7 @@ const ELEMENT_THEMES = {
     name: 'Pyro', color: '#ff6b20', glow: 'rgba(255,107,32,0.5)',
     particles: ['🔥','✦','◆','🔥','✦'],
     badgeText: 'Pyro Main',
-    iconUrl: 'https://gi.yatta.moe/assets/UI/element/pyro.png',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Fire.png',
     headColors: ['#ff6b20','#ffa060','#cc3d00','#ff6b20'],
     particleColors: ['#ff6b20','#ff9050','#ffcc80','#cc3d00','#ff4000','#ffd0a0'],
   },
@@ -28,7 +28,7 @@ const ELEMENT_THEMES = {
     name: 'Hydro', color: '#28b4e8', glow: 'rgba(40,180,232,0.5)',
     particles: ['💧','✦','◆','💧','✦'],
     badgeText: 'Hydro Main',
-    iconUrl: 'https://gi.yatta.moe/assets/UI/element/hydro.png',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Water.png',
     headColors: ['#28b4e8','#80d8ff','#0080c8','#28b4e8'],
     particleColors: ['#28b4e8','#80d8ff','#b0e8ff','#0080c8','#0060a8','#c0f0ff'],
   },
@@ -36,7 +36,7 @@ const ELEMENT_THEMES = {
     name: 'Cryo', color: '#90d8f0', glow: 'rgba(144,216,240,0.5)',
     particles: ['❄️','✦','◆','❄️','✦'],
     badgeText: 'Cryo Main',
-    iconUrl: 'https://gi.yatta.moe/assets/UI/element/cryo.png',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Ice.png',
     headColors: ['#90d8f0','#c8f0ff','#5ab8e0','#90d8f0'],
     particleColors: ['#90d8f0','#c8f0ff','#e8faff','#5ab8e0','#3a98c0','#dff8ff'],
   },
@@ -44,7 +44,7 @@ const ELEMENT_THEMES = {
     name: 'Electro', color: '#c060ff', glow: 'rgba(192,96,255,0.5)',
     particles: ['⚡','✦','◆','⚡','✦'],
     badgeText: 'Electro Main',
-    iconUrl: 'https://gi.yatta.moe/assets/UI/element/electro.png',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Electric.png',
     headColors: ['#c060ff','#e0a0ff','#8020d0','#c060ff'],
     particleColors: ['#c060ff','#e0a0ff','#f0d0ff','#8020d0','#6010b0','#ffecff'],
   },
@@ -52,7 +52,7 @@ const ELEMENT_THEMES = {
     name: 'Anemo', color: '#40d8a0', glow: 'rgba(64,216,160,0.5)',
     particles: ['🌬️','✦','◆','🌬️','✦'],
     badgeText: 'Anemo Main',
-    iconUrl: 'https://gi.yatta.moe/assets/UI/element/anemo.png',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Wind.png',
     headColors: ['#40d8a0','#90f0d0','#10a870','#40d8a0'],
     particleColors: ['#40d8a0','#90f0d0','#c8fff0','#10a870','#008050','#edfff8'],
   },
@@ -60,51 +60,52 @@ const ELEMENT_THEMES = {
     name: 'Geo', color: '#e8c020', glow: 'rgba(232,192,32,0.5)',
     particles: ['🪨','✦','◆','🪨','✦'],
     badgeText: 'Geo Main',
-    iconUrl: 'https://gi.yatta.moe/assets/UI/element/geo.png',
+    iconUrl: 'https://gi.yatta.moe/assets/UI/UI_Buff_Element_Rock.png',
     headColors: ['#e8c020','#fff090','#b08800','#e8c020'],
     particleColors: ['#e8c020','#fff090','#fffaaa','#b08800','#906000','#fffff0'],
   },
 };
 
-// Enka character name → element mapping
+// Enka character name → element mapping (fallback for name-based lookup)
 const CHAR_ELEMENT_MAP = {
   // Pyro
   'Amber':'pyro','Bennett':'pyro','Diluc':'pyro','Hu Tao':'pyro','Klee':'pyro',
   'Lyney':'pyro','Yanfei':'pyro','Yoimiya':'pyro','Xiangling':'pyro','Xinyan':'pyro',
-  'Arlecchino':'pyro','Chevreuse':'pyro','Gaming':'pyro','Thoma':'pyro',
-  'Emilie':'pyro','Mavuika':'pyro','Citlali':'pyro',
+  'Arlecchino':'pyro','Chevreuse':'pyro','Gaming':'pyro','Thoma':'pyro','Dehya':'pyro',
+  'Mavuika':'pyro','Durin':'pyro',
   // Hydro
-  'Barbara':'hydro','Kokomi':'hydro','Mona':'hydro','Tartaglia':'hydro','Nilufar':'hydro',
-  'Neuvillette':'hydro','Sigewinne':'hydro','Freminet':'hydro','Furina':'hydro',
+  'Barbara':'hydro','Kokomi':'hydro','Mona':'hydro','Tartaglia':'hydro',
+  'Neuvillette':'hydro','Sigewinne':'hydro','Furina':'hydro',
   'Xingqiu':'hydro','Yelan':'hydro','Ayato':'hydro','Candace':'hydro','Nilou':'hydro',
-  'Neuvillette':'hydro',
+  'Mualani':'hydro','Columbina':'hydro','Dahlia':'hydro','Aino':'hydro',
   // Cryo
   'Chongyun':'cryo','Diona':'cryo','Eula':'cryo','Ganyu':'cryo','Kaeya':'cryo',
   'Layla':'cryo','Qiqi':'cryo','Rosaria':'cryo','Shenhe':'cryo','Wriothesley':'cryo',
-  'Ayaka':'cryo','Freminet':'cryo','Mika':'cryo',
+  'Ayaka':'cryo','Freminet':'cryo','Mika':'cryo','Charlotte':'cryo','Aloy':'cryo',
+  'Citlali':'cryo','Escoffier':'cryo','Skirk':'cryo',
   // Electro
   'Beidou':'electro','Cyno':'electro','Fischl':'electro','Keqing':'electro','Lisa':'electro',
   'Raiden Shogun':'electro','Razor':'electro','Sara':'electro','Shinobu':'electro',
-  'Thundering Pulse':'electro','Yae Miko':'electro','Dori':'electro','Sethos':'electro',
-  'Clorinde':'electro','Ororon':'electro',
+  'Yae Miko':'electro','Dori':'electro','Sethos':'electro','Clorinde':'electro',
+  'Ororon':'electro','Iansan':'electro','Varesa':'electro','Ineffa':'electro','Flins':'electro',
   // Anemo
   'Jean':'anemo','Kazuha':'anemo','Lynette':'anemo','Sayu':'anemo','Sucrose':'anemo',
-  'Traveler':'anemo','Venti':'anemo','Wanderer':'anemo','Xiao':'anemo','Faruzan':'anemo',
-  'Chasca':'anemo','Xianyun':'anemo',
+  'Venti':'anemo','Wanderer':'anemo','Xiao':'anemo','Faruzan':'anemo',
+  'Chasca':'anemo','Xianyun':'anemo','Heizou':'anemo','Lan Yan':'anemo',
+  'Mizuki':'anemo','Jahoda':'anemo','Varka':'anemo','Ifa':'anemo',
   // Geo
   'Albedo':'geo','Chiori':'geo','Gorou':'geo','Itto':'geo','Ningguang':'geo',
-  'Noelle':'geo','Yunjin':'geo','Zhongli':'geo','Navia':'geo',
+  'Noelle':'geo','Yun Jin':'geo','Zhongli':'geo','Navia':'geo','Kachina':'geo',
+  'Xilonen':'geo','Illuga':'geo','Zibai':'geo',
   // Dendro
   'Alhaitham':'dendro','Baizhu':'dendro','Collei':'dendro','Kaveh':'dendro',
   'Kirara':'dendro','Nahida':'dendro','Tighnari':'dendro','Yaoyao':'dendro',
-  'Dendro Traveler':'dendro','Traveler (Dendro)':'dendro',
+  'Emilie':'dendro','Kinich':'dendro','Lauma':'dendro','Nefer':'dendro',
 };
 
 function getElementForCharacter(name) {
   if (!name) return null;
-  // Direct match
   if (CHAR_ELEMENT_MAP[name]) return CHAR_ELEMENT_MAP[name];
-  // Partial match
   for (const [k,v] of Object.entries(CHAR_ELEMENT_MAP)) {
     if (name.toLowerCase().includes(k.toLowerCase())) return v;
   }
@@ -119,21 +120,17 @@ function applyElementTheme(element) {
   currentElement = element;
   const theme = ELEMENT_THEMES[element];
 
-  // Flash overlay
   const overlay = document.getElementById('elemTransitionOverlay');
   if (overlay) {
     overlay.classList.add('flash');
     setTimeout(() => overlay.classList.remove('flash'), 300);
   }
 
-  // Set data attribute for CSS
   document.documentElement.setAttribute('data-element', element);
 
-  // Update element badge in sidebar
   const badge = document.querySelector('.elem-badge');
   if (badge) badge.textContent = '  ' + theme.badgeText;
 
-  // Update element icon images (header + pfp)
   document.querySelectorAll('.h-elem-icon, .pfp-elem img').forEach(img => {
     if (img.tagName === 'IMG') {
       img.src = theme.iconUrl;
@@ -141,13 +138,9 @@ function applyElementTheme(element) {
     }
   });
 
-  // Respawn particles with new theme
   respawnParticles(theme.particles);
-
-  // Update headphones SVG colors if visible
   buildHeadphonesSVG();
 
-  // Store last applied element
   try { sessionStorage.setItem('aw_elem', element); } catch(e) {}
 }
 
@@ -444,7 +437,6 @@ function activateNowPlayingVfx() {
   function drawRings(ts) {
     const theme = ELEMENT_THEMES[currentElement];
     const c1 = theme.headColors[0];
-    const c2 = theme.headColors[1];
     for (let i = rings.length - 1; i >= 0; i--) {
       const age = ts - rings[i].ts;
       const dur = rings[i].strong ? 900 : 650;
@@ -457,12 +449,11 @@ function activateNowPlayingVfx() {
       const a     = (1 - p) * (rings[i].strong ? 0.7 : 0.45);
       ctx.save();
       ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-      // Extract RGB from hex color
       const hexToRgb = h => {
-        const r = parseInt(h.slice(1,3),16);
-        const g = parseInt(h.slice(3,5),16);
-        const b = parseInt(h.slice(5,7),16);
-        return `${r},${g},${b}`;
+        const rv = parseInt(h.slice(1,3),16);
+        const gv = parseInt(h.slice(3,5),16);
+        const bv = parseInt(h.slice(5,7),16);
+        return `${rv},${gv},${bv}`;
       };
       ctx.strokeStyle = `rgba(${hexToRgb(c1)},${a})`;
       ctx.lineWidth   = rings[i].strong ? 2.5 : 1.5;
@@ -506,20 +497,12 @@ function activateNowPlayingVfx() {
 ═══════════════════════════════════════════════════ */
 const ENKA_UID = '764275665';
 
-// Enka character ID → character name (partial — most common)
-// Full list: https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json
-const ENKA_CHAR_NAMES = {};
-// We'll try to parse names from the API response itself
-
 function fetchEnka() {
   fetch(`/api/enka?uid=${ENKA_UID}`)
     .then(r => r.json())
-    .then(data => {
-      handleEnkaData(data);
-    })
+    .then(data => handleEnkaData(data))
     .catch(err => {
       console.warn('[Enka] fetch failed:', err);
-      // Fall back to static values
       setStaticEnka();
     });
 }
@@ -535,30 +518,20 @@ function setStaticEnka() {
 }
 
 function handleEnkaData(data) {
-  if (!data || data.detail) {
-    console.warn('[Enka] no data or error:', data);
-    setStaticEnka();
-    return;
-  }
-
+  if (!data || data.detail) { setStaticEnka(); return; }
   const info = data.playerInfo;
   if (!info) { setStaticEnka(); return; }
 
-  // Set basic stats
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('enka-ar', info.level || '—');
   set('enka-wl', info.worldLevel !== undefined ? info.worldLevel : '—');
   set('enka-region', 'EU');
   set('enka-achieve', info.finishAchievementNum || '—');
 
-  // Update header bar
   const headerBar = document.getElementById('enka-header-bar');
-
-  // Get showcase characters (avatarInfoList)
   const chars = data.avatarInfoList || [];
 
   if (chars.length === 0) {
-    // No showcase characters
     setActiveCharacterCard(null);
     set('enka-main', 'Traveler');
     if (headerBar) headerBar.textContent = `AR ${info.level}  ✦  WL ${info.worldLevel}  ✦  EU`;
@@ -566,42 +539,32 @@ function handleEnkaData(data) {
     return;
   }
 
-  // Try to get character names from Enka data
-  // Characters have avatarId which maps to names
-  // We'll use the costumes or character data to infer element
-  // Enka includes prop data and talent data; element is in the character lookup
-  
-  // First character in list = "active" (first in showcase)
-  const firstChar = chars[0];
-  const charName = getCharNameFromEnka(firstChar);
-  const element  = getElementFromEnkaChar(firstChar) || getElementForCharacter(charName) || 'dendro';
-  const charLevel = getCharLevel(firstChar);
+  const firstChar    = chars[0];
+  const charName     = getCharNameFromEnka(firstChar);
+  const element      = getElementFromEnkaChar(firstChar) || getElementForCharacter(charName) || 'dendro';
+  const charLevel    = getCharLevel(firstChar);
   const constellation = getConstellation(firstChar);
-  const iconUrl = getCharIconUrl(firstChar);
+  const iconUrl      = getCharIconUrl(firstChar);
 
   set('enka-main', charName || 'Traveler');
   if (headerBar) headerBar.textContent = `AR ${info.level}  ✦  WL ${info.worldLevel}  ✦  ${charName}  ✦  EU`;
 
-  // Display active character card
   setActiveCharacterCard({ name: charName, level: charLevel, element, iconUrl, constellation });
-
-  // Apply element theme!
   applyElementTheme(element);
 }
 
-// Element IDs reference (unused but kept for documentation)
-// const ENKA_ELEMENT_IDS = { 1:'pyro', 2:'anemo', 3:'geo', 4:'electro', 5:'dendro', 6:'hydro', 7:'cryo' };
-
+/* ── CHARACTER DATA MAPS ── */
 function getCharNameFromEnka(charInfo) {
   if (!charInfo) return 'Traveler';
   const id = charInfo.avatarId;
-  
-  // Known character IDs from Enka API
+
   const ID_MAP = {
+    // ── 1.0 Launch ──
     10000002: 'Kamisato Ayaka',
     10000003: 'Qiqi',
+    10000005: 'Traveler',        // Lumine (female)
     10000006: 'Lisa',
-    10000007: 'Traveler', // Male
+    10000007: 'Traveler',        // Aether (male)
     10000014: 'Barbara',
     10000015: 'Kaeya',
     10000016: 'Diluc',
@@ -628,167 +591,293 @@ function getCharNameFromEnka(charInfo) {
     10000042: 'Keqing',
     10000043: 'Sucrose',
     10000044: 'Xinyan',
+    // ── 1.1 ──
     10000045: 'Rosaria',
     10000046: 'Hu Tao',
     10000047: 'Kazuha',
     10000048: 'Yanfei',
     10000049: 'Yoimiya',
     10000050: 'Thoma',
+    // ── 1.2 ──
     10000051: 'Eula',
-    10000052: 'Shogun',
+    // ── 1.3 ──
+    10000052: 'Raiden Shogun',
     10000053: 'Sayu',
-    10000054: 'Kokomi',
+    // ── 1.4 ──
+    10000054: 'Sangonomiya Kokomi',
     10000055: 'Gorou',
-    10000056: 'Sara',
-    10000057: 'Itto',
+    10000056: 'Kujou Sara',
+    // ── 2.3 ──
+    10000057: 'Arataki Itto',
+    // ── 2.5 ──
     10000058: 'Yae Miko',
-    10000059: 'Heizou',
+    // ── 2.8 ──
+    10000059: 'Shikanoin Heizou',
+    // ── 2.7 ──
     10000060: 'Yelan',
+    // ── 2.1 ──
     10000061: 'Aloy',
+    // ── 2.4 ──
     10000062: 'Shenhe',
     10000063: 'Yun Jin',
-    10000064: 'Shinobu',
-    10000065: 'Ayato',
+    // ── 2.7 ──
+    10000064: 'Kuki Shinobu',
+    // ── 2.6 ──
+    10000065: 'Kamisato Ayato',
+    // ── 3.0 ──
     10000066: 'Collei',
     10000067: 'Dori',
     10000068: 'Tighnari',
+    // ── 3.1 ──
     10000069: 'Nilou',
     10000070: 'Cyno',
     10000071: 'Candace',
+    // ── 3.2 ──
     10000072: 'Nahida',
     10000073: 'Layla',
+    // ── 3.3 ──
     10000074: 'Wanderer',
     10000075: 'Faruzan',
+    // ── 3.4 ──
     10000076: 'Yaoyao',
     10000077: 'Alhaitham',
+    // ── 3.5 ──
     10000078: 'Dehya',
     10000079: 'Mika',
+    // ── 3.6 ──
     10000080: 'Kaveh',
     10000081: 'Baizhu',
-    10000082: 'Lynette',
-    10000083: 'Lyney',
-    10000084: 'Freminet',
-    10000085: 'Wriothesley',
+    // ── 3.7 ──
+    10000082: 'Kirara',
+    // ── 4.0 ──
+    10000083: 'Lynette',
+    10000084: 'Lyney',
+    10000085: 'Freminet',
+    // ── 4.1 ──
     10000086: 'Neuvillette',
-    10000087: 'Charlotte',
-    10000088: 'Furina',
-    10000089: 'Chevreuse',
+    10000087: 'Wriothesley',
+    // ── 4.2 ──
+    10000088: 'Charlotte',
+    10000089: 'Furina',
+    // ── 4.3 ──
     10000090: 'Navia',
-    10000091: 'Gaming',
-    10000092: 'Xianyun',
-    10000093: 'Chiori',
-    10000094: 'Sigewinne',
+    10000091: 'Chevreuse',
+    // ── 4.4 ──
+    10000092: 'Gaming',
+    10000093: 'Xianyun',
+    // ── 4.5 ──
+    10000094: 'Chiori',
+    // ── 4.6 ──
     10000095: 'Arlecchino',
-    10000096: 'Sethos',
-    10000097: 'Clorinde',
-    10000098: 'Emilie',
-    10000099: 'Kachina',
-    10000100: 'Kinich',
+    // ── 4.7 ──
+    10000096: 'Clorinde',
+    10000097: 'Sethos',
+    10000098: 'Sigewinne',
+    // ── 4.8 ──
+    10000099: 'Emilie',
+    // ── 5.0 ──
+    10000100: 'Kachina',
     10000101: 'Mualani',
-    10000102: 'Xilonen',
-    10000103: 'Chasca',
-    10000104: 'Ororon',
-    10000105: 'Mavuika',
+    10000102: 'Kinich',
+    // ── 5.1 ──
+    10000103: 'Xilonen',
+    // ── 5.2 ──
+    10000104: 'Chasca',
+    10000105: 'Ororon',
+    // ── 5.3 ──
     10000106: 'Citlali',
-    10000107: 'Lan Yan',
-    10000108: 'Ifa',
+    10000107: 'Mavuika',
+    10000108: 'Lan Yan',
+    // ── 5.4 ──
+    10000109: 'Yumemizuki Mizuki',
+    // ── 5.5 ──
+    10000110: 'Iansan',
+    10000111: 'Varesa',
+    // ── 5.6 ──
+    10000112: 'Escoffier',
+    10000113: 'Ifa',
+    // ── 5.7 ──
+    10000114: 'Dahlia',
+    10000115: 'Skirk',
+    // ── 5.8 ──
+    10000116: 'Ineffa',
+    // ── Luna I ──
+    10000117: 'Aino',
+    10000118: 'Lauma',
+    10000119: 'Flins',
+    // ── Luna II ──
+    10000120: 'Nefer',
+    // ── Luna III ──
+    10000121: 'Durin',
+    10000122: 'Jahoda',
+    // ── Luna IV ──
+    10000123: 'Columbina',
+    10000124: 'Illuga',
+    10000125: 'Zibai',
+    // ── Luna V ──
+    10000126: 'Varka',
   };
 
   const CHAR_ELEMENT_BY_ID = {
-    10000002: 'cryo',   // Ayaka
-    10000003: 'cryo',   // Qiqi
-    10000006: 'electro',// Lisa
-    10000007: 'dendro', // Traveler (default)
-    10000014: 'hydro',  // Barbara
-    10000015: 'cryo',   // Kaeya
-    10000016: 'pyro',   // Diluc
-    10000020: 'electro',// Razor
-    10000021: 'pyro',   // Amber
-    10000022: 'anemo',  // Venti
-    10000023: 'pyro',   // Xiangling
-    10000024: 'electro',// Beidou
-    10000025: 'hydro',  // Xingqiu
-    10000026: 'anemo',  // Xiao
-    10000027: 'geo',    // Ningguang
-    10000029: 'pyro',   // Klee
-    10000030: 'geo',    // Zhongli
-    10000031: 'electro',// Fischl
-    10000032: 'pyro',   // Bennett
-    10000033: 'hydro',  // Tartaglia
-    10000034: 'geo',    // Noelle
-    10000035: 'cryo',   // Qiqi
-    10000036: 'cryo',   // Chongyun
-    10000037: 'cryo',   // Ganyu
-    10000038: 'geo',    // Albedo
-    10000039: 'cryo',   // Diona
-    10000041: 'hydro',  // Mona
-    10000042: 'electro',// Keqing
-    10000043: 'anemo',  // Sucrose
-    10000044: 'pyro',   // Xinyan
-    10000045: 'cryo',   // Rosaria
-    10000046: 'pyro',   // Hu Tao
-    10000047: 'anemo',  // Kazuha
-    10000048: 'pyro',   // Yanfei
-    10000049: 'pyro',   // Yoimiya
-    10000050: 'pyro',   // Thoma
-    10000051: 'cryo',   // Eula
-    10000052: 'electro',// Raiden Shogun
-    10000053: 'anemo',  // Sayu
-    10000054: 'hydro',  // Kokomi
-    10000055: 'geo',    // Gorou
-    10000056: 'electro',// Sara
-    10000057: 'geo',    // Itto
-    10000058: 'electro',// Yae Miko
-    10000059: 'anemo',  // Heizou
-    10000060: 'hydro',  // Yelan
-    10000062: 'cryo',   // Shenhe
-    10000063: 'geo',    // Yun Jin
-    10000064: 'electro',// Shinobu
-    10000065: 'hydro',  // Ayato
-    10000066: 'dendro', // Collei
-    10000067: 'electro',// Dori
-    10000068: 'dendro', // Tighnari
-    10000069: 'hydro',  // Nilou
-    10000070: 'electro',// Cyno
-    10000071: 'hydro',  // Candace
-    10000072: 'dendro', // Nahida
-    10000073: 'cryo',   // Layla
-    10000074: 'anemo',  // Wanderer
-    10000075: 'anemo',  // Faruzan
-    10000076: 'dendro', // Yaoyao
-    10000077: 'dendro', // Alhaitham
-    10000078: 'pyro',   // Dehya
-    10000079: 'cryo',   // Mika
-    10000080: 'dendro', // Kaveh
-    10000081: 'dendro', // Baizhu
-    10000082: 'anemo',  // Lynette
-    10000083: 'pyro',   // Lyney
-    10000084: 'cryo',   // Freminet
-    10000085: 'cryo',   // Wriothesley
-    10000086: 'hydro',  // Neuvillette
-    10000087: 'cryo',   // Charlotte
-    10000088: 'hydro',  // Furina
-    10000089: 'pyro',   // Chevreuse
-    10000090: 'geo',    // Navia
-    10000091: 'pyro',   // Gaming
-    10000092: 'anemo',  // Xianyun
-    10000093: 'geo',    // Chiori
-    10000094: 'hydro',  // Sigewinne
-    10000095: 'pyro',   // Arlecchino
-    10000096: 'electro',// Sethos
-    10000097: 'electro',// Clorinde
-    10000098: 'dendro', // Emilie
-    10000099: 'geo',    // Kachina
-    10000100: 'dendro', // Kinich
-    10000101: 'hydro',  // Mualani
-    10000102: 'geo',    // Xilonen
-    10000103: 'anemo',  // Chasca
-    10000104: 'electro',// Ororon
-    10000105: 'pyro',   // Mavuika
-    10000106: 'cryo',   // Citlali
+    // 1.0
+    10000002: 'cryo',    // Ayaka
+    10000003: 'cryo',    // Qiqi
+    10000005: 'dendro',  // Traveler (Lumine, default dendro)
+    10000006: 'electro', // Lisa
+    10000007: 'dendro',  // Traveler (Aether, default dendro)
+    10000014: 'hydro',   // Barbara
+    10000015: 'cryo',    // Kaeya
+    10000016: 'pyro',    // Diluc
+    10000020: 'electro', // Razor
+    10000021: 'pyro',    // Amber
+    10000022: 'anemo',   // Venti
+    10000023: 'pyro',    // Xiangling
+    10000024: 'electro', // Beidou
+    10000025: 'hydro',   // Xingqiu
+    10000026: 'anemo',   // Xiao
+    10000027: 'geo',     // Ningguang
+    10000029: 'pyro',    // Klee
+    10000030: 'geo',     // Zhongli
+    10000031: 'electro', // Fischl
+    10000032: 'pyro',    // Bennett
+    10000033: 'hydro',   // Tartaglia
+    10000034: 'geo',     // Noelle
+    10000035: 'cryo',    // Qiqi (dupe)
+    10000036: 'cryo',    // Chongyun
+    10000037: 'cryo',    // Ganyu
+    10000038: 'geo',     // Albedo
+    10000039: 'cryo',    // Diona
+    10000041: 'hydro',   // Mona
+    10000042: 'electro', // Keqing
+    10000043: 'anemo',   // Sucrose
+    10000044: 'pyro',    // Xinyan
+    // 1.1+
+    10000045: 'cryo',    // Rosaria
+    10000046: 'pyro',    // Hu Tao
+    10000047: 'anemo',   // Kazuha
+    10000048: 'pyro',    // Yanfei
+    10000049: 'pyro',    // Yoimiya
+    10000050: 'pyro',    // Thoma
+    // 1.2+
+    10000051: 'cryo',    // Eula
+    // 1.3+
+    10000052: 'electro', // Raiden Shogun
+    10000053: 'anemo',   // Sayu
+    // 1.4+
+    10000054: 'hydro',   // Kokomi
+    10000055: 'geo',     // Gorou
+    10000056: 'electro', // Sara
+    // 2.3
+    10000057: 'geo',     // Itto
+    // 2.5
+    10000058: 'electro', // Yae Miko
+    // 2.8
+    10000059: 'anemo',   // Heizou
+    // 2.7
+    10000060: 'hydro',   // Yelan
+    // 2.1
+    10000061: 'cryo',    // Aloy
+    // 2.4
+    10000062: 'cryo',    // Shenhe
+    10000063: 'geo',     // Yun Jin
+    // 2.7
+    10000064: 'electro', // Shinobu
+    // 2.6
+    10000065: 'hydro',   // Ayato
+    // 3.0
+    10000066: 'dendro',  // Collei
+    10000067: 'electro', // Dori
+    10000068: 'dendro',  // Tighnari
+    // 3.1
+    10000069: 'hydro',   // Nilou
+    10000070: 'electro', // Cyno
+    10000071: 'hydro',   // Candace
+    // 3.2
+    10000072: 'dendro',  // Nahida
+    10000073: 'cryo',    // Layla
+    // 3.3
+    10000074: 'anemo',   // Wanderer
+    10000075: 'anemo',   // Faruzan
+    // 3.4
+    10000076: 'dendro',  // Yaoyao
+    10000077: 'dendro',  // Alhaitham
+    // 3.5
+    10000078: 'pyro',    // Dehya
+    10000079: 'cryo',    // Mika
+    // 3.6
+    10000080: 'dendro',  // Kaveh
+    10000081: 'dendro',  // Baizhu
+    // 3.7
+    10000082: 'dendro',  // Kirara
+    // 4.0
+    10000083: 'anemo',   // Lynette
+    10000084: 'pyro',    // Lyney
+    10000085: 'cryo',    // Freminet
+    // 4.1
+    10000086: 'hydro',   // Neuvillette
+    10000087: 'cryo',    // Wriothesley
+    // 4.2
+    10000088: 'cryo',    // Charlotte
+    10000089: 'hydro',   // Furina
+    // 4.3
+    10000090: 'geo',     // Navia
+    10000091: 'pyro',    // Chevreuse
+    // 4.4
+    10000092: 'pyro',    // Gaming
+    10000093: 'anemo',   // Xianyun
+    // 4.5
+    10000094: 'geo',     // Chiori
+    // 4.6
+    10000095: 'pyro',    // Arlecchino
+    // 4.7
+    10000096: 'electro', // Clorinde
+    10000097: 'electro', // Sethos
+    10000098: 'hydro',   // Sigewinne
+    // 4.8
+    10000099: 'dendro',  // Emilie
+    // 5.0
+    10000100: 'geo',     // Kachina
+    10000101: 'hydro',   // Mualani
+    10000102: 'dendro',  // Kinich
+    // 5.1
+    10000103: 'geo',     // Xilonen
+    // 5.2
+    10000104: 'anemo',   // Chasca
+    10000105: 'electro', // Ororon
+    // 5.3
+    10000106: 'cryo',    // Citlali
+    10000107: 'pyro',    // Mavuika
+    10000108: 'anemo',   // Lan Yan
+    // 5.4
+    10000109: 'anemo',   // Mizuki
+    // 5.5
+    10000110: 'electro', // Iansan
+    10000111: 'electro', // Varesa
+    // 5.6
+    10000112: 'cryo',    // Escoffier
+    10000113: 'anemo',   // Ifa
+    // 5.7
+    10000114: 'hydro',   // Dahlia
+    10000115: 'cryo',    // Skirk
+    // 5.8
+    10000116: 'electro', // Ineffa
+    // Luna I
+    10000117: 'hydro',   // Aino
+    10000118: 'dendro',  // Lauma
+    10000119: 'electro', // Flins
+    // Luna II
+    10000120: 'dendro',  // Nefer
+    // Luna III
+    10000121: 'pyro',    // Durin
+    10000122: 'anemo',   // Jahoda
+    // Luna IV
+    10000123: 'hydro',   // Columbina
+    10000124: 'geo',     // Illuga
+    10000125: 'geo',     // Zibai
+    // Luna V
+    10000126: 'anemo',   // Varka
   };
 
-  // Store element by ID for use in getElementFromEnkaChar
   window._enkaElemById = CHAR_ELEMENT_BY_ID;
   window._enkaIdToName = ID_MAP;
 
@@ -801,14 +890,11 @@ function getElementFromEnkaChar(charInfo) {
   if (window._enkaElemById && window._enkaElemById[id]) {
     return window._enkaElemById[id];
   }
-  // Also check skillDepotId for Traveler element variants
-  // Traveler Dendro: skillDepotId 704, Anemo: 504, Geo: 604, Electro: 704... 
-  // Actually: Anemo=504, Geo=604, Electro=704, Dendro=1404, Hydro=7070 (varies)
+  // Traveler element determined by skillDepotId
   if (id === 10000007 || id === 10000005) {
-    // Traveler — determine element from skillDepotId
     const depot = charInfo.skillDepotId;
     const travelerElements = {
-      504: 'anemo', 704: 'electro', 604: 'geo', 1404: 'dendro', 
+      504: 'anemo', 704: 'electro', 604: 'geo', 1404: 'dendro',
       8: 'anemo', 6: 'pyro', 4: 'cryo', 2: 'hydro'
     };
     return travelerElements[depot] || 'dendro';
@@ -831,15 +917,15 @@ function getConstellation(charInfo) {
 function getCharIconUrl(charInfo) {
   if (!charInfo) return null;
   const id = charInfo.avatarId;
-  // Enka provides character images via their CDN
+
+  // Maps avatar ID → Enka CDN icon name
   // Format: https://enka.network/ui/UI_AvatarIcon_{name}.png
-  // We need to map id → name
   const ICON_MAP = {
     10000002: 'Ayaka',
     10000003: 'Qiqi',
+    10000005: 'PlayerBoy',   // Lumine → show male (Aether) as requested
     10000006: 'Lisa',
-    10000007: 'PlayerBoy', // Traveler (male)
-    10000005: 'PlayerBoy',// Traveler (female)
+    10000007: 'PlayerBoy',   // Aether (male)
     10000014: 'Barbara',
     10000015: 'Kaeya',
     10000016: 'Diluc',
@@ -881,6 +967,7 @@ function getCharIconUrl(charInfo) {
     10000058: 'Yae',
     10000059: 'Heizo',
     10000060: 'Yelan',
+    10000061: 'Aloy',
     10000062: 'Shenhe',
     10000063: 'Yunjin',
     10000064: 'Shinobu',
@@ -901,32 +988,53 @@ function getCharIconUrl(charInfo) {
     10000079: 'Mika',
     10000080: 'Kaveh',
     10000081: 'Baizhu',
-    10000082: 'Lynette',
-    10000083: 'Lyney',
-    10000084: 'Freminet',
-    10000085: 'Wriothesley',
+    10000082: 'Kirara',
+    10000083: 'Lynette',
+    10000084: 'Lyney',
+    10000085: 'Freminet',
     10000086: 'Neuvillette',
-    10000087: 'Charlotte',
-    10000088: 'Furina',
-    10000089: 'Chevreuse',
+    10000087: 'Wriothesley',
+    10000088: 'Charlotte',
+    10000089: 'Furina',
     10000090: 'Navia',
-    10000091: 'Gaming',
-    10000092: 'Liuyun',
-    10000093: 'Chiori',
-    10000094: 'Sigewinne',
+    10000091: 'Chevreuse',
+    10000092: 'Gaming',
+    10000093: 'Liuyun',
+    10000094: 'Chiori',
     10000095: 'Arlecchino',
-    10000096: 'Sethos',
-    10000097: 'Clorinde',
-    10000098: 'Emilie',
-    10000099: 'Kachina',
-    10000100: 'Kinich',
+    10000096: 'Clorinde',
+    10000097: 'Sethos',
+    10000098: 'Sigewinne',
+    10000099: 'Emilie',
+    10000100: 'Kachina',
     10000101: 'Mualani',
-    10000102: 'Xilonen',
-    10000103: 'Chasca',
-    10000104: 'Ororon',
-    10000105: 'Mavuika',
+    10000102: 'Kinich',
+    10000103: 'Xilonen',
+    10000104: 'Chasca',
+    10000105: 'Ororon',
     10000106: 'Citlali',
+    10000107: 'Mavuika',
+    10000108: 'Liuyun2',    // Lan Yan — may vary, fallback gracefully
+    10000109: 'Mizuki',
+    10000110: 'Iansan',
+    10000111: 'Varesa',
+    10000112: 'Escoffier',
+    10000113: 'Ifa',
+    10000114: 'Dahlia',
+    10000115: 'Skirk',
+    10000116: 'Ineffa',
+    10000117: 'Aino',
+    10000118: 'Lauma',
+    10000119: 'Flins',
+    10000120: 'Nefer',
+    10000121: 'Durin',
+    10000122: 'Jahoda',
+    10000123: 'Columbina',
+    10000124: 'Illuga',
+    10000125: 'Zibai',
+    10000126: 'Varka',
   };
+
   const name = ICON_MAP[id];
   if (!name) return null;
   return `https://enka.network/ui/UI_AvatarIcon_${name}.png`;
@@ -935,10 +1043,7 @@ function getCharIconUrl(charInfo) {
 function setActiveCharacterCard(char) {
   const card = document.getElementById('enkaCharacterCard');
   if (!card) return;
-  if (!char) {
-    card.classList.remove('active');
-    return;
-  }
+  if (!char) { card.classList.remove('active'); return; }
   card.classList.add('active');
   const portrait = card.querySelector('.char-portrait');
   const nameEl   = card.querySelector('.char-name');
@@ -950,6 +1055,7 @@ function setActiveCharacterCard(char) {
       portrait.src = char.iconUrl;
       portrait.alt = char.name;
       portrait.style.display = 'block';
+      portrait.onerror = () => { portrait.style.display = 'none'; };
     } else {
       portrait.style.display = 'none';
     }
@@ -1053,7 +1159,6 @@ function pollLastFm() {
 
 /* ═══════════════════════════════════════════════════
    LANYARD — Discord Rich Presence
-   Enhanced game cover art via SteamGridDB
 ═══════════════════════════════════════════════════ */
 (function initLanyard() {
   const DISCORD_ID = '789872551731527690';
@@ -1077,42 +1182,28 @@ function pollLastFm() {
   function getLanyardImageUrl(appId, imageKey) {
     if (!imageKey) return null;
     if (imageKey.startsWith('mp:external/')) {
-      const path = imageKey.replace('mp:external/', '');
-      return `https://media.discordapp.net/external/${path}`;
+      return `https://media.discordapp.net/external/${imageKey.replace('mp:external/', '')}`;
     }
     if (imageKey.startsWith('http')) return imageKey;
     if (appId) return `https://cdn.discordapp.com/app-assets/${appId}/${imageKey}.png`;
     return null;
   }
 
-  // Build square game cover candidates — best quality first
   function buildIconCandidates(game) {
     const appId = game.application_id;
     const candidates = [];
 
-    // 1. SteamGridDB square grid art (best quality, 600x900 → we use ?width=128&height=128 crop)
-    // Use the game name to search SteamGridDB's free CDN
-    // Note: SteamGridDB requires API key for search, but Steam has free covers
-    // For Steam games: https://cdn.cloudflare.steamstatic.com/steam/apps/{steamId}/library_600x900.jpg
-    // We'll try to find the Steam app ID from the Discord app ID
-
-    // 2. Discord app assets (large image)
     const li = getLanyardImageUrl(appId, game.assets?.large_image);
     if (li) candidates.push(li);
 
-    // 3. Steam grid art (if we can detect steam from app name or ID)
     const steamId = DISCORD_TO_STEAM[appId] || GAME_NAME_TO_STEAM[game.name?.toLowerCase()];
     if (steamId) {
-      // Portrait/box art (600x900) — we display it square with object-fit:cover
       candidates.push(`https://cdn.cloudflare.steamstatic.com/steam/apps/${steamId}/library_600x900.jpg`);
-      // Header image (460x215) as fallback
       candidates.push(`https://cdn.cloudflare.steamstatic.com/steam/apps/${steamId}/header.jpg`);
     }
 
-    // 4. App icon
     if (appId) candidates.push(`https://cdn.discordapp.com/app-icons/${appId}/icon.png`);
 
-    // 5. Small image
     if (!game.assets?.large_image && game.assets?.small_image) {
       const si = getLanyardImageUrl(appId, game.assets.small_image);
       if (si) candidates.push(si);
@@ -1121,15 +1212,14 @@ function pollLastFm() {
     return candidates;
   }
 
-  // Discord App ID → Steam App ID mapping
   const DISCORD_TO_STEAM = {
-    '356888672342802432': '730',      // Warframe
+    '356888672342802432': '230410',   // Warframe
     '363445589247131668': '892970',   // Valheim
     '356876057940836353': '570',      // Dota 2
-    '365269832713969664': '730',      // CS:GO
+    '365269832713969664': '730',      // CS:GO / CS2
     '438522866070716416': '1172470',  // Apex Legends
     '401875653219958785': '271590',   // GTA V
-    '385880084663230464': '48700',    // Terraria
+    '385880084663230464': '105600',   // Terraria
     '356876974230470659': '440',      // TF2
     '357244967025238018': '252950',   // Rocket League
     '367827983903490050': '1091500',  // Cyberpunk 2077
@@ -1137,11 +1227,9 @@ function pollLastFm() {
     '359502208508739584': '374320',   // Dark Souls 3
     '378968978029936640': '1245620',  // Elden Ring
     '503250966491480065': '526870',   // Satisfactory
-    '482973175553933312': '1091500',  // Cyberpunk alt
-    '936929561302675456': null,        // Genshin Impact (not on Steam)
+    '936929561302675456': null,       // Genshin Impact
   };
 
-  // Game name → Steam ID for common games
   const GAME_NAME_TO_STEAM = {
     'dota 2': '570',
     'counter-strike 2': '730',
@@ -1200,7 +1288,7 @@ function pollLastFm() {
       return;
     }
 
-    const startTs       = game.timestamps?.start;
+    const startTs        = game.timestamps?.start;
     const iconCandidates = buildIconCandidates(game);
     const smallImg = (game.assets?.large_image && game.assets?.small_image)
       ? getLanyardImageUrl(game.application_id, game.assets.small_image)
@@ -1262,13 +1350,10 @@ buildHeadphonesSVG();
 pollLastFm();
 setInterval(pollLastFm, 1000);
 
-// Restore last element theme
 try {
   const saved = sessionStorage.getItem('aw_elem');
   if (saved && ELEMENT_THEMES[saved]) applyElementTheme(saved);
 } catch(e) {}
 
-// Fetch Enka data and set element theme
 fetchEnka();
-// Re-fetch every 5 minutes
 setInterval(fetchEnka, 300000);
