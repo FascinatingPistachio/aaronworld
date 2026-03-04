@@ -77,8 +77,19 @@ body::after{
 .page{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 18px 40px}
 
 /* PARTICLES */
-.leaf{position:fixed;top:100vh;z-index:9999;pointer-events:none;animation:leafFall linear forwards;transition:var(--transition-theme)}
-@keyframes leafFall{0%{transform:translateY(0) rotate(0deg);opacity:0}5%{opacity:1}95%{opacity:.7}100%{transform:translateY(-110vh) rotate(360deg);opacity:0}}
+.leaf{
+  position:fixed;top:100vh;z-index:0;pointer-events:none;
+  color:rgba(160,118,48,.45);
+  font-style:normal;
+  text-shadow:0 0 6px rgba(180,138,60,.25);
+  animation:leafFall linear forwards;
+}
+@keyframes leafFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:0}
+  5%{opacity:1}
+  95%{opacity:.5}
+  100%{transform:translateY(-110vh) rotate(180deg);opacity:0}
+}
 #elemTransitionOverlay{position:fixed;inset:0;z-index:9998;pointer-events:none;background:var(--accent0);opacity:0;transition:opacity .15s}
 #elemTransitionOverlay.flash{opacity:.06}
 
@@ -333,7 +344,7 @@ footer{margin-top:24px;text-align:center;padding:18px 20px 0;border-top:1px soli
 
 /* TWEMOJI */
 img.emoji{height:1.2em;width:1.2em;margin:0 .05em 0 .1em;vertical-align:-.2em;display:inline-block;pointer-events:none}
-.leaf img.emoji{height:1em;width:1em;margin:0;vertical-align:0}
+/* Stars are plain text ✦, not emoji — no twemoji override needed for leaves */
 
 /* READABLE TEXT — strong contrast throughout */
 .lanyard-game-name,.char-name,.snp-title,.atitle,.gb-msg,p.bt{color:var(--ink-1) !important}

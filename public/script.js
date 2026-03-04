@@ -154,28 +154,28 @@ function applyElementTheme(element) {
     window._setFaviconToElement(theme.iconUrl);
   }
 
-  respawnParticles(theme.particles);
+  respawnParticles();
   buildHeadphonesSVG();
 
   try { sessionStorage.setItem('aw_elem', element); } catch(e) {}
 }
 
 /* ── FLOATING PARTICLES ── */
-function respawnParticles(emojis) {
+function respawnParticles() {
   themeLeaves.forEach(l => l.remove());
   themeLeaves = [];
-  const arr = emojis || ELEMENT_THEMES[currentElement].particles;
-  arr.forEach(e => {
+  const count = 38;
+  for (let i = 0; i < count; i++) {
     const l = document.createElement('div');
     l.className = 'leaf';
-    l.textContent = e;
+    l.textContent = '✦';
     l.style.left = (Math.random() * 96) + 'vw';
-    l.style.fontSize = (9 + Math.random() * 13) + 'px';
-    l.style.animationDuration = (15 + Math.random() * 22) + 's';
-    l.style.animationDelay   = (Math.random() * 28) + 's';
+    l.style.fontSize = (7 + Math.random() * 14) + 'px';
+    l.style.animationDuration = (18 + Math.random() * 26) + 's';
+    l.style.animationDelay   = (Math.random() * 32) + 's';
     document.body.appendChild(l);
     themeLeaves.push(l);
-  });
+  }
 }
 respawnParticles();
 
