@@ -297,7 +297,7 @@ html[data-element] .console-sub{color:rgba(240,216,120,.65)}
 .console-body{padding:13px 15px}
 .console-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(190,158,72,.1)}
 .console-row:last-child{border-bottom:none}
-.c-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--ink-3);text-transform:uppercase}
+.c-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--ink-2);text-transform:uppercase}
 .c-val{font-family:'Lora',serif;font-size:13.5px;color:var(--ink-1);font-weight:600;text-align:right;max-width:65%}
 .c-val a{color:var(--ink-3);text-decoration:none;transition:color .2s}
 .c-val a:hover{color:var(--ink-1)}
@@ -336,9 +336,16 @@ img.emoji{height:1.2em;width:1.2em;margin:0 .05em 0 .1em;vertical-align:-.2em;di
 .leaf img.emoji{height:1em;width:1em;margin:0;vertical-align:0}
 
 /* READABLE TEXT — strong contrast throughout */
-.lanyard-game-name,.char-name,.snp-title,.console-name,.atitle,.gb-msg,p.bt{color:var(--ink-1) !important}
+.lanyard-game-name,.char-name,.snp-title,.atitle,.gb-msg,p.bt{color:var(--ink-1) !important}
 .pname{color:var(--ink-1) !important}
-.lanyard-status-label,.lanyard-playing-label,.char-label,.snp-status,.d-label,.c-label,.stat-l,.loader-status-text{opacity:1 !important}
+/* console-name/sub live on dark headers — must be gold */
+.console-name{color:var(--gold-1) !important}
+html[data-element] .console-name{color:var(--accent0) !important}
+.console-sub{color:rgba(240,216,120,.65) !important}
+/* console body text — must be readable on parchment */
+.c-val{color:var(--ink-1) !important}
+.c-label{color:var(--ink-2) !important}
+.lanyard-status-label,.lanyard-playing-label,.char-label,.snp-status,.d-label,.stat-l,.loader-status-text{opacity:1 !important}
 html[data-element="hydro"] .lanyard-playing-label,html[data-element="hydro"] .lanyard-status-label,html[data-element="hydro"] .char-label,html[data-element="hydro"] .snp-status{color:#006aaa !important}
 html[data-element="cryo"] .lanyard-playing-label,html[data-element="cryo"] .lanyard-status-label,html[data-element="cryo"] .char-label,html[data-element="cryo"] .snp-status{color:#3888aa !important}
 html[data-element="anemo"] .lanyard-playing-label,html[data-element="anemo"] .lanyard-status-label,html[data-element="anemo"] .char-label,html[data-element="anemo"] .snp-status{color:#0a7850 !important}
