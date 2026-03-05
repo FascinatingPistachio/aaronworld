@@ -1,10 +1,160 @@
 /* ═══════════════════════════════════════════════════
-   AARONWORLD — script.js
+   AARONWORLD — script.js v4
+   • Animated night sky canvas (stars + nebula + shooting stars)
    • Element theming (Enka API → active character)
    • Square game covers (SteamGridDB + Discord CDN)
    • Last.fm now playing
    • Lanyard Discord presence
 ═══════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   ANIMATED NIGHT SKY CANVAS
+══════════════════════════════════════ */
+(function initSkyCanvas() {
+  const canvas = document.getElementById('skyCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let W, H, stars = [], nebulae = [], shootingStars = [];
+  let frame = 0;
+  let currentThemeColors = ['rgba(120,100,200,0.4)', 'rgba(80,60,160,0.25)', 'rgba(160,140,240,0.3)'];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildStars();
+    buildNebulae();
+  }
+
+  function buildStars() {
+    stars = [];
+    const count = Math.min(280, Math.floor(W * H / 6000));
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 0.3 + Math.random() * 1.8,
+        alpha: 0.2 + Math.random() * 0.8,
+        twinkleSpeed: 0.005 + Math.random() * 0.015,
+        twinklePhase: Math.random() * Math.PI * 2,
+        color: Math.random() > 0.85 ? '#c8d8ff' : Math.random() > 0.7 ? '#ffe8c8' : '#ffffff',
+      });
+    }
+  }
+
+  function buildNebulae() {
+    nebulae = [];
+    const count = 5;
+    for (let i = 0; i < count; i++) {
+      nebulae.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.75,
+        rx: 120 + Math.random() * 200,
+        ry: 80 + Math.random() * 120,
+        alpha: 0.025 + Math.random() * 0.04,
+        hue: 200 + Math.random() * 80,
+      });
+    }
+  }
+
+  function maybeSpawnShootingStar() {
+    if (Math.random() < 0.003 && shootingStars.length < 3) {
+      const angle = (Math.PI / 6) + Math.random() * (Math.PI / 6);
+      const speed = 8 + Math.random() * 12;
+      shootingStars.push({
+        x: Math.random() * W * 0.8,
+        y: Math.random() * H * 0.3,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1.0,
+        length: 60 + Math.random() * 100,
+        width: 1.5 + Math.random() * 1.5,
+      });
+    }
+  }
+
+  // Expose update so element theme can shift nebula colors
+  window._skyUpdateTheme = function(colors) {
+    currentThemeColors = colors || currentThemeColors;
+  };
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Nebulae
+    nebulae.forEach(n => {
+      const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.rx);
+      const c = currentThemeColors[0] || 'rgba(100,80,200,0.3)';
+      g.addColorStop(0, c.replace(/[\d.]+\)$/, `${n.alpha * 2.5})`));
+      g.addColorStop(0.5, c.replace(/[\d.]+\)$/, `${n.alpha * 1.2})`));
+      g.addColorStop(1, 'transparent');
+      ctx.save();
+      ctx.scale(1, n.ry / n.rx);
+      ctx.translate(0, n.y - n.y * (n.ry / n.rx));
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y * (n.rx / n.ry), n.rx, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Stars
+    stars.forEach(s => {
+      const twinkle = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(frame * s.twinkleSpeed + s.twinklePhase));
+      ctx.save();
+      ctx.globalAlpha = s.alpha * twinkle;
+      // Glow
+      const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3.5);
+      glow.addColorStop(0, s.color);
+      glow.addColorStop(0.4, s.color);
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      // Core
+      ctx.globalAlpha = s.alpha * twinkle * 0.9;
+      ctx.fillStyle = s.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Shooting stars
+    for (let i = shootingStars.length - 1; i >= 0; i--) {
+      const ss = shootingStars[i];
+      ctx.save();
+      ctx.globalAlpha = ss.life * 0.85;
+      const grad = ctx.createLinearGradient(
+        ss.x - ss.vx * (ss.length / 10), ss.y - ss.vy * (ss.length / 10),
+        ss.x, ss.y
+      );
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.6, 'rgba(220,215,255,0.7)');
+      grad.addColorStop(1, 'rgba(255,255,255,1)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = ss.width;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(ss.x - ss.vx * (ss.length / 10), ss.y - ss.vy * (ss.length / 10));
+      ctx.lineTo(ss.x, ss.y);
+      ctx.stroke();
+      ctx.restore();
+      ss.x += ss.vx; ss.y += ss.vy;
+      ss.life -= 0.028;
+      if (ss.life <= 0 || ss.x > W || ss.y > H) shootingStars.splice(i, 1);
+    }
+
+    maybeSpawnShootingStar();
+    frame++;
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(draw);
+})();
 
 /* ── ELEMENT THEME SYSTEM ── */
 const ELEMENT_THEMES = {
@@ -156,6 +306,11 @@ function applyElementTheme(element) {
 
   respawnParticles();
   buildHeadphonesSVG();
+
+  // Update sky nebula colors
+  if (window._skyUpdateTheme) {
+    window._skyUpdateTheme([theme.glow, theme.glow.replace(/[\d.]+\)$/, '0.18)'), theme.particleColors[0]]);
+  }
 
   try { sessionStorage.setItem('aw_elem', element); } catch(e) {}
 }
