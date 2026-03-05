@@ -1,649 +1,665 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-element="dendro">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AARONWORLD — Traveler's Journal</title>
-  <!-- Favicon: blank until element loads -->
+  <meta name="description" content="Aaron's personal corner of the web — Genshin Impact, anime, Nintendo, and more.">
+  <meta name="theme-color" content="#050510">
   <link rel="icon" id="faviconLink" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <meta name="theme-color" content="#06040f">
-  <meta name="description" content="AARONWORLD — Aaron's personal corner of the web. Genshin Impact, anime, Nintendo, and more.">
   <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
-<style>
-/* Mobile nav overflow fix */
-@media(max-width:400px){.loader-hud-inner{padding:10px 14px 14px}}
-
-</style>
 </head>
 <body>
 
-<!-- ════ ANIMATED NIGHT SKY CANVAS ════ -->
+<!-- ══ SKY LAYERS ══ -->
 <canvas id="skyCanvas" aria-hidden="true"></canvas>
+<div id="nebulaLayer" aria-hidden="true"></div>
 
-<!-- ════ GENSHIN LOADING SCREEN ════ -->
-<div id="gi-loader">
+<!-- ══ ELEMENT FLASH OVERLAY ══ -->
+<div id="elemTransitionOverlay" aria-hidden="true"></div>
 
-  <!-- Cinematic vignette -->
-  <div class="loader-vignette"></div>
+<!-- ══════════════════════════════════════
+     LOADING SCREEN — Genshin Web Event
+══════════════════════════════════════ -->
+<div id="gi-loader" role="status" aria-label="Loading AARONWORLD">
 
-  <!-- Ground fog -->
-  <div class="loader-fog"></div>
-
-  <!-- Crepuscular light shafts -->
-  <div class="loader-rays">
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
-    <div class="loader-ray"></div>
+  <div class="loader-bg-art" aria-hidden="true">
+    <div class="lba-layer lba-sky"></div>
+    <div class="lba-layer lba-glow"></div>
+    <div class="lba-layer lba-rays">
+      <div class="lba-ray" style="--r:-28deg;--x:8%;--w:260px;--d:0s;--o:.18"></div>
+      <div class="lba-ray" style="--r:-16deg;--x:22%;--w:140px;--d:1.2s;--o:.13"></div>
+      <div class="lba-ray" style="--r:-6deg;--x:34%;--w:300px;--d:2.4s;--o:.17"></div>
+      <div class="lba-ray" style="--r:5deg;--x:52%;--w:200px;--d:.7s;--o:.12"></div>
+      <div class="lba-ray" style="--r:14deg;--x:66%;--w:340px;--d:1.9s;--o:.19"></div>
+      <div class="lba-ray" style="--r:25deg;--x:84%;--w:180px;--d:.3s;--o:.11"></div>
+    </div>
+    <div class="lba-fog"></div>
+    <div class="lba-vignette"></div>
   </div>
 
-  <!-- Dust motes — JS will add more dynamically -->
-  <div class="loader-mote" style="left:12%;width:4px;height:4px;animation-duration:12s;animation-delay:0s;--drift:-15px"></div>
-  <div class="loader-mote" style="left:35%;width:3px;height:3px;animation-duration:18s;animation-delay:2s;--drift:25px"></div>
-  <div class="loader-mote" style="left:58%;width:5px;height:5px;animation-duration:14s;animation-delay:1s;--drift:10px"></div>
-  <div class="loader-mote" style="left:75%;width:3px;height:3px;animation-duration:20s;animation-delay:4s;--drift:-20px"></div>
-  <div class="loader-mote" style="left:90%;width:4px;height:4px;animation-duration:16s;animation-delay:1.5s;--drift:8px"></div>
-
-  <!-- Stage: crest + identity wordmark -->
-  <div class="loader-stage">
-
-    <!-- Decorative crest (no element icon) -->
-    <div class="loader-crest">
-      <div class="loader-crest-rule"></div>
-      <div class="loader-crest-gems">
-        <div class="loader-crest-gem sm" style="animation-delay:.3s"></div>
-        <div class="loader-crest-gem" style="animation-delay:0s"></div>
-        <div class="loader-crest-gem sm" style="animation-delay:.6s"></div>
+  <div class="loader-main" aria-hidden="true">
+    <div class="loader-ornament">
+      <div class="lorn-line"></div>
+      <div class="lorn-gems">
+        <div class="lorn-gem sm" style="animation-delay:.4s"></div>
+        <div class="lorn-gem md" style="animation-delay:.1s"></div>
+        <div class="lorn-gem lg" style="animation-delay:0s"></div>
+        <div class="lorn-gem md" style="animation-delay:.2s"></div>
+        <div class="lorn-gem sm" style="animation-delay:.5s"></div>
       </div>
-      <div class="loader-crest-rule"></div>
+      <div class="lorn-line"></div>
     </div>
 
-    <!-- Site wordmark -->
-    <div class="loader-identity">
-      <div class="loader-eyebrow">✦ &nbsp;&nbsp; Traveler's Journal &nbsp;&nbsp; ✦</div>
-      <div class="loader-wordmark">AARON<em>WORLD</em></div>
-      <div class="loader-divider">
-        <div class="loader-divider-line"></div>
-        <div class="loader-divider-gem"></div>
-        <div class="loader-divider-gem" style="animation-delay:.4s"></div>
-        <div class="loader-divider-gem" style="animation-delay:.8s"></div>
-        <div class="loader-divider-line"></div>
+    <div class="loader-wordmark-wrap">
+      <div class="lw-eyebrow">✦ &nbsp; Traveler's Personal Journal &nbsp; ✦</div>
+      <div class="lw-title">AARON<em>WORLD</em></div>
+      <div class="lw-divider">
+        <div class="lw-div-line"></div>
+        <div class="lw-div-gem" style="animation-delay:0s"></div>
+        <div class="lw-div-gem" style="animation-delay:.35s"></div>
+        <div class="lw-div-gem" style="animation-delay:.7s"></div>
+        <div class="lw-div-line rev"></div>
       </div>
-      <div class="loader-subtitle">Region: EU &nbsp;·&nbsp; AR 27 &nbsp;·&nbsp; Dendro Main</div>
+      <div class="lw-sub">EU Server &nbsp;·&nbsp; AR 27 &nbsp;·&nbsp; Dendro Traveler</div>
     </div>
-
   </div>
 
-  <!-- Bottom HUD — dark frosted glass -->
   <div class="loader-hud">
-    <div class="loader-hud-inner">
-      <div class="loader-hud-top">
-        <div class="loader-tip-block">
-          <div class="loader-tip-label">Traveler's Tip</div>
-          <div class="loader-tip-text" id="loaderTip">"The pursuit of knowledge requires crossing many frontiers."</div>
-          <div class="loader-tip-attr" id="loaderTipAttr">— Alhaitham</div>
-        </div>
-        <div class="loader-brand">
-          <div class="loader-brand-gem-row">
-            <div class="loader-brand-gem"></div>
-            <div class="loader-brand-name">AARONWORLD</div>
-          </div>
-          <div class="loader-brand-sub">Teyvat &nbsp;·&nbsp; EU Server</div>
+    <div class="lhud-sep"></div>
+    <div class="lhud-inner">
+      <div class="lhud-tip">
+        <div class="lhud-tip-label"><span class="lhud-tip-rule"></span>Traveler's Tip<span class="lhud-tip-rule"></span></div>
+        <div class="lhud-tip-text" id="loaderTip">"The pursuit of knowledge requires crossing many frontiers."</div>
+        <div class="lhud-tip-attr" id="loaderTipAttr">— Alhaitham</div>
+      </div>
+      <div class="lhud-brand">
+        <div class="lhud-brand-gem"></div>
+        <div class="lhud-brand-name">AARONWORLD</div>
+        <div class="lhud-brand-sub">Teyvat · EU Server</div>
+      </div>
+    </div>
+    <div class="lhud-progress">
+      <div class="lhud-bar-wrap">
+        <div class="lhud-bar-track">
+          <div class="lhud-bar-fill" id="loaderBarFill"></div>
         </div>
       </div>
-      <div class="loader-hud-bar">
-        <div class="loader-bar-track">
-          <div class="loader-bar-fill" id="loaderBarFill"></div>
-        </div>
-        <div class="loader-status-text" id="loaderStatus">Initialising…</div>
-      </div>
+      <div class="lhud-status" id="loaderStatus">Initialising…</div>
     </div>
   </div>
 
 </div>
+<!-- /loader -->
 
-<div id="elemTransitionOverlay"></div>
+<!-- ══════════════════════════════════════
+     MAIN SITE
+══════════════════════════════════════ -->
+<div class="page" id="mainPage">
 
-<div class="page">
+  <!-- ── HEADER ── -->
+  <header class="site-header" id="siteHeader">
+    <div class="sh-corner sh-c-tl"></div><div class="sh-corner sh-c-tr"></div>
+    <div class="sh-corner sh-c-bl"></div><div class="sh-corner sh-c-br"></div>
+    <div class="sh-corner2 sh-c2-tl"></div><div class="sh-corner2 sh-c2-tr"></div>
+    <div class="sh-corner2 sh-c2-bl"></div><div class="sh-corner2 sh-c2-br"></div>
+    <div class="sh-top-line"></div>
 
-<!-- ════ HEADER ════ -->
-<div class="gi-panel site-header">
-  <div class="hc hc-tl"></div><div class="hc hc-tr"></div>
-  <div class="hc hc-bl"></div><div class="hc hc-br"></div>
-  <div class="hc2 hc2-tl"></div><div class="hc2 hc2-tr"></div>
-  <div class="hc2 hc2-bl"></div><div class="hc2 hc2-br"></div>
+    <div class="sh-eyebrow">✦ &emsp; Traveler's Personal Journal &emsp; ✦</div>
 
-  <div class="h-eyebrow">✦   Traveler's Personal Journal   ✦</div>
+    <div class="sh-title-row">
+      <img class="sh-elem-icon" id="headerElemIconL" src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:26px;filter:drop-shadow(0 0 8px currentColor)'}))">
+      <h1 class="sh-title">AARON<em>WORLD</em></h1>
+      <img class="sh-elem-icon" id="headerElemIconR" src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:26px;filter:drop-shadow(0 0 8px currentColor)'}))">
+    </div>
 
-  <div class="h-title-row">
-    <img class="h-elem-icon"
-      src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
-      onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:28px'}))">
-    <h1 class="h-title">AARON<em>WORLD</em></h1>
-    <img class="h-elem-icon"
-      src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
-      onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:28px'}))">
+    <div class="sh-tagline">✦ &emsp; Welcome to my corner of the web — may the wind lead you &emsp; ✦</div>
+
+    <div class="sh-status-bar" id="enka-header-bar">
+      <span class="sh-stat" id="sh-ar">AR 27</span>
+      <span class="sh-sep">✦</span>
+      <span class="sh-stat" id="sh-wl">WL 2</span>
+      <span class="sh-sep">✦</span>
+      <span class="sh-stat" id="sh-main">Dendro Main</span>
+      <span class="sh-sep">✦</span>
+      <span class="sh-stat">EU</span>
+    </div>
+  </header>
+
+  <!-- ── NAV ── -->
+  <nav class="main-nav" id="mainNav" role="navigation" aria-label="Main navigation">
+    <div class="nav-shimmer"></div>
+    <button class="nav-link active" data-sec="home" onclick="showSec('home',this)">
+      <span class="nav-icon">⌂</span><span class="nav-txt">Home</span>
+    </button>
+    <button class="nav-link" data-sec="about" onclick="showSec('about',this)">
+      <span class="nav-icon">✦</span><span class="nav-txt">About</span>
+    </button>
+    <button class="nav-link" data-sec="anime" onclick="showSec('anime',this)">
+      <span class="nav-icon">◈</span><span class="nav-txt">Anime</span>
+    </button>
+    <button class="nav-link" data-sec="showcase" onclick="showSec('showcase',this)">
+      <span class="nav-icon">▶</span><span class="nav-txt">Showcase</span>
+    </button>
+    <button class="nav-link" data-sec="setup" onclick="showSec('setup',this)">
+      <span class="nav-icon">⊕</span><span class="nav-txt">Setup</span>
+    </button>
+  </nav>
+
+  <!-- ── BODY GRID ── -->
+  <div class="body-grid">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" aria-label="Profile sidebar">
+
+      <!-- Profile card -->
+      <div class="gi-panel">
+        <div class="gi-head">
+          <div class="gi-gem"></div>
+          <span class="gi-head-title">Traveler Profile</span>
+          <div class="gi-head-line"></div>
+        </div>
+        <div class="gi-body center-body">
+
+          <div class="pfp-outer" id="pfpOuter">
+            <canvas id="pfpVfx" aria-hidden="true"></canvas>
+            <div class="pfp-ring r1" aria-hidden="true"></div>
+            <div class="pfp-ring r2" aria-hidden="true"></div>
+            <div class="pfp-ring r3" aria-hidden="true"></div>
+            <img class="pfp-img" id="pfpImg"
+              src="https://raw.githubusercontent.com/UserPFP/img/main/Avatars/7/789872551731527690.gif"
+              alt="Aaron's avatar"
+              onerror="this.src='https://ui-avatars.com/api/?name=Aaron&background=0d1b0a&color=a8cc28&size=100&bold=true'">
+            <div class="pfp-elem-badge" id="pfpElemBadge">
+              <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="Dendro element"
+                onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))">
+            </div>
+            <div id="pfpHeadphones" aria-hidden="true"></div>
+          </div>
+
+          <div class="profile-name">Aaron</div>
+          <div class="profile-sub">Traveler · Teyvat · EU</div>
+
+          <div class="elem-tag" id="elemTag">
+            <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="" onerror="this.style.display='none'" aria-hidden="true">
+            <span>Dendro Main</span>
+          </div>
+
+          <div class="stats-block">
+            <div class="stat-row">
+              <span class="stat-label">Adventure Rank</span>
+              <span class="stat-value" id="enka-ar">27</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">World Level</span>
+              <span class="stat-value" id="enka-wl">2</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Server</span>
+              <span class="stat-value" id="enka-region">EU</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Main</span>
+              <span class="stat-value" id="enka-main">Dendro Traveler</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Achievements</span>
+              <span class="stat-value" id="enka-achieve">—</span>
+            </div>
+          </div>
+
+          <div id="enkaCharacterCard">
+            <img class="ecc-portrait" id="eccPortrait" src="" alt="Active character" onerror="this.style.display='none'">
+            <div class="ecc-info">
+              <div class="ecc-label"><div class="ecc-dot"></div>Active Character</div>
+              <div class="ecc-name" id="eccName">—</div>
+              <div class="ecc-level" id="eccLevel"></div>
+            </div>
+            <div class="ecc-const" id="eccConst">C0</div>
+          </div>
+
+        </div>
+
+        <!-- Now Playing strip -->
+        <div class="nowplaying-strip" id="sidebarNowPlaying">
+          <div class="np-divider">
+            <div class="np-div-line"></div>
+            <div class="np-div-icon">♪</div>
+            <div class="np-div-line"></div>
+          </div>
+          <div class="np-inner">
+            <div class="np-art" id="snpArt">🎵</div>
+            <div class="np-text">
+              <div class="np-status"><div class="np-dot"></div><span>Now Playing</span></div>
+              <div class="np-title" id="snpTitle">—</div>
+              <div class="np-artist" id="snpArtist">—</div>
+            </div>
+            <div class="np-eq" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /profile card -->
+
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-col" id="mainContent">
+
+      <!-- HOME -->
+      <section id="home" class="section active" aria-label="Home">
+
+        <div class="gi-panel reveal">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Greetings, Traveler</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text">Welcome to <strong>AARONWORLD</strong> — my personal little corner of the internet, made with love. I built this place because I wanted somewhere truly mine.</p>
+            <p class="body-text">I spend most of my free time traversing <strong>Teyvat</strong> in Genshin Impact, watching <strong>anime</strong>, and tinkering with <strong>HTML &amp; CSS</strong>. This site is always under construction — check back often, something new is always growing here!</p>
+            <blockquote class="gi-quote">
+              The forest whispers to those who listen. May the wind lead you! 🌿
+            </blockquote>
+          </div>
+        </div>
+
+        <!-- Quick links / social -->
+        <div class="gi-panel reveal" style="animation-delay:.06s">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Connections</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body">
+            <div class="links-grid">
+              <a class="link-card" href="https://www.last.fm/user/FoxStorm1" target="_blank" rel="noopener">
+                <div class="lc-icon">♫</div>
+                <div class="lc-info">
+                  <div class="lc-label">Last.fm</div>
+                  <div class="lc-val">FoxStorm1</div>
+                </div>
+                <div class="lc-arrow">›</div>
+              </a>
+              <a class="link-card" href="https://lanyard.rest" target="_blank" rel="noopener">
+                <div class="lc-icon">◈</div>
+                <div class="lc-info">
+                  <div class="lc-label">Discord</div>
+                  <div class="lc-val">Via Lanyard</div>
+                </div>
+                <div class="lc-arrow">›</div>
+              </a>
+              <a class="link-card" href="https://enka.network/u/764275665" target="_blank" rel="noopener">
+                <div class="lc-icon">🌿</div>
+                <div class="lc-info">
+                  <div class="lc-label">Enka Profile</div>
+                  <div class="lc-val">UID 764275665</div>
+                </div>
+                <div class="lc-arrow">›</div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="section" aria-label="About Aaron">
+
+        <div class="gi-panel reveal">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">About This Traveler</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text">Hi, I'm <strong>Aaron</strong>.</p>
+            <p class="body-text">I'm a massive Nintendo fan with a slightly unreasonable console collection, a Genshin player who will defend Dendro to the grave, and someone who will not apologise for having strong opinions on anime. JJK is mid and I said what I said.</p>
+            <blockquote class="gi-quote">
+              「The pursuit of knowledge requires crossing many frontiers.」— Alhaitham
+            </blockquote>
+          </div>
+        </div>
+
+        <div class="gi-panel reveal" style="animation-delay:.06s">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Traveler's Dossier</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body no-pad">
+            <div class="dossier-grid">
+              <div class="dossier-row"><div class="dr-icon">🎮</div><div class="dr-body"><div class="dr-label">Currently Playing</div><div class="dr-val">Genshin Impact · Fortnite · Rocket League</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🌿</div><div class="dr-body"><div class="dr-label">Fave Element</div><div class="dr-val">Dendro</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🗺️</div><div class="dr-body"><div class="dr-label">Fave Region</div><div class="dr-val">Sumeru</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">📺</div><div class="dr-body"><div class="dr-label">Currently Watching</div><div class="dr-val">Whatever's on the anime list</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🚫</div><div class="dr-body"><div class="dr-label">Certified Bad Anime</div><div class="dr-val">Jujutsu Kaisen (overrated, sorry not sorry)</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🕹️</div><div class="dr-body"><div class="dr-label">Consoles Owned</div><div class="dr-val">Switch 2 · Modded Switch · Wii U · GCN · N64</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🔓</div><div class="dr-body"><div class="dr-label">Switch CFW</div><div class="dr-val">Atmosphere + Hekate</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">💿</div><div class="dr-body"><div class="dr-label">Wii U CFW</div><div class="dr-val">Aroma</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🌐</div><div class="dr-body"><div class="dr-label">Browser</div><div class="dr-val">Brave</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🏗️</div><div class="dr-body"><div class="dr-label">Site Status</div><div class="dr-val">Perpetually under construction</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ANIME -->
+      <section id="anime" class="section" aria-label="Anime rankings">
+
+        <div class="gi-panel reveal">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Anime Rankings</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text subtle" style="margin-bottom:18px;">Ranked in order of my personal preference — #1 is my all-time favourite.</p>
+            <div class="anime-grid">
+              <div class="anime-card" style="--i:0"><div class="ac-rank rank-gold">1</div><div class="ac-poster"><img src="https://i.ibb.co/bjbCxsxB/252b8c2532-jpg.webp" alt="Tougen Anki" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Tougen Anki</div></div></div>
+              <div class="anime-card" style="--i:1"><div class="ac-rank">2</div><div class="ac-poster"><img src="https://i.ibb.co/7dNbp992/63172b00a1-jpg.webp" alt="Jack of all trades" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Jack of all trades: party of none</div></div></div>
+              <div class="anime-card" style="--i:2"><div class="ac-rank">3</div><div class="ac-poster"><img src="https://i.ibb.co/SDBfBgfx/d9aeed41f7-jpg.webp" alt="Dr. Stone" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Dr. Stone</div></div></div>
+              <div class="anime-card" style="--i:3"><div class="ac-rank">4</div><div class="ac-poster"><img src="https://i.ibb.co/LDyhzp0C/b913b9d60a-jpg.webp" alt="Death Note" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Death Note</div></div></div>
+              <div class="anime-card" style="--i:4"><div class="ac-rank">5</div><div class="ac-poster"><img src="https://i.ibb.co/Rk3Gy2Lf/530ac6c560-jpg.webp" alt="Tokyo Ghoul" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Tokyo Ghoul</div></div></div>
+              <div class="anime-card" style="--i:5"><div class="ac-rank">6</div><div class="ac-poster"><img src="https://i.ibb.co/tPXjTGmR/495b0bcfe5-jpg.webp" alt="Black Clover" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Black Clover</div></div></div>
+              <div class="anime-card" style="--i:6"><div class="ac-rank">7</div><div class="ac-poster"><img src="https://i.ibb.co/nqDtdLPr/8a8750d29e-jpg.webp" alt="Hell's Paradise" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Hell's Paradise</div></div></div>
+              <div class="anime-card" style="--i:7"><div class="ac-rank">8</div><div class="ac-poster"><img src="https://i.ibb.co/gMHGMN7C/5d32955d78-jpg.webp" alt="Shield Hero" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Rising of the Shield Hero</div></div></div>
+              <div class="anime-card" style="--i:8"><div class="ac-rank">9</div><div class="ac-poster"><img src="https://i.ibb.co/27p0XzPF/cc41223570-jpg.webp" alt="Gachiakuta" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Gachiakuta</div></div></div>
+              <div class="anime-card" style="--i:9"><div class="ac-rank">10</div><div class="ac-poster"><img src="https://i.ibb.co/WpznTTLy/e5e3c7ec46-jpg.webp" alt="Solo Levelling" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Solo Levelling</div></div></div>
+              <div class="anime-card" style="--i:10"><div class="ac-rank">11</div><div class="ac-poster"><img src="https://i.ibb.co/6c0jWzP7/9c6a2853d7-jpg.webp" alt="Demon Slayer" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Demon Slayer</div></div></div>
+              <div class="anime-card" style="--i:11"><div class="ac-rank">12</div><div class="ac-poster"><img src="https://i.ibb.co/PzbBxqfF/c98614e818-jpg.webp" alt="High Card" loading="lazy"></div><div class="ac-foot"><div class="ac-title">High Card</div></div></div>
+              <div class="anime-card" style="--i:12"><div class="ac-rank">13</div><div class="ac-poster"><img src="https://i.ibb.co/JFK933Kn/3144f15062-jpg.webp" alt="Oshi no Ko" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Oshi no Ko</div></div></div>
+              <div class="anime-card" style="--i:13"><div class="ac-rank">14</div><div class="ac-poster"><img src="https://i.ibb.co/4qVhyKw/d17d7148c6-jpg.webp" alt="Seven Deadly Sins" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Seven Deadly Sins</div></div></div>
+              <div class="anime-card" style="--i:14"><div class="ac-rank">15</div><div class="ac-poster"><img src="https://i.ibb.co/JjWKXfR5/af633add9b-jpg.webp" alt="My Hero Academia" loading="lazy"></div><div class="ac-foot"><div class="ac-title">My Hero Academia</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SHOWCASE -->
+      <section id="showcase" class="section" aria-label="Activity showcase">
+
+        <div class="gi-panel reveal">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Currently Playing</span>
+            <div class="gi-head-line"></div>
+            <div class="live-badge" aria-label="Live data">LIVE</div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text subtle" style="margin-bottom:16px;">Live Discord presence via <a href="https://lanyard.rest" target="_blank" rel="noopener">Lanyard</a> — updates every 15 seconds.</p>
+            <div id="lanyardWidget"><div class="gi-spinner"><div class="spinner-ring"></div><span>Connecting…</span></div></div>
+          </div>
+        </div>
+
+        <div class="gi-panel reveal" style="animation-delay:.07s">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Now Playing</span>
+            <div class="gi-head-line"></div>
+            <div class="live-badge">LIVE</div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text subtle" style="margin-bottom:16px;">Scrobbles from <a href="https://www.last.fm/user/FoxStorm1" target="_blank" rel="noopener">my Last.fm</a>.</p>
+            <div id="lastfmWidget"><div class="gi-spinner"><div class="spinner-ring"></div><span>Loading Last.fm…</span></div></div>
+          </div>
+        </div>
+
+        <div class="gi-panel reveal" style="animation-delay:.14s">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Game Library</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text subtle" style="margin-bottom:18px;">Games I play regularly — no particular order.</p>
+            <div class="cards-grid">
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🌿</div><div><div class="ic-name">Genshin Impact</div><div class="ic-sub">PC · F2P</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">AR</span><span class="ic-v" id="gc-ar">—</span></div>
+                  <div class="ic-row"><span class="ic-l">Server</span><span class="ic-v">Europe</span></div>
+                  <div class="ic-row"><span class="ic-l">Element</span><span class="ic-v">Dendro</span></div>
+                  <div class="ic-row"><span class="ic-l">Hours</span><span class="ic-v">Too many</span></div>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🏗️</div><div><div class="ic-name">Fortnite</div><div class="ic-sub">PC / Switch 2</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Mode</span><span class="ic-v">Battle Royale</span></div>
+                  <div class="ic-row"><span class="ic-l">Platform</span><span class="ic-v">Cross-platform</span></div>
+                  <div class="ic-row"><span class="ic-l">Playstyle</span><span class="ic-v">Casual</span></div>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🚗</div><div><div class="ic-name">Rocket League</div><div class="ic-sub">PC</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Type</span><span class="ic-v">Competitive</span></div>
+                  <div class="ic-row"><span class="ic-l">Platform</span><span class="ic-v">PC</span></div>
+                  <div class="ic-row"><span class="ic-l">Playstyle</span><span class="ic-v">Try-hard (sometimes)</span></div>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🧱</div><div><div class="ic-name">Roblox</div><div class="ic-sub">PC</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Type</span><span class="ic-v">Platform</span></div>
+                  <div class="ic-row"><span class="ic-l">Playstyle</span><span class="ic-v">Depends on the game</span></div>
+                </div>
+              </div>
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🦸</div><div><div class="ic-name">Overwatch 2</div><div class="ic-sub">PC</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Type</span><span class="ic-v">Hero Shooter</span></div>
+                  <div class="ic-row"><span class="ic-l">Playstyle</span><span class="ic-v">Trying my best</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SETUP -->
+      <section id="setup" class="section" aria-label="Console collection">
+
+        <div class="gi-panel reveal">
+          <div class="gi-head">
+            <div class="gi-gem"></div>
+            <span class="gi-head-title">Console Collection</span>
+            <div class="gi-head-line"></div>
+          </div>
+          <div class="gi-body">
+            <p class="body-text subtle" style="margin-bottom:18px;">Every console I own. Modded ones run custom firmware for homebrew, backups &amp; emulation.</p>
+            <div class="cards-grid">
+
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🆕</div><div><div class="ic-name">Nintendo Switch 2</div><div class="ic-sub">Stock</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Status</span><span class="ic-v">Unmodded</span></div>
+                  <div class="ic-row"><span class="ic-l">Released</span><span class="ic-v">2025</span></div>
+                  <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">Keeping it clean for now</span></div>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🔓</div><div><div class="ic-name">Nintendo Switch</div><div class="ic-sub">Custom Firmware</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">CFW</span><span class="ic-v"><a href="https://github.com/Atmosphere-NX/Atmosphere" target="_blank" rel="noopener">Atmosphere</a></span></div>
+                  <div class="ic-row"><span class="ic-l">Bootloader</span><span class="ic-v"><a href="https://github.com/CTCaer/hekate" target="_blank" rel="noopener">Hekate</a></span></div>
+                  <div class="ic-row"><span class="ic-l">Type</span><span class="ic-v">Unpatched RCM</span></div>
+                  <div class="ic-row"><span class="ic-l">Guide</span><span class="ic-v"><a href="https://switch.hacks.guide" target="_blank" rel="noopener">switch.hacks.guide</a></span></div>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">📀</div><div><div class="ic-name">Nintendo Wii U</div><div class="ic-sub">Custom Firmware</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">CFW</span><span class="ic-v"><a href="https://aroma.foryour.cafe" target="_blank" rel="noopener">Aroma</a></span></div>
+                  <div class="ic-row"><span class="ic-l">Exploit</span><span class="ic-v">Coldboot Haxchi</span></div>
+                  <div class="ic-row"><span class="ic-l">vWii</span><span class="ic-v">Homebrew + BootMii</span></div>
+                  <div class="ic-row"><span class="ic-l">Guide</span><span class="ic-v"><a href="https://wiiu.hacks.guide" target="_blank" rel="noopener">wiiu.hacks.guide</a></span></div>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🟪</div><div><div class="ic-name">Nintendo GameCube</div><div class="ic-sub">Modded</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Released</span><span class="ic-v">2001</span></div>
+                  <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">The purple lunchbox. A classic.</span></div>
+                  <div class="ic-row"><span class="ic-l">Guide</span><span class="ic-v"><a href="https://www.gc-forever.com/wiki/" target="_blank" rel="noopener">gc-forever wiki</a></span></div>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🟥</div><div><div class="ic-name">Nintendo 64</div><div class="ic-sub">Retro</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Released</span><span class="ic-v">1996</span></div>
+                  <div class="ic-row"><span class="ic-l">Best Game</span><span class="ic-v">Ocarina of Time, obviously</span></div>
+                  <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">Old enough to be my parent. Slaps.</span></div>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <div class="ic-head"><div class="ic-icon">🃏</div><div><div class="ic-name">Game &amp; Watch</div><div class="ic-sub">Mario + Zelda editions</div></div></div>
+                <div class="ic-rows">
+                  <div class="ic-row"><span class="ic-l">Editions</span><span class="ic-v">Super Mario · Zelda</span></div>
+                  <div class="ic-row"><span class="ic-l">Released</span><span class="ic-v">2020 / 2021</span></div>
+                  <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">Actually really cool</span></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
   </div>
+  <!-- /body-grid -->
 
-  <div class="h-tagline">✦   Welcome to my corner of the web — may the wind lead you   ✦</div>
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-rule">
+      <div class="fr-line"></div>
+      <div class="fr-gem"></div>
+      <div class="fr-gem" style="animation-delay:.4s"></div>
+      <div class="fr-gem" style="animation-delay:.8s"></div>
+      <div class="fr-line rev"></div>
+    </div>
+    <div class="footer-badges">
+      <a href="https://brave.com" target="_blank" rel="noopener" title="Get Brave Browser">
+        <img src="https://cyber.dabamos.de/88x31/brave.gif" width="88" height="31" alt="Brave Browser" onerror="this.parentElement.style.display='none'">
+      </a>
+      <a href="https://wiibrew.org/wiki/Homebrew_Channel" target="_blank" rel="noopener" title="Homebrew Channel">
+        <img src="https://1dkreally.neocities.org/graphics/buttons/homebrewchannel.gif" width="88" height="31" alt="Homebrew Channel" onerror="this.parentElement.style.display='none'">
+      </a>
+    </div>
+    <div class="footer-copy">© AARONWORLD &emsp;✦&emsp; Hand-crafted in the forests of Sumeru &emsp;✦&emsp; All rights reserved</div>
+    <div class="footer-sub">Built with love &amp; too much caffeine</div>
+  </footer>
 
-  <div class="gold-rule" style="max-width:480px;margin:10px auto 0;" id="enka-header-bar">
-    WL 2  ✦  AR 27  ✦  DENDRO MAIN  ✦  EU
-  </div>
 </div>
-
-<!-- ════ NAV ════ -->
-<nav id="mainNav">
-  <a href="#" class="active" onclick="showSec('home',this);return false;">Home</a>
-  <a href="#" onclick="showSec('about',this);return false;">About</a>
-  <a href="#" onclick="showSec('anime',this);return false;">Anime List</a>
-  <a href="#" onclick="showSec('showcase',this);return false;">Showcase</a>
-  <a href="#" onclick="showSec('setup',this);return false;">Setup</a>
-</nav>
-
-<div class="grid">
-
-<!-- ════ SIDEBAR ════ -->
-<aside class="sidebar">
-
-  <!-- Profile -->
-  <div class="gi-panel">
-    <div class="gi-head">
-      <div class="gi-head-gem"></div>
-      <div class="gi-head-title">Traveler Profile</div>
-      <div class="gi-head-line"></div>
-    </div>
-    <div class="panel-body" style="text-align:center">
-
-      <div class="pfp-outer" id="pfpOuter">
-        <canvas id="pfpVfx"></canvas>
-        <div class="pfp-ring"></div>
-        <div class="pfp-ring"></div>
-        <div class="pfp-ring"></div>
-        <img class="pfp-img"
-          src="https://raw.githubusercontent.com/UserPFP/img/main/Avatars/7/789872551731527690.gif"
-          alt="Aaron"
-          onerror="this.src='https://ui-avatars.com/api/?name=Aaron&background=111e08&color=b8d430&size=96&bold=true'">
-        <div class="pfp-elem">
-          <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="Element"
-            onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:12px'}))">
-        </div>
-        <div id="pfpHeadphones"></div>
-      </div>
-
-      <div class="pname" style="margin-top:14px;">Aaron</div>
-      <div class="par">Traveler · Teyvat</div>
-      <div class="elem-badge">
-        <img src="https://i.ibb.co/fz1vj9B3/Element-Dendro.webp" alt="" onerror="this.style.display='none'">
-        Dendro Main
-      </div>
-
-      <div class="stat-row"><span class="stat-l">Adventure Rank</span><span class="stat-v" id="enka-ar">27</span></div>
-      <div class="stat-row"><span class="stat-l">World Level</span><span class="stat-v" id="enka-wl">2</span></div>
-      <div class="stat-row"><span class="stat-l">Region</span><span class="stat-v" id="enka-region">EU</span></div>
-      <div class="stat-row"><span class="stat-l">Main</span><span class="stat-v" id="enka-main">Dendro Traveler</span></div>
-      <div class="stat-row"><span class="stat-l">Achievements</span><span class="stat-v" id="enka-achieve">—</span></div>
-
-      <div id="enkaCharacterCard" style="margin:10px 0 4px;">
-        <img class="char-portrait" src="" alt="Character" onerror="this.style.display='none'">
-        <div class="char-info">
-          <div class="char-label"><div class="char-label-dot"></div>Active Character</div>
-          <div class="char-name">—</div>
-          <div class="char-level"></div>
-        </div>
-        <div class="char-constellation">C0</div>
-      </div>
-    </div>
-
-    <div class="sidebar-nowplaying" id="sidebarNowPlaying">
-      <div class="gold-rule" style="margin:0 14px;">♪</div>
-      <div class="snp-inner">
-        <div class="snp-art" id="snpArt">🎵</div>
-        <div class="snp-text">
-          <div class="snp-status"><div class="snp-dot"></div> Now Playing</div>
-          <div class="snp-title" id="snpTitle">—</div>
-          <div class="snp-artist" id="snpArtist">—</div>
-        </div>
-        <div class="snp-eq">
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-</aside>
-
-<!-- ════ MAIN ════ -->
-<main class="main-col">
-
-  <!-- HOME -->
-  <div id="home" class="section active">
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Greetings, Traveler</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt">Welcome to <strong>AARONWORLD</strong> — my personal little corner of the internet, made with love. I built this place because I wanted somewhere truly mine.</p>
-        <p class="bt">I spend most of my free time traversing <strong>Teyvat</strong> in Genshin Impact, watching <strong>anime</strong>, and tinkering with <strong>HTML &amp; CSS</strong>. This site is always under construction — check back often, something new is always growing here!</p>
-        <div class="gi-blockquote">
-          The forest whispers to those who listen. May the wind lead you! 🌿
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ABOUT -->
-  <div id="about" class="section">
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">About This Traveler</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt">Hi, I'm <strong>Aaron</strong>.</p>
-        <p class="bt">I'm a massive Nintendo fan with a slightly unreasonable console collection, a Genshin player who will defend Dendro to the grave, and someone who will not apologise for having strong opinions on anime. JJK is mid and I said what I said.</p>
-        <div class="gi-blockquote">
-          「The pursuit of knowledge requires crossing many frontiers.」— Alhaitham
-        </div>
-      </div>
-    </div>
-
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Traveler's Dossier</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body" style="padding:0">
-        <div class="dossier-grid">
-          <div class="dossier-row"><div class="d-icon">🎮</div><div class="d-text"><span class="d-label">Currently Playing</span><span class="d-val">Genshin Impact · Fortnite · Rocket League</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🌿</div><div class="d-text"><span class="d-label">Fave Element</span><span class="d-val">Dendro</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🗺️</div><div class="d-text"><span class="d-label">Fave Region</span><span class="d-val">Sumeru</span></div></div>
-          <div class="dossier-row"><div class="d-icon">📺</div><div class="d-text"><span class="d-label">Currently Watching</span><span class="d-val">Whatever's on the anime list</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🚫</div><div class="d-text"><span class="d-label">Certified Bad Anime</span><span class="d-val">Jujutsu Kaisen (overrated, sorry not sorry)</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🕹️</div><div class="d-text"><span class="d-label">Consoles Owned</span><span class="d-val">Switch 2 · Modded Switch · Wii U · GCN · N64</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🔓</div><div class="d-text"><span class="d-label">Switch CFW</span><span class="d-val">Atmosphere + Hekate</span></div></div>
-          <div class="dossier-row"><div class="d-icon">💿</div><div class="d-text"><span class="d-label">Wii U CFW</span><span class="d-val">Aroma</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🏗️</div><div class="d-text"><span class="d-label">Site Status</span><span class="d-val">Perpetually under construction</span></div></div>
-          <div class="dossier-row"><div class="d-icon">🌐</div><div class="d-text"><span class="d-label">Browser</span><span class="d-val">Brave</span></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ANIME -->
-  <div id="anime" class="section">
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Anime Rankings</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt" style="margin-bottom:14px;font-size:12.5px;color:var(--ink4);">Ranked in order — #1 is my all-time favourite.</p>
-        <div class="agrid">
-          <div class="acard"><div class="a-rank rank1">1</div><div class="aposter-img"><img src="https://i.ibb.co/bjbCxsxB/252b8c2532-jpg.webp" alt="Tougen Anki" loading="lazy"></div><div class="abody"><div class="atitle">Tougen Anki</div></div></div>
-          <div class="acard"><div class="a-rank">2</div><div class="aposter-img"><img src="https://i.ibb.co/7dNbp992/63172b00a1-jpg.webp" alt="Jack of all trades" loading="lazy"></div><div class="abody"><div class="atitle">Jack of all trades: party of none</div></div></div>
-          <div class="acard"><div class="a-rank">3</div><div class="aposter-img"><img src="https://i.ibb.co/SDBfBgfx/d9aeed41f7-jpg.webp" alt="Dr. Stone" loading="lazy"></div><div class="abody"><div class="atitle">Dr. Stone</div></div></div>
-          <div class="acard"><div class="a-rank">4</div><div class="aposter-img"><img src="https://i.ibb.co/LDyhzp0C/b913b9d60a-jpg.webp" alt="Death Note" loading="lazy"></div><div class="abody"><div class="atitle">Death Note</div></div></div>
-          <div class="acard"><div class="a-rank">5</div><div class="aposter-img"><img src="https://i.ibb.co/Rk3Gy2Lf/530ac6c560-jpg.webp" alt="Tokyo Ghoul" loading="lazy"></div><div class="abody"><div class="atitle">Tokyo Ghoul</div></div></div>
-          <div class="acard"><div class="a-rank">6</div><div class="aposter-img"><img src="https://i.ibb.co/tPXjTGmR/495b0bcfe5-jpg.webp" alt="Black Clover" loading="lazy"></div><div class="abody"><div class="atitle">Black Clover</div></div></div>
-          <div class="acard"><div class="a-rank">7</div><div class="aposter-img"><img src="https://i.ibb.co/nqDtdLPr/8a8750d29e-jpg.webp" alt="Hell's Paradise" loading="lazy"></div><div class="abody"><div class="atitle">Hell's Paradise</div></div></div>
-          <div class="acard"><div class="a-rank">8</div><div class="aposter-img"><img src="https://i.ibb.co/gMHGMN7C/5d32955d78-jpg.webp" alt="The Rising of the Shield Hero" loading="lazy"></div><div class="abody"><div class="atitle">The Rising of the Shield Hero</div></div></div>
-          <div class="acard"><div class="a-rank">9</div><div class="aposter-img"><img src="https://i.ibb.co/27p0XzPF/cc41223570-jpg.webp" alt="Gachiakuta" loading="lazy"></div><div class="abody"><div class="atitle">Gachiakuta</div></div></div>
-          <div class="acard"><div class="a-rank">10</div><div class="aposter-img"><img src="https://i.ibb.co/WpznTTLy/e5e3c7ec46-jpg.webp" alt="Solo Levelling" loading="lazy"></div><div class="abody"><div class="atitle">Solo Levelling</div></div></div>
-          <div class="acard"><div class="a-rank">11</div><div class="aposter-img"><img src="https://i.ibb.co/6c0jWzP7/9c6a2853d7-jpg.webp" alt="Demon Slayer" loading="lazy"></div><div class="abody"><div class="atitle">Demon Slayer</div></div></div>
-          <div class="acard"><div class="a-rank">12</div><div class="aposter-img"><img src="https://i.ibb.co/PzbBxqfF/c98614e818-jpg.webp" alt="High Card" loading="lazy"></div><div class="abody"><div class="atitle">High Card</div></div></div>
-          <div class="acard"><div class="a-rank">13</div><div class="aposter-img"><img src="https://i.ibb.co/JFK933Kn/3144f15062-jpg.webp" alt="Oshi no ko" loading="lazy"></div><div class="abody"><div class="atitle">Oshi no ko</div></div></div>
-          <div class="acard"><div class="a-rank">14</div><div class="aposter-img"><img src="https://i.ibb.co/4qVhyKw/d17d7148c6-jpg.webp" alt="Seven Deadly Sins" loading="lazy"></div><div class="abody"><div class="atitle">Seven Deadly Sins</div></div></div>
-          <div class="acard"><div class="a-rank">15</div><div class="aposter-img"><img src="https://i.ibb.co/JjWKXfR5/af633add9b-jpg.webp" alt="My Hero Academia" loading="lazy"></div><div class="abody"><div class="atitle">My Hero Academia</div></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHOWCASE -->
-  <div id="showcase" class="section">
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Currently Playing</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt" style="margin-bottom:14px;font-size:13px;color:var(--ink4);">
-          What I'm playing right now — pulled live from Discord via <a href="https://lanyard.rest" target="_blank" rel="noopener" style="color:var(--d2);text-decoration:none;">Lanyard</a>.
-        </p>
-        <div id="lanyardWidget">
-          <div class="gi-loading">Connecting to Lanyard…</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Now Playing</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt" style="margin-bottom:14px;font-size:13px;color:var(--ink4);">
-          Live from <a href="https://www.last.fm/user/FoxStorm1" target="_blank" rel="noopener" style="color:var(--d2);text-decoration:none;">my Last.fm</a> — updates automatically.
-        </p>
-        <div id="lastfmWidget">
-          <div class="gi-loading">Loading Last.fm…</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Game Library</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt" style="margin-bottom:16px;">Games I play regularly. No particular order, just the ones that actually get opened.</p>
-        <div class="setup-grid">
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🌿</div>
-              <div><div class="console-name">Genshin Impact</div><div class="console-sub">PC · Free to Play</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">AR</span><span class="c-val"><span id="gc-ar">—</span></span></div>
-              <div class="console-row"><span class="c-label">Server</span><span class="c-val">Europe</span></div>
-              <div class="console-row"><span class="c-label">Fave Element</span><span class="c-val">Dendro</span></div>
-              <div class="console-row"><span class="c-label">Hours</span><span class="c-val">Too many</span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🏗️</div>
-              <div><div class="console-name">Fortnite</div><div class="console-sub">PC / Switch 2</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Mode</span><span class="c-val">Battle Royale</span></div>
-              <div class="console-row"><span class="c-label">Platform</span><span class="c-val">Cross-platform</span></div>
-              <div class="console-row"><span class="c-label">Playstyle</span><span class="c-val">Casual</span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🚗</div>
-              <div><div class="console-name">Rocket League</div><div class="console-sub">PC</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Type</span><span class="c-val">Competitive</span></div>
-              <div class="console-row"><span class="c-label">Platform</span><span class="c-val">PC</span></div>
-              <div class="console-row"><span class="c-label">Playstyle</span><span class="c-val">Sometimes try-hard</span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🧱</div>
-              <div><div class="console-name">Roblox</div><div class="console-sub">PC</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Type</span><span class="c-val">Platform</span></div>
-              <div class="console-row"><span class="c-label">Platform</span><span class="c-val">PC</span></div>
-              <div class="console-row"><span class="c-label">Playstyle</span><span class="c-val">Depends on the game</span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🦸</div>
-              <div><div class="console-name">Overwatch 2</div><div class="console-sub">PC</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Type</span><span class="c-val">Hero Shooter</span></div>
-              <div class="console-row"><span class="c-label">Platform</span><span class="c-val">PC</span></div>
-              <div class="console-row"><span class="c-label">Playstyle</span><span class="c-val">Trying my best</span></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETUP -->
-  <div id="setup" class="section">
-    <div class="gi-panel">
-      <div class="gi-head">
-        <div class="gi-head-gem"></div>
-        <div class="gi-head-title">Console Collection</div>
-        <div class="gi-head-line"></div>
-      </div>
-      <div class="panel-body">
-        <p class="bt" style="margin-bottom:16px;">Every console I own. The modded ones run custom firmware for homebrew, backups, and emulation — click the guide links if you want to do the same.</p>
-        <div class="setup-grid">
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🆕</div>
-              <div><div class="console-name">Nintendo Switch 2</div><div class="console-sub">Stock</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Status</span><span class="c-val">Stock / Unmodded</span></div>
-              <div class="console-row"><span class="c-label">Released</span><span class="c-val">2025</span></div>
-              <div class="console-row"><span class="c-label">Notes</span><span class="c-val">The new one. Keeping it clean for now.</span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🔓</div>
-              <div><div class="console-name">Nintendo Switch</div><div class="console-sub">Custom Firmware</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">CFW</span><span class="c-val"><a href="https://github.com/Atmosphere-NX/Atmosphere" target="_blank" rel="noopener">Atmosphere</a></span></div>
-              <div class="console-row"><span class="c-label">Bootloader</span><span class="c-val"><a href="https://github.com/CTCaer/hekate" target="_blank" rel="noopener">Hekate</a></span></div>
-              <div class="console-row"><span class="c-label">Type</span><span class="c-val">Unpatched (RCM)</span></div>
-              <div class="console-row"><span class="c-label">Guide</span><span class="c-val"><a href="https://switch.hacks.guide" target="_blank" rel="noopener">switch.hacks.guide</a></span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">📀</div>
-              <div><div class="console-name">Nintendo Wii U</div><div class="console-sub">Custom Firmware</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">CFW</span><span class="c-val"><a href="https://aroma.foryour.cafe" target="_blank" rel="noopener">Aroma</a></span></div>
-              <div class="console-row"><span class="c-label">Exploit</span><span class="c-val">Coldboot Haxchi / CBHC</span></div>
-              <div class="console-row"><span class="c-label">vWii</span><span class="c-val">Homebrew Channel + BootMii</span></div>
-              <div class="console-row"><span class="c-label">Guide</span><span class="c-val"><a href="https://wiiu.hacks.guide" target="_blank" rel="noopener">wiiu.hacks.guide</a></span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🟪</div>
-              <div><div class="console-name">Nintendo GameCube</div><div class="console-sub">Modded</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Released</span><span class="c-val">2001</span></div>
-              <div class="console-row"><span class="c-label">Notes</span><span class="c-val">The purple lunchbox. A classic.</span></div>
-              <div class="console-row"><span class="c-label">Guide</span><span class="c-val"><a href="https://www.gc-forever.com/wiki/index.php?title=Main_Page" target="_blank" rel="noopener">gc-forever wiki</a></span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🟥</div>
-              <div><div class="console-name">Nintendo 64</div><div class="console-sub">Retro</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Released</span><span class="c-val">1996</span></div>
-              <div class="console-row"><span class="c-label">Notes</span><span class="c-val">Old enough to be my parent. Still slaps.</span></div>
-              <div class="console-row"><span class="c-label">Best Game</span><span class="c-val">Ocarina of Time, obviously</span></div>
-            </div>
-          </div>
-
-          <div class="console-card">
-            <div class="console-head">
-              <div class="console-icon">🃏</div>
-              <div><div class="console-name">Game &amp; Watch</div><div class="console-sub">Mario + Zelda editions</div></div>
-            </div>
-            <div class="console-body">
-              <div class="console-row"><span class="c-label">Editions</span><span class="c-val">Super Mario Bros · The Legend of Zelda</span></div>
-              <div class="console-row"><span class="c-label">Released</span><span class="c-val">2020 / 2021</span></div>
-              <div class="console-row"><span class="c-label">Notes</span><span class="c-val">The new Nintendo mini ones. Actually really cool.</span></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-</main>
-</div><!-- /grid -->
-
-<!-- ════ FOOTER ════ -->
-<footer class="gi-panel">
-  <div class="footer-badges">
-    <a href="https://brave.com" target="_blank" rel="noopener">
-      <img src="https://cyber.dabamos.de/88x31/brave.gif" width="88" height="31" alt="get brave browser" onerror="this.style.display='none'">
-    </a>
-    <a href="https://wiibrew.org/wiki/Homebrew_Channel" target="_blank" rel="noopener">
-      <img src="https://1dkreally.neocities.org/graphics/buttons/homebrewchannel.gif" width="88" height="31" alt="homebrew channel" onerror="this.style.display='none'">
-    </a>
-  </div>
-  <div class="footer-copy">
-    © AARONWORLD — Hand-crafted in the forests of Sumeru  ✦  All rights reserved
-  </div>
-</footer>
-
-</div><!-- /page -->
+<!-- /page -->
 
 <script src="script.js"></script>
 <script>
-// ── TWEMOJI SETUP ──
+/* ── TWEMOJI ── */
 function parseTwemoji(el) {
   if (!window.twemoji) return;
   twemoji.parse(el || document.body, { folder: 'svg', ext: '.svg', className: 'emoji' });
 }
 window.addEventListener('load', function () {
   parseTwemoji(document.body);
-  const dynamic = ['lanyardWidget', 'lastfmWidget', 'sidebarNowPlaying'];
-  dynamic.forEach(function(id) {
+  ['lanyardWidget','lastfmWidget','sidebarNowPlaying'].forEach(function(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    new MutationObserver(function(mutations) {
-      mutations.forEach(function(m) {
-        m.addedNodes.forEach(function(n) { if (n.nodeType === 1) parseTwemoji(n); });
-      });
+    new MutationObserver(function(m) {
+      m.forEach(function(mut) { mut.addedNodes.forEach(function(n) { if (n.nodeType===1) parseTwemoji(n); }); });
     }).observe(el, { childList: true, subtree: true });
   });
 });
 
-// ── GENSHIN LOADING SCREEN ──
+/* ── LOADING SCREEN ── */
 (function() {
-  const loader    = document.getElementById('gi-loader');
-  const barFill   = document.getElementById('loaderBarFill');
-  const statusEl  = document.getElementById('loaderStatus');
-  const tipEl     = document.getElementById('loaderTip');
-  const tipAttr   = document.getElementById('loaderTipAttr');
+  const loader   = document.getElementById('gi-loader');
+  const barFill  = document.getElementById('loaderBarFill');
+  const statusEl = document.getElementById('loaderStatus');
+  const tipEl    = document.getElementById('loaderTip');
+  const tipAttr  = document.getElementById('loaderTipAttr');
 
   const tips = [
     { text: '"The pursuit of knowledge requires crossing many frontiers."', attr: '— Alhaitham' },
-    { text: '"The forest whispers to those who listen."', attr: '— Sumeru Proverb' },
-    { text: '"Even the smallest leaf holds the secrets of the world."', attr: '— Collei' },
-    { text: '"Adventure is out there, Traveler. The world awaits."', attr: '— Paimon' },
-    { text: '"Every journey begins with a single step into the unknown."', attr: '— Teyvat Traveler' },
-    { text: '"The wind carries whispers of distant lands and forgotten dreams."', attr: '— Unknown' },
+    { text: '"The forest whispers to those who listen."',                   attr: '— Sumeru Proverb' },
+    { text: '"Even the smallest leaf holds the secrets of the world."',     attr: '— Collei' },
+    { text: '"Adventure is out there, Traveler. The world awaits."',        attr: '— Paimon' },
+    { text: '"Every journey begins with a single step into the unknown."',  attr: '— Teyvat Traveler' },
+    { text: '"The wind carries whispers of distant lands."',                attr: '— Unknown' },
     { text: '"A true scholar does not fear questions — they fear stopping."', attr: '— House of Daena' },
   ];
   const tip = tips[Math.floor(Math.random() * tips.length)];
   if (tipEl)   tipEl.textContent   = tip.text;
   if (tipAttr) tipAttr.textContent = tip.attr;
 
-  // Spawn extra atmospheric dust motes
-  for (let i = 0; i < 12; i++) {
+  /* spawn dust motes */
+  for (let i = 0; i < 14; i++) {
     const m = document.createElement('div');
-    m.className = 'loader-mote';
-    m.style.left   = (3 + Math.random() * 94) + 'vw';
-    m.style.bottom = (Math.random() * 30) + '%';
-    const sz = (2 + Math.random() * 5) + 'px';
-    m.style.width  = sz; m.style.height = sz;
-    m.style.animationDuration = (10 + Math.random() * 18) + 's';
-    m.style.animationDelay    = (Math.random() * 14) + 's';
-    m.style.setProperty('--drift', (Math.random() > .5 ? 1 : -1) * (10 + Math.random() * 30) + 'px');
+    m.className = 'lba-mote';
+    m.style.cssText = `left:${3+Math.random()*94}vw;bottom:${Math.random()*30}%;width:${2+Math.random()*5}px;height:${2+Math.random()*5}px;animation-duration:${10+Math.random()*18}s;animation-delay:${Math.random()*14}s;--drift:${(Math.random()>.5?1:-1)*(10+Math.random()*30)}px`;
     loader.appendChild(m);
   }
 
   const stages = [
-    { pct: 15,  label: 'Initialising…' },
-    { pct: 32,  label: 'Loading Teyvat…' },
-    { pct: 51,  label: 'Fetching Character…' },
+    { pct: 12,  label: 'Initialising…' },
+    { pct: 30,  label: 'Loading Teyvat…' },
+    { pct: 50,  label: 'Fetching Character…' },
     { pct: 68,  label: 'Syncing Journal…' },
     { pct: 84,  label: 'Preparing World…' },
     { pct: 100, label: 'Entering…' },
   ];
-
-  let stageIdx = 0;
+  let si = 0;
   function nextStage() {
-    if (stageIdx >= stages.length) return;
-    const s = stages[stageIdx++];
-    barFill.style.width   = s.pct + '%';
-    statusEl.textContent  = s.label;
-    if (stageIdx < stages.length) {
-      setTimeout(nextStage, 300 + Math.random() * 420);
-    } else {
-      setTimeout(dismissLoader, 700);
-    }
+    if (si >= stages.length) return;
+    const s = stages[si++];
+    barFill.style.width  = s.pct + '%';
+    statusEl.textContent = s.label;
+    if (si < stages.length) setTimeout(nextStage, 280 + Math.random() * 400);
+    else setTimeout(dismiss, 650);
   }
-  setTimeout(nextStage, 400);
+  setTimeout(nextStage, 380);
 
-  function dismissLoader() {
+  function dismiss() {
     loader.classList.add('hidden');
     document.body.style.overflow = '';
+    document.getElementById('mainPage')?.classList.add('visible');
   }
-
-  // Safety dismiss after 6s
-  setTimeout(dismissLoader, 6000);
+  setTimeout(dismiss, 6200);
   document.body.style.overflow = 'hidden';
 })();
 
-// ── FAVICON: set to element icon after Genshin data loads ──
+/* ── FAVICON ── */
 window._setFaviconToElement = function(iconUrl) {
   if (!iconUrl) return;
   const link = document.getElementById('faviconLink');
   if (!link) return;
-  // Use a canvas to convert to PNG for favicon
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
+  const img = new Image(); img.crossOrigin='anonymous';
   img.onload = function() {
     try {
-      const canvas = document.createElement('canvas');
-      canvas.width = 32; canvas.height = 32;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, 32, 32);
-      link.href = canvas.toDataURL('image/png');
-    } catch(e) {
-      // CORS fallback: just set URL directly
-      link.href = iconUrl;
-    }
+      const c = document.createElement('canvas'); c.width=32; c.height=32;
+      c.getContext('2d').drawImage(img,0,0,32,32); link.href=c.toDataURL('image/png');
+    } catch(e){ link.href=iconUrl; }
   };
-  img.onerror = function() {
-    link.href = iconUrl;
-  };
+  img.onerror = function(){ link.href=iconUrl; };
   img.src = iconUrl;
 };
 </script>
