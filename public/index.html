@@ -32,6 +32,7 @@
 
   <!-- ── Cinematic scene (camera pans across this) ── -->
   <div class="ldr-scene" id="ldrScene" aria-hidden="true">
+    <div class="ldr-scene-pan">
 
     <!-- Sky gradient layers -->
     <div class="lsc-sky"></div>
@@ -63,16 +64,17 @@
     <div class="lsc-mist"></div>
     <div class="lsc-mist lsc-mist2"></div>
 
-    <!-- Floating dust motes (JS spawns more) -->
+    <!-- Floating dust motes -->
     <div class="lsc-mote" style="left:8%;width:3px;height:3px;animation-duration:14s;animation-delay:0s;--md:-18px"></div>
     <div class="lsc-mote" style="left:25%;width:5px;height:5px;animation-duration:20s;animation-delay:3s;--md:22px"></div>
     <div class="lsc-mote" style="left:52%;width:4px;height:4px;animation-duration:16s;animation-delay:1.5s;--md:-10px"></div>
     <div class="lsc-mote" style="left:71%;width:3px;height:3px;animation-duration:22s;animation-delay:5s;--md:28px"></div>
     <div class="lsc-mote" style="left:88%;width:4px;height:4px;animation-duration:18s;animation-delay:2s;--md:-15px"></div>
 
-    <!-- Vignette on top of everything -->
+    </div><!-- /ldr-scene-pan -->
+
+    <!-- Vignette and letterbox are NOT inside the pan — they stay fixed -->
     <div class="lsc-vignette"></div>
-    <!-- Cinematic letterbox -->
     <div class="lsc-letterbox-top"></div>
     <div class="lsc-letterbox-bot"></div>
   </div>

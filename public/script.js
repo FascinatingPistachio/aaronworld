@@ -903,39 +903,209 @@ function buildHeadphonesSVG() {
   const el = document.getElementById('pfpHeadphones');
   if (!el) return;
   const t  = ELEMENT_THEMES[currentElement];
-  const c1 = t.headColors[0], c2 = t.headColors[1],
-        c3 = t.headColors[2], gw = t.glow;
-  el.innerHTML = `<svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style="width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 10px ${c1}) drop-shadow(0 0 28px ${gw})">
-    <path d="M 22 72 C 22 22 118 22 118 72" stroke="url(#bg)" stroke-width="7" stroke-linecap="round" fill="none"/>
-    <path d="M 28 70 C 28 30 112 30 112 70" stroke="${c2}44" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <rect x="14" y="64" width="10" height="22" rx="3" fill="url(#yk)" stroke="${c3}" stroke-width="1"/>
-    <rect x="116" y="64" width="10" height="22" rx="3" fill="url(#yk)" stroke="${c3}" stroke-width="1"/>
-    <rect x="2" y="72" width="22" height="36" rx="8" fill="url(#cp)" stroke="${c1}" stroke-width="1.8"/>
-    <rect x="6" y="77" width="14" height="26" rx="5" fill="url(#gr)" stroke="${c1}55" stroke-width="0.8"/>
-    <circle cx="13" cy="90" r="3.5" fill="url(#sp)" stroke="${c1}" stroke-width="0.8"/><circle cx="13" cy="90" r="1.5" fill="${c2}"/>
-    <rect x="116" y="72" width="22" height="36" rx="8" fill="url(#cp)" stroke="${c1}" stroke-width="1.8"/>
-    <rect x="120" y="77" width="14" height="26" rx="5" fill="url(#gr)" stroke="${c1}55" stroke-width="0.8"/>
-    <circle cx="127" cy="90" r="3.5" fill="url(#sp)" stroke="${c1}" stroke-width="0.8"/><circle cx="127" cy="90" r="1.5" fill="${c2}"/>
+  const c1 = t.headColors[0]; // bright accent
+  const c2 = t.headColors[1]; // highlight
+  const c3 = t.headColors[2]; // mid
+  const c4 = t.headColors[3] || c3;
+  const gw = t.glow;
+  const g2 = t.glow.replace(/[\d.]+\)$/, '0.22)');
+
+  // Strip alpha so we can build rgba manually from hex
+  const hex2rgb = h => {
+    const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h.replace(/^#([a-f\d])([a-f\d])([a-f\d])$/i,'#$1$1$2$2$3$3'));
+    return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '200,200,200';
+  };
+  const rgb1 = hex2rgb(c1), rgb2 = hex2rgb(c2), rgb3 = hex2rgb(c3);
+
+  el.innerHTML = `
+  <svg viewBox="0 0 170 148" fill="none" xmlns="http://www.w3.org/2000/svg"
+    style="width:100%;height:100%;overflow:visible;
+           filter:drop-shadow(0 0 8px rgba(${rgb1},0.55)) drop-shadow(0 2px 18px rgba(${rgb3},0.35))">
     <defs>
-      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%"   stop-color="${c3}"/><stop offset="30%" stop-color="${c1}"/>
-        <stop offset="50%"  stop-color="${c2}"/><stop offset="70%" stop-color="${c1}"/>
-        <stop offset="100%" stop-color="${c3}"/>
+      <!-- Headband gradient: warm dark metal with element sheen -->
+      <linearGradient id="hbg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#1a1a1a"/>
+        <stop offset="38%"  stop-color="#2a2a2a"/>
+        <stop offset="100%" stop-color="#111111"/>
       </linearGradient>
-      <linearGradient id="yk" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="${c3}"/><stop offset="100%" stop-color="${c3}88"/>
+      <!-- Headband accent stripe -->
+      <linearGradient id="hba" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="${c3}" stop-opacity="0"/>
+        <stop offset="28%"  stop-color="${c1}" stop-opacity="0.7"/>
+        <stop offset="50%"  stop-color="${c2}" stop-opacity="0.9"/>
+        <stop offset="72%"  stop-color="${c1}" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="${c3}" stop-opacity="0"/>
       </linearGradient>
-      <linearGradient id="cp" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="${c3}cc"/><stop offset="100%" stop-color="${c3}44"/>
+      <!-- Headband specular -->
+      <linearGradient id="hbs" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stop-color="rgba(255,255,255,0.22)"/>
+        <stop offset="55%" stop-color="rgba(255,255,255,0.04)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
       </linearGradient>
-      <linearGradient id="gr" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#161616"/><stop offset="100%" stop-color="#080808"/>
+      <!-- Yoke: dark brushed metal -->
+      <linearGradient id="ykg" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#1c1c1c"/>
+        <stop offset="50%"  stop-color="#2e2e2e"/>
+        <stop offset="100%" stop-color="#181818"/>
       </linearGradient>
-      <radialGradient id="sp" cx="40%" cy="35%">
-        <stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c3}"/>
+      <!-- Cup outer shell: deep matte dark -->
+      <radialGradient id="cupL" cx="38%" cy="32%" r="62%">
+        <stop offset="0%"   stop-color="#2c2c2c"/>
+        <stop offset="55%"  stop-color="#1a1a1a"/>
+        <stop offset="100%" stop-color="#0d0d0d"/>
       </radialGradient>
+      <radialGradient id="cupR" cx="62%" cy="32%" r="62%">
+        <stop offset="0%"   stop-color="#2c2c2c"/>
+        <stop offset="55%"  stop-color="#1a1a1a"/>
+        <stop offset="100%" stop-color="#0d0d0d"/>
+      </radialGradient>
+      <!-- Cup rim: element color -->
+      <linearGradient id="rimL" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%"   stop-color="${c2}" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="${c3}" stop-opacity="0.5"/>
+      </linearGradient>
+      <linearGradient id="rimR" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="${c2}" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="${c3}" stop-opacity="0.5"/>
+      </linearGradient>
+      <!-- Ear cushion: soft fabric-like -->
+      <radialGradient id="cushL" cx="42%" cy="38%" r="58%">
+        <stop offset="0%"   stop-color="#1e1e1e"/>
+        <stop offset="70%"  stop-color="#131313"/>
+        <stop offset="100%" stop-color="#0a0a0a"/>
+      </radialGradient>
+      <radialGradient id="cushR" cx="58%" cy="38%" r="58%">
+        <stop offset="0%"   stop-color="#1e1e1e"/>
+        <stop offset="70%"  stop-color="#131313"/>
+        <stop offset="100%" stop-color="#0a0a0a"/>
+      </radialGradient>
+      <!-- Driver/membrane: concentric rings look -->
+      <radialGradient id="drvL" cx="45%" cy="40%" r="55%">
+        <stop offset="0%"   stop-color="rgba(${rgb1},0.18)"/>
+        <stop offset="35%"  stop-color="rgba(${rgb3},0.08)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+      </radialGradient>
+      <radialGradient id="drvR" cx="55%" cy="40%" r="55%">
+        <stop offset="0%"   stop-color="rgba(${rgb1},0.18)"/>
+        <stop offset="35%"  stop-color="rgba(${rgb3},0.08)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+      </radialGradient>
+      <!-- Cup specular highlight -->
+      <radialGradient id="cupHiL" cx="32%" cy="26%" r="42%">
+        <stop offset="0%"  stop-color="rgba(255,255,255,0.14)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </radialGradient>
+      <radialGradient id="cupHiR" cx="68%" cy="26%" r="42%">
+        <stop offset="0%"  stop-color="rgba(255,255,255,0.14)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </radialGradient>
+      <!-- LED strip glow -->
+      <linearGradient id="ledL" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="${c2}" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="${c3}" stop-opacity="0.6"/>
+      </linearGradient>
+      <linearGradient id="ledR" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="${c2}" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="${c3}" stop-opacity="0.6"/>
+      </linearGradient>
+      <!-- Padding cushion soft ring -->
+      <radialGradient id="padL" cx="50%" cy="50%" r="50%">
+        <stop offset="55%"  stop-color="rgba(${rgb3},0)"/>
+        <stop offset="78%"  stop-color="rgba(${rgb3},0.08)"/>
+        <stop offset="100%" stop-color="rgba(${rgb1},0.22)"/>
+      </radialGradient>
+      <radialGradient id="padR" cx="50%" cy="50%" r="50%">
+        <stop offset="55%"  stop-color="rgba(${rgb3},0)"/>
+        <stop offset="78%"  stop-color="rgba(${rgb3},0.08)"/>
+        <stop offset="100%" stop-color="rgba(${rgb1},0.22)"/>
+      </radialGradient>
+      <!-- Overall glow filter -->
+      <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="3.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="softglow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
     </defs>
+
+    <!-- ── OUTER GLOW HALOS (behind everything) ── -->
+    <ellipse cx="30" cy="99" rx="26" ry="30" fill="rgba(${rgb1},0.07)" filter="url(#softglow)"/>
+    <ellipse cx="140" cy="99" rx="26" ry="30" fill="rgba(${rgb1},0.07)" filter="url(#softglow)"/>
+
+    <!-- ══ HEADBAND ══ -->
+    <!-- Shadow/depth arc below headband -->
+    <path d="M 32 76 C 32 24 138 24 138 76" stroke="#000000" stroke-width="11" stroke-linecap="round" fill="none" opacity="0.55"/>
+    <!-- Main headband body -->
+    <path d="M 32 76 C 32 24 138 24 138 76" stroke="url(#hbg)" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <!-- Headband inner highlight edge -->
+    <path d="M 34 74 C 34 28 136 28 136 74" stroke="url(#hbs)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <!-- Element accent stripe along headband -->
+    <path d="M 36 72 C 36 33 134 33 134 72" stroke="url(#hba)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <!-- Subtle stitching dashes on headband -->
+    <path d="M 52 50 C 68 32 102 32 118 50" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="3 5" stroke-linecap="round" fill="none"/>
+
+    <!-- ══ YOKE ARMS (connects band to cups) ══ -->
+    <!-- Left yoke -->
+    <rect x="22" y="68" width="12" height="26" rx="4" fill="url(#ykg)" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"/>
+    <rect x="24" y="70" width="5"  height="22" rx="2" fill="rgba(255,255,255,0.05)"/>
+    <!-- Left yoke adjustment notches -->
+    <line x1="23" y1="76" x2="33" y2="76" stroke="rgba(255,255,255,0.09)" stroke-width="0.6"/>
+    <line x1="23" y1="80" x2="33" y2="80" stroke="rgba(255,255,255,0.09)" stroke-width="0.6"/>
+    <line x1="23" y1="84" x2="33" y2="84" stroke="rgba(255,255,255,0.09)" stroke-width="0.6"/>
+    <!-- Right yoke -->
+    <rect x="136" y="68" width="12" height="26" rx="4" fill="url(#ykg)" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"/>
+    <rect x="137" y="70" width="5"  height="22" rx="2" fill="rgba(255,255,255,0.05)"/>
+    <line x1="137" y1="76" x2="147" y2="76" stroke="rgba(255,255,255,0.09)" stroke-width="0.6"/>
+    <line x1="137" y1="80" x2="147" y2="80" stroke="rgba(255,255,255,0.09)" stroke-width="0.6"/>
+    <line x1="137" y1="84" x2="147" y2="84" stroke="rgba(255,255,255,0.09)" stroke-width="0.6"/>
+
+    <!-- ══ LEFT EAR CUP ══ -->
+    <!-- Cup outer shadow -->
+    <ellipse cx="30" cy="101" rx="28" ry="32" fill="rgba(0,0,0,0.45)"/>
+    <!-- Cup outer shell -->
+    <ellipse cx="29" cy="99" rx="27" ry="31" fill="url(#cupL)"/>
+    <!-- Cup rim (element accent) — thin inner border -->
+    <ellipse cx="29" cy="99" rx="27" ry="31" fill="none" stroke="url(#rimL)" stroke-width="1.8" opacity="0.8"/>
+    <!-- Cup surface specular highlight -->
+    <ellipse cx="29" cy="99" rx="27" ry="31" fill="url(#cupHiL)"/>
+    <!-- Ear cushion oval (inset) -->
+    <ellipse cx="29" cy="99" rx="21" ry="25" fill="url(#cushL)"/>
+    <!-- Cushion soft glow ring from element -->
+    <ellipse cx="29" cy="99" rx="21" ry="25" fill="url(#padL)"/>
+    <!-- Cushion rim stitching -->
+    <ellipse cx="29" cy="99" rx="21" ry="25" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="2.5 4"/>
+    <!-- Driver membrane — concentric detail rings -->
+    <ellipse cx="29" cy="99" rx="14" ry="17" fill="url(#drvL)"/>
+    <ellipse cx="29" cy="99" rx="14" ry="17" fill="none" stroke="rgba(${rgb1},0.12)" stroke-width="0.8"/>
+    <ellipse cx="29" cy="99" rx="9"  ry="11" fill="none" stroke="rgba(${rgb1},0.1)"  stroke-width="0.7"/>
+    <ellipse cx="29" cy="99" rx="5"  ry="6"  fill="none" stroke="rgba(${rgb1},0.15)" stroke-width="0.8"/>
+    <!-- Central driver dot -->
+    <ellipse cx="29" cy="99" rx="2.5" ry="3" fill="rgba(${rgb2},0.55)"/>
+    <!-- LED strip — left outer edge -->
+    <path d="M 5 88 Q 3 99 5 111" stroke="url(#ledL)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(#glow)" opacity="0.85"/>
+    <!-- Cup screw detail -->
+    <circle cx="42" cy="84" r="1.5" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+    <circle cx="42" cy="114" r="1.5" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+
+    <!-- ══ RIGHT EAR CUP ══ -->
+    <ellipse cx="141" cy="101" rx="28" ry="32" fill="rgba(0,0,0,0.45)"/>
+    <ellipse cx="141" cy="99" rx="27" ry="31" fill="url(#cupR)"/>
+    <ellipse cx="141" cy="99" rx="27" ry="31" fill="none" stroke="url(#rimR)" stroke-width="1.8" opacity="0.8"/>
+    <ellipse cx="141" cy="99" rx="27" ry="31" fill="url(#cupHiR)"/>
+    <ellipse cx="141" cy="99" rx="21" ry="25" fill="url(#cushR)"/>
+    <ellipse cx="141" cy="99" rx="21" ry="25" fill="url(#padR)"/>
+    <ellipse cx="141" cy="99" rx="21" ry="25" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="2.5 4"/>
+    <ellipse cx="141" cy="99" rx="14" ry="17" fill="url(#drvR)"/>
+    <ellipse cx="141" cy="99" rx="14" ry="17" fill="none" stroke="rgba(${rgb1},0.12)" stroke-width="0.8"/>
+    <ellipse cx="141" cy="99" rx="9"  ry="11" fill="none" stroke="rgba(${rgb1},0.1)"  stroke-width="0.7"/>
+    <ellipse cx="141" cy="99" rx="5"  ry="6"  fill="none" stroke="rgba(${rgb1},0.15)" stroke-width="0.8"/>
+    <ellipse cx="141" cy="99" rx="2.5" ry="3" fill="rgba(${rgb2},0.55)"/>
+    <!-- LED strip — right outer edge -->
+    <path d="M 165 88 Q 167 99 165 111" stroke="url(#ledR)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(#glow)" opacity="0.85"/>
+    <circle cx="128" cy="84" r="1.5" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+    <circle cx="128" cy="114" r="1.5" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
   </svg>`;
 }
 
@@ -1600,3 +1770,116 @@ function pollLastFm() {
   });
 })();
 
+
+/* ─── Canvas Favicon Generator ─── */
+(function() {
+  const SIZE = 64;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = SIZE;
+  const ctx = cv.getContext('2d');
+
+  function drawFavicon(accentHex) {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+
+    // Parse hex → rgb
+    const hex2rgb = h => {
+      const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+        h.replace(/^#([a-f\d])([a-f\d])([a-f\d])$/i,'#$1$1$2$2$3$3')
+      );
+      return r ? [parseInt(r[1],16),parseInt(r[2],16),parseInt(r[3],16)] : [160,120,240];
+    };
+    const [R,G,B] = hex2rgb(accentHex);
+
+    // Deep space background
+    const bg = ctx.createRadialGradient(SIZE/2,SIZE/2,0,SIZE/2,SIZE/2,SIZE/2);
+    bg.addColorStop(0, `rgba(${Math.round(R*0.12)},${Math.round(G*0.08)},${Math.round(B*0.16)},1)`);
+    bg.addColorStop(1, 'rgba(4,3,10,1)');
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.arc(SIZE/2,SIZE/2,SIZE/2,0,Math.PI*2);
+    ctx.fill();
+
+    // Outer rim — element colour
+    ctx.strokeStyle = `rgba(${R},${G},${B},0.55)`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(SIZE/2,SIZE/2,SIZE/2-1.5,0,Math.PI*2);
+    ctx.stroke();
+
+    // Star field (deterministic)
+    for (let i = 0; i < 22; i++) {
+      const sx = ((i*2654435761)>>>0) % SIZE;
+      const sy = ((i*1013904223)>>>0) % SIZE;
+      const sr = 0.4 + (i % 3) * 0.45;
+      const sa = 0.25 + (i % 4) * 0.18;
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI*2);
+      ctx.fillStyle = i % 5 === 0
+        ? `rgba(${R},${G},${B},${sa})`
+        : `rgba(210,220,255,${sa * 0.7})`;
+      ctx.fill();
+    }
+
+    // Central diamond gem — the "A" monogram stand-in
+    const cx = SIZE/2, cy = SIZE/2;
+    const s  = 11; // half-size
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(Math.PI/4);
+
+    // Outer gem glow
+    const glow = ctx.createRadialGradient(0,0,0,0,0,s*2.2);
+    glow.addColorStop(0, `rgba(${R},${G},${B},0.45)`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(-s*2.2,-s*2.2,s*4.4,s*4.4);
+
+    // Gem facets
+    // Bottom fill (shadow)
+    ctx.fillStyle = `rgb(${Math.round(R*0.35)},${Math.round(G*0.35)},${Math.round(B*0.35)})`;
+    ctx.fillRect(-s,-s,s*2,s*2);
+
+    // Left facet
+    ctx.beginPath();
+    ctx.moveTo(-s,-s); ctx.lineTo(0,0); ctx.lineTo(-s,s); ctx.closePath();
+    ctx.fillStyle = `rgba(${Math.round(R*0.6)},${Math.round(G*0.6)},${Math.round(B*0.6)},1)`;
+    ctx.fill();
+
+    // Right facet
+    ctx.beginPath();
+    ctx.moveTo(s,-s); ctx.lineTo(0,0); ctx.lineTo(s,s); ctx.closePath();
+    ctx.fillStyle = `rgba(${R},${G},${B},0.9)`;
+    ctx.fill();
+
+    // Top facet (brightest — specular)
+    ctx.beginPath();
+    ctx.moveTo(-s,-s); ctx.lineTo(0,-s*0.35); ctx.lineTo(s,-s); ctx.lineTo(0,0); ctx.closePath();
+    const specGrad = ctx.createLinearGradient(-s,-s,s,-s);
+    specGrad.addColorStop(0, `rgba(255,255,255,0.55)`);
+    specGrad.addColorStop(0.5, `rgba(${R+80>255?255:R+80},${G+80>255?255:G+80},${B+80>255?255:B+80},0.9)`);
+    specGrad.addColorStop(1, `rgba(255,255,255,0.55)`);
+    ctx.fillStyle = specGrad;
+    ctx.fill();
+
+    // Gem border
+    ctx.strokeStyle = `rgba(${R},${G},${B},0.75)`;
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(-s,-s,s*2,s*2);
+
+    ctx.restore();
+
+    // Update the <link> favicon
+    const link = document.getElementById('faviconLink');
+    if (link) link.href = cv.toDataURL('image/png');
+  }
+
+  // Called on element change
+  window._setFaviconToElement = function(iconUrl) {
+    const t = ELEMENT_THEMES[currentElement];
+    if (t) drawFavicon(t.color);
+  };
+
+  // Initial draw with current theme
+  const initTheme = ELEMENT_THEMES[document.documentElement.getAttribute('data-element')] || ELEMENT_THEMES.dendro;
+  drawFavicon(initTheme.color);
+})();
