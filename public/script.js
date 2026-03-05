@@ -1177,3 +1177,530 @@ function pollLastFm() {
   pollLastFm();
   setInterval(pollLastFm, 15000);
 })();
+
+/* ════════════════════════════════════════════════════════
+   AARONWORLD — ETHEREAL ENHANCEMENT LAYER
+   Custom Cursor · Aurora · Constellations · 3D Tilt · Magic
+   ════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   CUSTOM CURSOR
+══════════════════════════════════════ */
+(function initCursor() {
+  const dot  = document.createElement('div'); dot.id  = 'aw-cursor-dot';
+  const ring = document.createElement('div'); ring.id = 'aw-cursor-ring';
+  document.body.appendChild(dot);
+  document.body.appendChild(ring);
+
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let rx = mx, ry = my;
+  let trailTimer = 0;
+  const TRAIL_INTERVAL = 38;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left  = mx + 'px';
+    dot.style.top   = my + 'px';
+
+    const now = Date.now();
+    if (now - trailTimer > TRAIL_INTERVAL) {
+      spawnTrail(mx, my);
+      trailTimer = now;
+    }
+  });
+
+  function spawnTrail(x, y) {
+    const t = document.createElement('div');
+    t.className = 'cursor-trail';
+    const sz = 3 + Math.random() * 5;
+    t.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 700);
+  }
+
+  (function animRing() {
+    rx += (mx - rx) * 0.14;
+    ry += (my - ry) * 0.14;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.addEventListener('mousedown', () => { dot.classList.add('clicking'); ring.classList.add('clicking'); });
+  document.addEventListener('mouseup',   () => { dot.classList.remove('clicking'); ring.classList.remove('clicking'); });
+
+  const hoverEls = 'a, button, .anime-card, .info-card, .link-card, .nav-link, .gi-panel';
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest(hoverEls)) ring.classList.add('hovering');
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest(hoverEls)) ring.classList.remove('hovering');
+  });
+})();
+
+/* ══════════════════════════════════════
+   AURORA BOREALIS CANVAS
+══════════════════════════════════════ */
+(function initAurora() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'auroraCanvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.insertBefore(canvas, document.body.firstChild);
+
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Aurora colour bands — update when element changes
+  let aColors = [
+    { h: 140, s: 80, base: 0.00, speed: 0.42, amp: 0.18, width: 0.32 },
+    { h: 160, s: 70, base: 0.12, speed: 0.31, amp: 0.14, width: 0.28 },
+    { h: 180, s: 90, base: 0.06, speed: 0.55, amp: 0.20, width: 0.22 },
+    { h: 200, s: 75, base: 0.20, speed: 0.27, amp: 0.16, width: 0.30 },
+    { h: 270, s: 60, base: 0.16, speed: 0.36, amp: 0.12, width: 0.20 },
+  ];
+
+  function getThemeHue() {
+    const el = document.documentElement.getAttribute('data-element') || 'dendro';
+    const map = { dendro:130, pyro:15, hydro:200, cryo:195, electro:275, anemo:160, geo:48 };
+    return map[el] || 130;
+  }
+
+  window._auroraUpdateTheme = function() {
+    const h = getThemeHue();
+    aColors = aColors.map((c, i) => ({ ...c, h: h + i * 18 - 36 }));
+  };
+
+  function drawAurora() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.005;
+
+    aColors.forEach((band, bi) => {
+      const bandH = H * 0.55;
+      const baseY = H * 0.1 + H * band.base;
+      const waveAmp = H * band.amp;
+
+      const path = new Path2D();
+      path.moveTo(0, bandH + 20);
+
+      // Draw wavy aurora band
+      const steps = 80;
+      for (let i = 0; i <= steps; i++) {
+        const x = (i / steps) * W;
+        const progress = i / steps;
+        const y = baseY
+          + Math.sin(progress * Math.PI * 3 + t * band.speed + bi) * waveAmp
+          + Math.sin(progress * Math.PI * 5 + t * band.speed * 1.4 + bi * 0.7) * waveAmp * 0.4
+          + Math.sin(progress * Math.PI * 8 + t * band.speed * 0.8) * waveAmp * 0.2;
+        i === 0 ? path.moveTo(x, y) : path.lineTo(x, y);
+      }
+      // Bottom of band
+      for (let i = steps; i >= 0; i--) {
+        const x = (i / steps) * W;
+        const progress = i / steps;
+        const y = baseY
+          + Math.sin(progress * Math.PI * 3 + t * band.speed + bi) * waveAmp
+          + Math.sin(progress * Math.PI * 5 + t * band.speed * 1.4 + bi * 0.7) * waveAmp * 0.4
+          + Math.sin(progress * Math.PI * 8 + t * band.speed * 0.8) * waveAmp * 0.2
+          + H * band.width;
+        path.lineTo(x, y);
+      }
+      path.closePath();
+
+      // Gradient top to bottom of band
+      const grad = ctx.createLinearGradient(0, baseY - waveAmp, 0, baseY + waveAmp + H * band.width);
+      const alpha = 0.06 + Math.sin(t * 0.5 + bi) * 0.025;
+      grad.addColorStop(0, `hsla(${band.h},${band.s}%,75%,0)`);
+      grad.addColorStop(0.3, `hsla(${band.h},${band.s}%,68%,${alpha})`);
+      grad.addColorStop(0.5, `hsla(${band.h+15},${band.s}%,72%,${alpha * 1.4})`);
+      grad.addColorStop(0.7, `hsla(${band.h},${band.s}%,68%,${alpha})`);
+      grad.addColorStop(1, `hsla(${band.h},${band.s}%,75%,0)`);
+
+      ctx.fillStyle = grad;
+      ctx.fill(path);
+    });
+
+    requestAnimationFrame(drawAurora);
+  }
+
+  window._auroraUpdateTheme();
+  drawAurora();
+
+  // Hook into element theme changes
+  const _origApply = window.applyElementTheme;
+  if (_origApply) {
+    window.applyElementTheme = function(el) {
+      _origApply(el);
+      setTimeout(window._auroraUpdateTheme, 50);
+    };
+  }
+})();
+
+/* ══════════════════════════════════════
+   CONSTELLATION CANVAS
+══════════════════════════════════════ */
+(function initConstellations() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'constellationCanvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.insertBefore(canvas, document.body.firstChild);
+
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [], t = 0;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildNodes();
+  }
+
+  function buildNodes() {
+    nodes = [];
+    const count = Math.floor(W * H / 28000);
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.75,
+        vx: (Math.random() - 0.5) * 0.12,
+        vy: (Math.random() - 0.5) * 0.06,
+        r: 0.8 + Math.random() * 1.4,
+        a: 0.2 + Math.random() * 0.6,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  const MAX_DIST = 160;
+
+  function drawConstellations() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.008;
+
+    // Move nodes
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0) n.x = W; if (n.x > W) n.x = 0;
+      if (n.y < 0) n.y = H * 0.75; if (n.y > H * 0.75) n.y = 0;
+    });
+
+    const el = document.documentElement.getAttribute('data-element') || 'dendro';
+    const colorMap = {
+      dendro: '168,204,40', pyro: '255,107,32', hydro: '40,180,232',
+      cryo: '144,216,240', electro: '192,96,255', anemo: '64,216,160', geo: '232,192,32'
+    };
+    const rgb = colorMap[el] || '168,204,40';
+
+    // Draw edges
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MAX_DIST) {
+          const alpha = (1 - dist / MAX_DIST) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(${rgb},${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw nodes
+    nodes.forEach(n => {
+      const pulse = 0.5 + 0.5 * Math.sin(t * 1.5 + n.phase);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${rgb},${n.a * pulse})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(drawConstellations);
+  }
+
+  drawConstellations();
+})();
+
+/* ══════════════════════════════════════
+   3D CARD TILT
+══════════════════════════════════════ */
+(function initCardTilt() {
+  const TILT = 10; // max degrees
+
+  function attachTilt(selector, tiltMag) {
+    document.addEventListener('mousemove', e => {
+      const cards = document.querySelectorAll(selector);
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (e.clientX < rect.left - 60 || e.clientX > rect.right + 60 ||
+            e.clientY < rect.top  - 60 || e.clientY > rect.bottom + 60) return;
+
+        const cx = rect.left + rect.width  / 2;
+        const cy = rect.top  + rect.height / 2;
+        const dx = (e.clientX - cx) / (rect.width  / 2);
+        const dy = (e.clientY - cy) / (rect.height / 2);
+
+        const ry =  dx * tiltMag;
+        const rx = -dy * tiltMag;
+
+        // Store for CSS
+        card.style.setProperty('--rx', rx + 'deg');
+        card.style.setProperty('--ry', ry + 'deg');
+        card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px) translateY(-5px)`;
+
+        // Holographic highlight position
+        const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
+        const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
+        const holo = card.querySelector('.ac-holo');
+        if (holo) {
+          holo.style.backgroundPosition = `${mx} ${my}`;
+        }
+      });
+    });
+
+    document.addEventListener('mouseleave', () => {
+      document.querySelectorAll(selector).forEach(card => {
+        card.style.transform = '';
+      });
+    }, true);
+  }
+
+  // Reset on mouseleave per card
+  function attachReset(selector) {
+    document.addEventListener('mouseover', e => {});
+    document.querySelectorAll(selector).forEach(card => {
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  }
+
+  // Observe DOM changes for dynamically added cards
+  const observer = new MutationObserver(() => {
+    attachReset('.anime-card');
+    attachReset('.info-card');
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  attachTilt('.anime-card', TILT);
+  attachTilt('.info-card', 5);
+  attachTilt('.link-card', 4);
+})();
+
+/* ══════════════════════════════════════
+   ANIMATED PANEL BORDER (inject elements)
+══════════════════════════════════════ */
+(function injectPanelBorderGlows() {
+  function inject() {
+    document.querySelectorAll('.gi-panel:not(.glow-injected)').forEach(p => {
+      p.classList.add('glow-injected');
+      const glow = document.createElement('div');
+      glow.className = 'panel-border-glow';
+      p.insertBefore(glow, p.firstChild);
+    });
+  }
+  inject();
+  new MutationObserver(inject).observe(document.body, { childList: true, subtree: true });
+})();
+
+/* ══════════════════════════════════════
+   HOLOGRAPHIC OVERLAY INJECTION
+══════════════════════════════════════ */
+(function injectHoloOverlays() {
+  function inject() {
+    document.querySelectorAll('.anime-card:not(.holo-injected)').forEach(card => {
+      card.classList.add('holo-injected');
+      const holo = document.createElement('div');
+      holo.className = 'ac-holo';
+      card.appendChild(holo);
+    });
+  }
+  inject();
+  new MutationObserver(inject).observe(document.body, { childList: true, subtree: true });
+})();
+
+/* ══════════════════════════════════════
+   DOSSIER STAGGER INDICES
+══════════════════════════════════════ */
+(function initDossierStagger() {
+  function stagger() {
+    document.querySelectorAll('.dossier-row').forEach((row, i) => {
+      row.style.setProperty('--di', i);
+    });
+  }
+  stagger();
+})();
+
+/* ══════════════════════════════════════
+   LINK CARD MOUSE GRADIENT
+══════════════════════════════════════ */
+(function initLinkCardGradient() {
+  document.addEventListener('mousemove', e => {
+    document.querySelectorAll('.link-card').forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
+      const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
+      card.style.setProperty('--mx', mx);
+      card.style.setProperty('--my', my);
+    });
+  });
+})();
+
+/* ══════════════════════════════════════
+   AURORA THEME HOOK
+══════════════════════════════════════ */
+(function hookAuroraToTheme() {
+  // Update aurora on element changes
+  const _orig = window._skyUpdateTheme;
+  window._skyUpdateTheme = function(c) {
+    if (_orig) _orig(c);
+    if (window._auroraUpdateTheme) setTimeout(window._auroraUpdateTheme, 100);
+  };
+})();
+
+/* ══════════════════════════════════════
+   ENHANCED SHOOTING STARS
+   (Adds sparkle burst to existing)
+══════════════════════════════════════ */
+(function enhanceShootingStars() {
+  // Spawn occasional extra-bright shooting stars with sparkle burst
+  function spawnSuperStar() {
+    const canvas = document.getElementById('skyCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    let x = Math.random() * W * 0.6;
+    let y = Math.random() * H * 0.25;
+    const angle = Math.PI / 6 + Math.random() * Math.PI / 8;
+    const spd = 18 + Math.random() * 12;
+    const vx = Math.cos(angle) * spd, vy = Math.sin(angle) * spd;
+    let life = 1.2;
+
+    function draw() {
+      if (life <= 0) {
+        // Sparkle burst
+        const rgb = '220,210,255';
+        for (let i = 0; i < 8; i++) {
+          const ang = (i / 8) * Math.PI * 2;
+          const dist = (1.2 - life) * 30;
+          ctx.save();
+          ctx.globalAlpha = life * 0.5;
+          ctx.strokeStyle = `rgba(${rgb},0.8)`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + Math.cos(ang) * dist, y + Math.sin(ang) * dist);
+          ctx.stroke();
+          ctx.restore();
+        }
+        return;
+      }
+      ctx.save();
+      ctx.globalAlpha = Math.min(life, 1) * 0.95;
+      const grad = ctx.createLinearGradient(x - vx * 5, y - vy * 5, x, y);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.6, 'rgba(200,200,255,0.8)');
+      grad.addColorStop(1, 'rgba(255,255,255,1)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x - vx * 5, y - vy * 5);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.restore();
+      x += vx; y += vy; life -= 0.03;
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  setInterval(() => {
+    if (Math.random() < 0.25) spawnSuperStar();
+  }, 6000);
+})();
+
+/* ══════════════════════════════════════
+   SECTION SWITCH ENHANCEMENT
+══════════════════════════════════════ */
+(function enhanceSectionSwitch() {
+  const _orig = window.showSec;
+  if (!_orig) return;
+  window.showSec = function(id, btn) {
+    _orig(id, btn);
+    // Stagger the reveal of child panels
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    sec.querySelectorAll('.reveal').forEach((el, i) => {
+      el.style.animationDelay = (i * 0.06) + 's';
+    });
+    // Re-stagger dossier rows
+    sec.querySelectorAll('.dossier-row').forEach((row, i) => {
+      row.style.setProperty('--di', i);
+      row.style.animation = 'none';
+      row.offsetHeight; // reflow
+      row.style.animation = '';
+    });
+  };
+})();
+
+
+/* ══════════════════════════════════════
+   SECTION STAGGER — MutationObserver
+══════════════════════════════════════ */
+(function watchSections() {
+  const allSections = document.querySelectorAll('.section');
+  allSections.forEach(sec => {
+    const obs = new MutationObserver(mutations => {
+      mutations.forEach(m => {
+        if (m.attributeName === 'class' && sec.classList.contains('active')) {
+          // Stagger reveal panels
+          sec.querySelectorAll('.reveal').forEach((el, i) => {
+            el.style.animationDelay = (i * 0.07) + 's';
+            el.style.animationName = 'none';
+            el.offsetHeight;
+            el.style.animationName = '';
+          });
+          // Stagger dossier rows
+          sec.querySelectorAll('.dossier-row').forEach((row, i) => {
+            row.style.setProperty('--di', i);
+            row.style.animation = 'none';
+            row.offsetHeight;
+            row.style.animation = '';
+          });
+        }
+      });
+    });
+    obs.observe(sec, { attributes: true });
+  });
+})();
+
+/* ══════════════════════════════════════
+   INTERACTIVE MOUSE PARALLAX for pfp
+══════════════════════════════════════ */
+(function initPfpParallax() {
+  const pfp = document.getElementById('pfpOuter');
+  if (!pfp) return;
+
+  document.addEventListener('mousemove', e => {
+    const rect = pfp.getBoundingClientRect();
+    const cx = rect.left + rect.width  / 2;
+    const cy = rect.top  + rect.height / 2;
+    const dx = (e.clientX - cx) / window.innerWidth;
+    const dy = (e.clientY - cy) / window.innerHeight;
+
+    pfp.querySelectorAll('.pfp-ring').forEach((ring, i) => {
+      const factor = (i + 1) * 2.5;
+      ring.style.transform = `rotate(${ring._baseAngle || 0}deg) translate(${dx * factor}px, ${dy * factor}px)`;
+    });
+  });
+})();
+
