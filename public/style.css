@@ -85,6 +85,27 @@ body::after{
   background-size:200px;
 }
 
+/* ── Slow cinematic sky drift (not mouse-based, purely time-based) ── */
+#skyCanvas{
+  animation:skyDrift 28s ease-in-out infinite;
+}
+@keyframes skyDrift{
+  0%   { transform: scale(1.04) translate(0px, 0px); }
+  25%  { transform: scale(1.04) translate(-6px, -3px); }
+  50%  { transform: scale(1.04) translate(-2px, 5px); }
+  75%  { transform: scale(1.04) translate(6px, -2px); }
+  100% { transform: scale(1.04) translate(0px, 0px); }
+}
+#nebulaLayer{
+  animation:nebulaDrift 36s ease-in-out infinite;
+}
+@keyframes nebulaDrift{
+  0%   { transform: translate(0,0) scale(1); }
+  33%  { transform: translate(-10px,-5px) scale(1.02); }
+  66%  { transform: translate(8px, 6px) scale(0.99); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
 /* ══════════════════════════════════════
    SKY CANVAS + NEBULA
 ══════════════════════════════════════ */
@@ -1051,151 +1072,264 @@ img.emoji{height:1.15em;width:1.15em;margin:0 .06em 0 .1em;vertical-align:-.18em
   .link-card:hover{transform:none}
 }
 
+
 /* ══════════════════════════════════════
-   ═══ LOADING SCREEN (Genshin Event) ═══
+   TRANSITION CANVAS (page wipes)
+══════════════════════════════════════ */
+#transitionCanvas{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:9990;pointer-events:none;opacity:0;
+  transition:opacity .05s;
+}
+#transitionCanvas.active{opacity:1}
+
+/* ══════════════════════════════════════
+   ═══ LOADING SCREEN — Cinematic ═══
 ══════════════════════════════════════ */
 #gi-loader{
   position:fixed;inset:0;z-index:99999;
-  display:flex;flex-direction:column;
-  transition:opacity 1.8s cubic-bezier(.4,0,.2,1), visibility 1.8s;
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:opacity 2s cubic-bezier(.4,0,.2,1), visibility 2s;
 }
 #gi-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
 
-/* ── Background art ── */
-.loader-bg-art,.lba-layer{position:absolute;inset:0;pointer-events:none}
-.lba-sky{
-  background:
-    radial-gradient(ellipse 72% 55% at 22% 0%,rgba(255,248,215,.88) 0%,transparent 58%),
-    radial-gradient(ellipse 120% 48% at 50% 0%,rgba(240,228,198,.94) 0%,transparent 52%),
-    radial-gradient(ellipse 115% 32% at 50% 64%,rgba(220,195,142,.72) 0%,transparent 56%),
-    radial-gradient(ellipse 82% 26% at 76% 84%,rgba(198,178,150,.58) 0%,transparent 56%),
-    linear-gradient(175deg,#eee5ce 0%,#dfd2b4 20%,#d4c6a4 46%,#cab892 68%,#bcac82 100%);
+/* ── Cinematic scene — wider than viewport, pans ── */
+.ldr-scene{
+  position:absolute;inset:0;
+  width:160vw; /* overscan for pan */
+  left:-30vw;  /* start offset */
+  animation:ldrCamPan 12s cubic-bezier(.25,.1,.25,1) forwards;
+  transform-origin:center center;
 }
-.lba-glow{
-  background:
-    radial-gradient(ellipse 55% 44% at 30% 25%,rgba(255,240,160,.38) 0%,transparent 62%),
-    radial-gradient(ellipse 38% 32% at 72% 18%,rgba(255,220,130,.22) 0%,transparent 55%);
+@keyframes ldrCamPan{
+  0%   { left:-30vw; transform:scale(1.12); }
+  35%  { left:-18vw; transform:scale(1.07); }
+  70%  { left:-8vw;  transform:scale(1.03); }
+  100% { left:0;     transform:scale(1);    }
 }
-.lba-rays{z-index:1}
-.lba-ray{
-  position:absolute;top:-5%;
+
+/* Sky */
+.lsc-sky{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 90% 60% at 28% 0%,  rgba(255,248,210,.95) 0%,transparent 55%),
+    radial-gradient(ellipse 130% 50% at 55% 0%,  rgba(242,228,190,.96) 0%,transparent 50%),
+    radial-gradient(ellipse 110% 35% at 50% 65%, rgba(220,195,140,.75) 0%,transparent 54%),
+    radial-gradient(ellipse 80%  28% at 80% 88%, rgba(196,178,148,.6)  0%,transparent 55%),
+    linear-gradient(174deg,#ede0c4 0%,#dfd0b0 20%,#d3c3a0 44%,#c8b688 68%,#baa87c 100%);
+}
+.lsc-sky2{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 32% 22%, rgba(255,238,150,.32) 0%,transparent 60%),
+    radial-gradient(ellipse 42% 36% at 76% 16%, rgba(255,218,120,.2)  0%,transparent 55%);
+  animation:skySway 14s ease-in-out infinite;
+}
+@keyframes skySway{0%,100%{opacity:.8}50%{opacity:1}}
+
+/* Distant mountain ridges — painted silhouette style */
+.lsc-mtn-far{
+  position:absolute;bottom:22%;left:0;right:0;height:42%;pointer-events:none;
+  background:
+    radial-gradient(ellipse 18% 60% at 8%   100%,rgba(180,162,130,.52) 0%,transparent 70%),
+    radial-gradient(ellipse 22% 70% at 18%  100%,rgba(172,155,122,.58) 0%,transparent 70%),
+    radial-gradient(ellipse 20% 65% at 30%  100%,rgba(180,162,130,.48) 0%,transparent 68%),
+    radial-gradient(ellipse 25% 72% at 44%  100%,rgba(175,158,126,.55) 0%,transparent 72%),
+    radial-gradient(ellipse 18% 58% at 58%  100%,rgba(182,165,132,.5)  0%,transparent 66%),
+    radial-gradient(ellipse 22% 68% at 72%  100%,rgba(178,161,128,.53) 0%,transparent 70%),
+    radial-gradient(ellipse 20% 62% at 84%  100%,rgba(175,158,125,.5)  0%,transparent 68%),
+    radial-gradient(ellipse 18% 55% at 94%  100%,rgba(180,162,130,.46) 0%,transparent 65%);
+  filter:blur(2px);
+  animation:mtnFarDrift 14s ease-in-out infinite;
+}
+@keyframes mtnFarDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-8px)}}
+
+.lsc-mtn-mid{
+  position:absolute;bottom:18%;left:0;right:0;height:38%;pointer-events:none;
+  background:
+    radial-gradient(ellipse 16% 80% at 5%   100%,rgba(155,138,108,.72) 0%,transparent 70%),
+    radial-gradient(ellipse 19% 88% at 16%  100%,rgba(148,132,102,.78) 0%,transparent 72%),
+    radial-gradient(ellipse 17% 82% at 28%  100%,rgba(155,138,108,.7)  0%,transparent 70%),
+    radial-gradient(ellipse 21% 92% at 42%  100%,rgba(150,134,104,.75) 0%,transparent 74%),
+    radial-gradient(ellipse 16% 78% at 56%  100%,rgba(156,139,110,.68) 0%,transparent 70%),
+    radial-gradient(ellipse 20% 86% at 70%  100%,rgba(152,135,105,.72) 0%,transparent 72%),
+    radial-gradient(ellipse 17% 80% at 83%  100%,rgba(155,138,108,.68) 0%,transparent 70%),
+    radial-gradient(ellipse 15% 74% at 93%  100%,rgba(150,134,104,.65) 0%,transparent 68%);
+  filter:blur(1px);
+  animation:mtnMidDrift 10s ease-in-out infinite;
+}
+@keyframes mtnMidDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-14px)}}
+
+.lsc-mtn-near{
+  position:absolute;bottom:14%;left:0;right:0;height:32%;pointer-events:none;
+  background:
+    radial-gradient(ellipse 14% 95% at 2%   100%,rgba(120,104,78,.88) 0%,transparent 72%),
+    radial-gradient(ellipse 16% 100% at 14% 100%,rgba(114,98,72,.92) 0%,transparent 74%),
+    radial-gradient(ellipse 14% 90% at 26%  100%,rgba(120,104,78,.85) 0%,transparent 72%),
+    radial-gradient(ellipse 18% 105% at 40% 100%,rgba(116,100,74,.9) 0%,transparent 76%),
+    radial-gradient(ellipse 13% 88% at 54%  100%,rgba(122,106,80,.83) 0%,transparent 72%),
+    radial-gradient(ellipse 17% 98% at 68%  100%,rgba(118,102,76,.88) 0%,transparent 74%),
+    radial-gradient(ellipse 14% 92% at 81%  100%,rgba(120,104,78,.84) 0%,transparent 72%),
+    radial-gradient(ellipse 13% 86% at 92%  100%,rgba(114,98,72,.8)  0%,transparent 70%);
+  animation:mtnNearDrift 7s ease-in-out infinite;
+}
+@keyframes mtnNearDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-22px)}}
+
+/* Ancient ruin arch silhouettes */
+.lsc-ruins{
+  position:absolute;bottom:12%;left:0;right:0;height:30%;pointer-events:none;
+  background:
+    /* Left arch */
+    radial-gradient(ellipse 3% 45% at 12% 100%, rgba(80,68,50,.9) 0%,transparent 65%),
+    radial-gradient(ellipse 3% 45% at 17% 100%, rgba(80,68,50,.9) 0%,transparent 65%),
+    /* Lintel */
+    linear-gradient(0deg,rgba(80,68,50,.9) 0%,rgba(80,68,50,.0) 15%) no-repeat,
+    /* Right arch */
+    radial-gradient(ellipse 2.5% 38% at 75% 100%, rgba(70,58,42,.85) 0%,transparent 62%),
+    radial-gradient(ellipse 2.5% 38% at 79% 100%, rgba(70,58,42,.85) 0%,transparent 62%),
+    /* Far background arch */
+    radial-gradient(ellipse 2% 28% at 90% 100%, rgba(95,80,58,.7) 0%,transparent 58%),
+    radial-gradient(ellipse 2% 28% at 93% 100%, rgba(95,80,58,.7) 0%,transparent 58%);
+  filter:blur(.5px);
+  animation:ruinsDrift 9s ease-in-out infinite;
+}
+@keyframes ruinsDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-30px)}}
+
+/* Foreground foliage */
+.lsc-foliage{
+  position:absolute;bottom:0;left:-2%;right:-2%;height:22%;pointer-events:none;
+  background:
+    radial-gradient(ellipse 8%  60% at 3%  100%, rgba(60,82,28,.95) 0%,transparent 68%),
+    radial-gradient(ellipse 10% 72% at 11% 100%, rgba(50,74,22,.92) 0%,transparent 72%),
+    radial-gradient(ellipse 7%  55% at 20% 100%, rgba(64,88,30,.9)  0%,transparent 66%),
+    radial-gradient(ellipse 9%  65% at 32% 100%, rgba(54,76,24,.88) 0%,transparent 70%),
+    radial-gradient(ellipse 6%  50% at 43% 100%, rgba(62,86,28,.85) 0%,transparent 65%),
+    radial-gradient(ellipse 8%  60% at 57% 100%, rgba(58,80,26,.88) 0%,transparent 68%),
+    radial-gradient(ellipse 10% 70% at 70% 100%, rgba(52,76,22,.9)  0%,transparent 72%),
+    radial-gradient(ellipse 7%  55% at 80% 100%, rgba(60,84,28,.87) 0%,transparent 66%),
+    radial-gradient(ellipse 9%  65% at 90% 100%, rgba(55,77,24,.88) 0%,transparent 70%),
+    radial-gradient(ellipse 6%  50% at 98% 100%, rgba(62,86,30,.84) 0%,transparent 64%);
+  animation:foliageDrift 6s ease-in-out infinite;
+}
+@keyframes foliageDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-40px)}}
+
+/* Rays */
+.lsc-rays{position:absolute;inset:0;z-index:2}
+.lsc-ray{
+  position:absolute;top:-10%;left:0;
   transform-origin:top center;
-  transform:rotate(var(--r,0deg)) translateX(var(--x,50%));
-  left:0;
-  width:var(--w,200px);height:110%;
-  background:linear-gradient(180deg,rgba(255,248,220,.62) 0%,transparent 70%);
-  animation:lbaRayPulse 10s ease-in-out infinite;
-  animation-delay:var(--d,0s);
-  opacity:var(--o,.15);
+  transform:rotate(var(--ra,0deg)) translateX(var(--rx,50%));
+  width:var(--rw,200px);height:120%;
+  background:linear-gradient(180deg,rgba(255,248,220,.6) 0%,transparent 65%);
+  animation:lscRayBreath 12s ease-in-out infinite var(--rd,0s);
+  opacity:var(--ro,.14);
 }
-@keyframes lbaRayPulse{0%,100%{opacity:calc(var(--o,.15)*.3)}50%{opacity:var(--o,.15)}}
-.lba-fog{
-  position:absolute;bottom:0;left:0;right:0;height:45%;z-index:2;
-  background:linear-gradient(0deg,rgba(172,156,120,.65) 0%,rgba(195,178,142,.2) 40%,transparent 100%);
-}
-.lba-vignette{
-  position:absolute;inset:0;z-index:3;
-  background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 35%,rgba(28,20,8,.65) 100%);
-}
+@keyframes lscRayBreath{0%,100%{opacity:calc(var(--ro,.14)*.3)}50%{opacity:var(--ro,.14)}}
 
-/* dust motes */
-.lba-mote{
-  position:absolute;border-radius:50%;
-  background:rgba(255,248,210,.88);filter:blur(1.5px);
+/* Ground mist */
+.lsc-mist{
+  position:absolute;bottom:0;left:-5%;right:-5%;height:28%;z-index:3;pointer-events:none;
+  background:linear-gradient(0deg,rgba(218,200,162,.75) 0%,rgba(218,200,162,.3) 30%,transparent 80%);
+  animation:mistDrift 8s ease-in-out infinite;
+}
+.lsc-mist2{
+  height:18%;opacity:.6;
+  background:linear-gradient(0deg,rgba(230,215,180,.6) 0%,rgba(230,215,180,.15) 40%,transparent 80%);
+  animation-direction:reverse;animation-duration:11s;
+}
+@keyframes mistDrift{0%,100%{transform:translateX(0) scaleX(1)}50%{transform:translateX(-12px) scaleX(1.04)}}
+
+/* Dust motes */
+.lsc-mote{
+  position:absolute;border-radius:50%;bottom:10%;
+  background:rgba(255,248,210,.9);filter:blur(1.5px);
   pointer-events:none;z-index:4;
-  animation:moteDrift linear infinite;
+  animation:lscMote linear infinite;
 }
-@keyframes moteDrift{
+@keyframes lscMote{
   0%{transform:translateY(0) translateX(0);opacity:0}
-  8%{opacity:1}90%{opacity:.45}
-  100%{transform:translateY(-78vh) translateX(var(--drift,20px));opacity:0}
+  8%{opacity:1}90%{opacity:.4}
+  100%{transform:translateY(-78vh) translateX(var(--md,18px));opacity:0}
 }
 
-/* ── Main stage ── */
-.loader-main{
-  flex:1;position:relative;z-index:10;
+/* Vignette */
+.lsc-vignette{
+  position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:
+    radial-gradient(ellipse 88% 88% at 50% 50%,transparent 28%,rgba(18,12,4,.7) 100%),
+    linear-gradient(180deg,rgba(14,10,4,.2) 0%,transparent 15%,transparent 80%,rgba(8,6,2,.5) 100%);
+}
+
+/* Cinematic letterbox */
+.lsc-letterbox-top,.lsc-letterbox-bot{
+  position:absolute;left:0;right:0;z-index:6;pointer-events:none;
+  background:rgba(4,3,1,1);
+  animation:lbOpen 1.8s cubic-bezier(.4,0,.2,1) .3s forwards;
+}
+.lsc-letterbox-top{top:0;height:9vh;transform-origin:top}
+.lsc-letterbox-bot{bottom:0;height:9vh;transform-origin:bottom}
+@keyframes lbOpen{
+  from{transform:scaleY(1)}
+  to  {transform:scaleY(0)}
+}
+
+/* Stage (central content) — sits above scene at fixed position */
+.ldr-stage{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  z-index:10;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;padding-bottom:2vh;
+  padding-bottom:4vh;
+  animation:stageReveal 1.8s cubic-bezier(.16,1,.3,1) .6s both;
 }
+@keyframes stageReveal{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 
-.loader-ornament{
+.ldr-ornament{
   display:flex;align-items:center;gap:0;
-  margin-bottom:30px;
-  animation:lornIn 1.4s cubic-bezier(.16,1,.3,1) .2s both;
+  margin-bottom:28px;
 }
-@keyframes lornIn{from{opacity:0;transform:translateY(-16px) scale(.9)}to{opacity:1;transform:none}}
-.lorn-line{
-  width:clamp(50px,10vw,130px);height:1px;
-  background:linear-gradient(90deg,transparent,rgba(210,175,55,.68) 55%,rgba(210,175,55,.88));
-}
-.lorn-line+.lorn-gems+.lorn-line{background:linear-gradient(270deg,transparent,rgba(210,175,55,.68) 55%,rgba(210,175,55,.88))}
-.lorn-gems{display:flex;align-items:center;gap:7px;padding:0 20px}
-.lorn-gem{
-  transform:rotate(45deg);flex-shrink:0;
-  background:linear-gradient(135deg,#f8ec7c,#b88a20);
-  animation:lornGemBreath 2.6s ease-in-out infinite;
-}
-.lorn-gem.sm{width:5px;height:5px;opacity:.65}
-.lorn-gem.md{width:7px;height:7px;opacity:.82}
-.lorn-gem.lg{width:10px;height:10px;box-shadow:0 0 14px rgba(212,175,55,.85),0 0 30px rgba(212,175,55,.45)}
-@keyframes lornGemBreath{
-  0%,100%{box-shadow:0 0 6px rgba(212,175,55,.5),0 0 14px rgba(212,175,55,.22)}
-  50%{box-shadow:0 0 22px rgba(212,175,55,1),0 0 44px rgba(212,175,55,.55)}
-}
+.ldr-wordmark{text-align:center}
 
-.loader-wordmark-wrap{
-  text-align:center;position:relative;z-index:11;
-  animation:lwIn 1.7s cubic-bezier(.16,1,.3,1) .38s both;
-}
-@keyframes lwIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+/* ── lw-* preserved from before ── */
 .lw-eyebrow{
   font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:13px;
-  color:rgba(38,26,8,.5);text-transform:uppercase;margin-bottom:16px;
+  color:rgba(34,22,6,.48);text-transform:uppercase;margin-bottom:16px;
 }
 .lw-title{
   font-family:'Cinzel Decorative',serif;
   font-size:clamp(32px,5.5vw,60px);font-weight:700;
-  color:#1c1306;letter-spacing:11px;line-height:1;
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.65),
-    0 3px 0 rgba(255,255,255,.15),
-    0 10px 32px rgba(0,0,0,.25),
-    0 0 90px rgba(212,175,55,.24);
+  color:#1c1204;letter-spacing:11px;line-height:1;
+  text-shadow:0 1px 0 rgba(255,255,255,.65),0 3px 0 rgba(255,255,255,.12),0 8px 28px rgba(0,0,0,.22),0 0 80px rgba(200,160,40,.2);
 }
-.lw-title em{color:#7a5010;font-style:normal}
+.lw-title em{color:#6e4808;font-style:normal}
 .lw-divider{
   display:flex;align-items:center;gap:14px;
-  margin:18px auto 16px;max-width:380px;
+  margin:18px auto 16px;max-width:400px;
 }
-.lw-div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(178,146,50,.65))}
-.lw-div-line.rev{background:linear-gradient(270deg,transparent,rgba(178,146,50,.65))}
+.lw-div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(172,138,42,.65))}
+.lw-div-line.rev{background:linear-gradient(270deg,transparent,rgba(172,138,42,.65))}
 .lw-div-gem{
   width:7px;height:7px;flex-shrink:0;
-  background:linear-gradient(135deg,#f5e87a,#a07c1e);
+  background:linear-gradient(135deg,#f4e470,#9e7218);
   transform:rotate(45deg);
-  box-shadow:0 0 12px rgba(212,175,55,.85),0 0 26px rgba(212,175,55,.4);
+  box-shadow:0 0 12px rgba(208,168,40,.85),0 0 26px rgba(208,168,40,.4);
   animation:lornGemBreath 2.4s ease-in-out infinite;
 }
 .lw-sub{
   font-family:'Cinzel',serif;font-size:10px;letter-spacing:10px;
-  color:rgba(38,26,8,.46);text-transform:uppercase;
+  color:rgba(34,22,6,.44);text-transform:uppercase;
 }
 
-/* ── Bottom HUD ── */
+/* ── HUD ── */
 .loader-hud{
   position:relative;z-index:20;flex-shrink:0;
-  background:rgba(12,9,5,.82);
+  background:rgba(10,7,4,.84);
   backdrop-filter:blur(14px) saturate(1.4);
   -webkit-backdrop-filter:blur(14px) saturate(1.4);
 }
 .lhud-sep{
-  height:1px;
+  height:1.5px;
   background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(212,175,55,.2) 8%,
-    rgba(228,200,72,.7) 50%,
-    rgba(212,175,55,.2) 92%,
-    transparent 100%);
+    transparent 0%,rgba(208,168,40,.2) 8%,rgba(225,194,66,.72) 50%,rgba(208,168,40,.2) 92%,transparent 100%);
 }
 .lhud-inner{
   display:flex;align-items:flex-start;justify-content:space-between;
@@ -1205,55 +1339,48 @@ img.emoji{height:1.15em;width:1.15em;margin:0 .06em 0 .1em;vertical-align:-.18em
 .lhud-tip-label{
   display:flex;align-items:center;gap:8px;
   font-family:'Cinzel',serif;font-size:7px;letter-spacing:4px;
-  color:rgba(210,175,55,.5);text-transform:uppercase;margin-bottom:6px;
+  color:rgba(208,168,40,.5);text-transform:uppercase;margin-bottom:6px;
 }
-.lhud-tip-rule{flex:1;max-width:20px;height:1px;background:rgba(210,175,55,.4)}
+.lhud-tip-rule{flex:1;max-width:20px;height:1px;background:rgba(208,168,40,.38)}
 .lhud-tip-text{
   font-family:'IM Fell English',serif;font-style:italic;
-  font-size:14.5px;color:rgba(248,235,210,.92);line-height:1.68;
+  font-size:14.5px;color:rgba(248,232,205,.92);line-height:1.68;
 }
 .lhud-tip-attr{
   margin-top:5px;font-family:'Cinzel',serif;font-size:7.5px;
-  letter-spacing:2px;color:rgba(210,175,55,.42);
+  letter-spacing:2px;color:rgba(208,168,40,.42);
 }
 .lhud-brand{
   flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;padding-top:2px;
 }
 .lhud-brand-gem{
   width:9px;height:9px;border-radius:50%;align-self:flex-end;
-  background:radial-gradient(circle at 35% 35%,#f5e080,#a87820);
-  box-shadow:0 0 8px rgba(212,175,55,.75);
-  animation:lornGemBreath 2.2s ease-in-out infinite;
-  margin-bottom:2px;
+  background:radial-gradient(circle at 35% 35%,#f4de74,#a07016);
+  box-shadow:0 0 8px rgba(208,168,40,.75);
+  animation:lornGemBreath 2.2s ease-in-out infinite;margin-bottom:2px;
 }
 .lhud-brand-name{
   font-family:'Cinzel Decorative',serif;font-size:11px;
-  letter-spacing:3px;color:rgba(232,215,155,.85);white-space:nowrap;
+  letter-spacing:3px;color:rgba(230,210,148,.88);white-space:nowrap;
 }
 .lhud-brand-sub{
   font-family:'Cinzel',serif;font-size:7px;letter-spacing:4px;
-  color:rgba(198,175,112,.42);text-transform:uppercase;white-space:nowrap;
+  color:rgba(195,170,108,.42);text-transform:uppercase;white-space:nowrap;
 }
 .lhud-progress{
   display:flex;align-items:center;gap:14px;
   padding:10px 52px 16px;
 }
 .lhud-bar-wrap{flex:1}
-.lhud-bar-track{
-  height:2px;position:relative;
-  background:rgba(255,255,255,.07);
-}
+.lhud-bar-track{height:2px;position:relative;background:rgba(255,255,255,.07)}
 .lhud-bar-fill{
   height:100%;width:0%;position:relative;
-  background:linear-gradient(90deg,rgba(175,138,28,.6) 0%,#c8a840 40%,#e8c84a 75%,#f5e080 100%);
+  background:linear-gradient(90deg,rgba(172,132,24,.6) 0%,#c8a438 40%,#e6c244 75%,#f4de74 100%);
   transition:width .65s cubic-bezier(.4,0,.2,1);
 }
 .lhud-bar-fill::after{
-  content:'';position:absolute;right:-1px;top:-4px;
-  width:2px;height:10px;
-  background:#fff9d0;
-  box-shadow:0 0 12px #f0d060,0 0 26px rgba(240,200,60,.8),0 0 48px rgba(240,200,60,.4);
-  border-radius:1px;
+  content:'';position:absolute;right:-1px;top:-4px;width:2px;height:10px;
+  background:#fff8c8;box-shadow:0 0 12px #e8c050,0 0 26px rgba(232,190,50,.8),0 0 48px rgba(232,190,50,.4);border-radius:1px;
 }
 .lhud-bar-fill::before{
   content:'';position:absolute;inset:0;
@@ -1263,75 +1390,53 @@ img.emoji{height:1.15em;width:1.15em;margin:0 .06em 0 .1em;vertical-align:-.18em
 @keyframes barShimmer{from{transform:translateX(-100%)}to{transform:translateX(700%)}}
 .lhud-status{
   font-family:'Cinzel',serif;font-size:7px;letter-spacing:3.5px;
-  color:rgba(198,175,110,.58);text-transform:uppercase;
+  color:rgba(195,168,104,.58);text-transform:uppercase;
   white-space:nowrap;flex-shrink:0;min-width:112px;text-align:right;
 }
 
-/* Mobile loader adjustments */
+/* ornament shared */
+.lorn-line{
+  width:clamp(50px,10vw,130px);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(204,166,44,.72) 55%,rgba(204,166,44,.9));
+}
+.lorn-line+.lorn-gems+.lorn-line{background:linear-gradient(270deg,transparent,rgba(204,166,44,.72) 55%,rgba(204,166,44,.9))}
+.lorn-gems{display:flex;align-items:center;gap:7px;padding:0 20px}
+.lorn-gem{transform:rotate(45deg);flex-shrink:0;background:linear-gradient(135deg,#f6ea74,#b08818);animation:lornGemBreath 2.6s ease-in-out infinite}
+.lorn-gem.sm{width:5px;height:5px;opacity:.65}
+.lorn-gem.md{width:7px;height:7px;opacity:.82}
+.lorn-gem.lg{width:10px;height:10px;box-shadow:0 0 14px rgba(208,168,40,.88),0 0 30px rgba(208,168,40,.44)}
+@keyframes lornGemBreath{
+  0%,100%{box-shadow:0 0 6px rgba(208,168,40,.5),0 0 14px rgba(208,168,40,.2)}
+  50%{box-shadow:0 0 22px rgba(208,168,40,1),0 0 44px rgba(208,168,40,.55)}
+}
+
+/* Mobile */
 @media(max-width:600px){
   .lhud-inner{padding:12px 20px 10px;gap:14px}
   .lhud-brand{display:none}
   .lhud-progress{padding:8px 20px 14px}
-  .lw-title{letter-spacing:6px}
-  .lw-eyebrow{letter-spacing:7px;font-size:7.5px}
+  .lw-title{letter-spacing:5px}
 }
 @media(max-width:380px){
-  .lw-title{font-size:9vw;letter-spacing:4px}
-  .lorn-line{width:40px}
+  .lw-title{font-size:9vw;letter-spacing:3px}
+  .lorn-line{width:36px}
 }
 
 /* ══════════════════════════════════════
-   ── MEDIA CARD (Last.fm) ──
+   MEDIA CARD (Last.fm)
 ══════════════════════════════════════ */
-.media-card {
-  display: flex; align-items: flex-start; gap: 16px; padding: 14px;
-  background: rgba(12,9,24,.88);
-  border: 1px solid rgba(120,100,200,.26);
-  transition: border-color .6s;
-}
-html[data-element] .media-card { border-color: color-mix(in srgb,var(--a2) 38%,transparent); }
-.media-art {
-  width: 72px; height: 72px; flex-shrink: 0;
-  background: linear-gradient(155deg,rgba(26,18,48,.9),rgba(14,10,30,.9));
-  border: 1.5px solid rgba(120,100,200,.38);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px; overflow: hidden; border-radius: 3px;
-  transition: border-color .6s, background .6s;
-}
-html[data-element] .media-art { background: linear-gradient(155deg,var(--a3),var(--a4)); border-color: var(--a1); }
-.media-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.media-info { flex: 1; min-width: 0; }
-.media-playing-row {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
-  font-family: 'Cinzel',serif; font-size: 8px; letter-spacing: 3px;
-  color: rgba(155,142,215,.6); text-transform: uppercase;
-}
-.media-dot {
-  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-  background: rgba(160,140,240,1); box-shadow: 0 0 6px rgba(160,140,240,.6);
-  animation: gemPulse 1.5s ease-in-out infinite;
-}
-html[data-element] .media-dot { background: var(--a1); box-shadow: 0 0 6px var(--glow); }
-.media-title {
-  font-family: 'Cinzel',serif; font-size: 13.5px; font-weight: 700;
-  color: var(--t0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;
-}
-.media-sub {
-  font-family: 'Lora',serif; font-size: 12px; color: rgba(155,142,200,.62);
-  font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px;
-}
-.media-link {
-  display: inline-block; margin-top: 8px;
-  font-family: 'Cinzel',serif; font-size: 8px; letter-spacing: 2.5px;
-  color: rgba(160,140,240,.75); text-decoration: none; text-transform: uppercase;
-  transition: color .2s;
-}
-.media-link:hover { color: var(--t0); }
-.lfm-idle {
-  padding: 20px 16px; text-align: center;
-  font-family: 'Cinzel',serif; font-size: 8.5px; letter-spacing: 4px;
-  color: rgba(130,118,188,.5); text-transform: uppercase;
-}
-.lany-status-row {
-  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
-}
+.media-card{display:flex;align-items:flex-start;gap:16px;padding:14px;background:rgba(12,9,24,.88);border:1px solid rgba(120,100,200,.26);transition:border-color .6s}
+html[data-element] .media-card{border-color:color-mix(in srgb,var(--a2) 38%,transparent)}
+.media-art{width:72px;height:72px;flex-shrink:0;background:linear-gradient(155deg,rgba(26,18,48,.9),rgba(14,10,30,.9));border:1.5px solid rgba(120,100,200,.38);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;border-radius:3px;transition:border-color .6s,background .6s}
+html[data-element] .media-art{background:linear-gradient(155deg,var(--a3),var(--a4));border-color:var(--a1)}
+.media-art img{width:100%;height:100%;object-fit:cover;display:block}
+.media-info{flex:1;min-width:0}
+.media-playing-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:rgba(155,142,215,.6);text-transform:uppercase}
+.media-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:rgba(160,140,240,1);box-shadow:0 0 6px rgba(160,140,240,.6);animation:gemPulse 1.5s ease-in-out infinite}
+html[data-element] .media-dot{background:var(--a1);box-shadow:0 0 6px var(--glow)}
+.media-title{font-family:'Cinzel',serif;font-size:13.5px;font-weight:700;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.media-sub{font-family:'Lora',serif;font-size:12px;color:rgba(155,142,200,.62);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.media-link{display:inline-block;margin-top:8px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2.5px;color:rgba(160,140,240,.75);text-decoration:none;text-transform:uppercase;transition:color .2s}
+.media-link:hover{color:var(--t0)}
+.lfm-idle{padding:20px 16px;text-align:center;font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:4px;color:rgba(130,118,188,.5);text-transform:uppercase}
+.lany-status-row{display:flex;align-items:center;gap:10px;padding:12px 16px}

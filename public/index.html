@@ -22,45 +22,80 @@
 <!-- ══ ELEMENT FLASH OVERLAY ══ -->
 <div id="elemTransitionOverlay" aria-hidden="true"></div>
 
+<!-- ══ PAGE TRANSITION CANVAS ══ -->
+<canvas id="transitionCanvas" aria-hidden="true"></canvas>
+
 <!-- ══════════════════════════════════════
      LOADING SCREEN — Genshin Web Event
 ══════════════════════════════════════ -->
 <div id="gi-loader" role="status" aria-label="Loading AARONWORLD">
 
-  <div class="loader-bg-art" aria-hidden="true">
-    <div class="lba-layer lba-sky"></div>
-    <div class="lba-layer lba-glow"></div>
-    <div class="lba-layer lba-rays">
-      <div class="lba-ray" style="--r:-28deg;--x:8%;--w:260px;--d:0s;--o:.18"></div>
-      <div class="lba-ray" style="--r:-16deg;--x:22%;--w:140px;--d:1.2s;--o:.13"></div>
-      <div class="lba-ray" style="--r:-6deg;--x:34%;--w:300px;--d:2.4s;--o:.17"></div>
-      <div class="lba-ray" style="--r:5deg;--x:52%;--w:200px;--d:.7s;--o:.12"></div>
-      <div class="lba-ray" style="--r:14deg;--x:66%;--w:340px;--d:1.9s;--o:.19"></div>
-      <div class="lba-ray" style="--r:25deg;--x:84%;--w:180px;--d:.3s;--o:.11"></div>
+  <!-- ── Cinematic scene (camera pans across this) ── -->
+  <div class="ldr-scene" id="ldrScene" aria-hidden="true">
+
+    <!-- Sky gradient layers -->
+    <div class="lsc-sky"></div>
+    <div class="lsc-sky2"></div>
+
+    <!-- Distant mountain silhouettes (slow parallax) -->
+    <div class="lsc-layer lsc-mtn-far"></div>
+    <div class="lsc-layer lsc-mtn-mid"></div>
+    <div class="lsc-layer lsc-mtn-near"></div>
+
+    <!-- Ruins / architecture layer -->
+    <div class="lsc-layer lsc-ruins"></div>
+
+    <!-- Foreground foliage -->
+    <div class="lsc-layer lsc-foliage"></div>
+
+    <!-- Crepuscular rays (wide, slow breath) -->
+    <div class="lsc-rays">
+      <div class="lsc-ray" style="--ra:-32deg;--rx:5%;--rw:280px;--rd:0s;--ro:.16"></div>
+      <div class="lsc-ray" style="--ra:-18deg;--rx:18%;--rw:160px;--rd:1.4s;--ro:.11"></div>
+      <div class="lsc-ray" style="--ra:-5deg;--rx:32%;--rw:340px;--rd:2.8s;--ro:.18"></div>
+      <div class="lsc-ray" style="--ra:7deg;--rx:50%;--rw:220px;--rd:.8s;--ro:.13"></div>
+      <div class="lsc-ray" style="--ra:18deg;--rx:64%;--rw:300px;--rd:2.1s;--ro:.17"></div>
+      <div class="lsc-ray" style="--ra:28deg;--rx:80%;--rw:200px;--rd:.4s;--ro:.12"></div>
+      <div class="lsc-ray" style="--ra:38deg;--rx:92%;--rw:140px;--rd:1.8s;--ro:.09"></div>
     </div>
-    <div class="lba-fog"></div>
-    <div class="lba-vignette"></div>
+
+    <!-- Ground mist -->
+    <div class="lsc-mist"></div>
+    <div class="lsc-mist lsc-mist2"></div>
+
+    <!-- Floating dust motes (JS spawns more) -->
+    <div class="lsc-mote" style="left:8%;width:3px;height:3px;animation-duration:14s;animation-delay:0s;--md:-18px"></div>
+    <div class="lsc-mote" style="left:25%;width:5px;height:5px;animation-duration:20s;animation-delay:3s;--md:22px"></div>
+    <div class="lsc-mote" style="left:52%;width:4px;height:4px;animation-duration:16s;animation-delay:1.5s;--md:-10px"></div>
+    <div class="lsc-mote" style="left:71%;width:3px;height:3px;animation-duration:22s;animation-delay:5s;--md:28px"></div>
+    <div class="lsc-mote" style="left:88%;width:4px;height:4px;animation-duration:18s;animation-delay:2s;--md:-15px"></div>
+
+    <!-- Vignette on top of everything -->
+    <div class="lsc-vignette"></div>
+    <!-- Cinematic letterbox -->
+    <div class="lsc-letterbox-top"></div>
+    <div class="lsc-letterbox-bot"></div>
   </div>
 
-  <div class="loader-main" aria-hidden="true">
-    <div class="loader-ornament">
+  <!-- ── Central identity stage ── -->
+  <div class="ldr-stage" aria-hidden="true">
+    <div class="ldr-ornament">
       <div class="lorn-line"></div>
       <div class="lorn-gems">
         <div class="lorn-gem sm" style="animation-delay:.4s"></div>
-        <div class="lorn-gem md" style="animation-delay:.1s"></div>
-        <div class="lorn-gem lg" style="animation-delay:0s"></div>
-        <div class="lorn-gem md" style="animation-delay:.2s"></div>
+        <div class="lorn-gem md" style="animation-delay:.15s"></div>
+        <div class="lorn-gem lg"></div>
+        <div class="lorn-gem md" style="animation-delay:.25s"></div>
         <div class="lorn-gem sm" style="animation-delay:.5s"></div>
       </div>
       <div class="lorn-line"></div>
     </div>
-
-    <div class="loader-wordmark-wrap">
+    <div class="ldr-wordmark">
       <div class="lw-eyebrow">✦ &nbsp; Traveler's Personal Journal &nbsp; ✦</div>
       <div class="lw-title">AARON<em>WORLD</em></div>
       <div class="lw-divider">
         <div class="lw-div-line"></div>
-        <div class="lw-div-gem" style="animation-delay:0s"></div>
+        <div class="lw-div-gem"></div>
         <div class="lw-div-gem" style="animation-delay:.35s"></div>
         <div class="lw-div-gem" style="animation-delay:.7s"></div>
         <div class="lw-div-line rev"></div>
@@ -69,6 +104,7 @@
     </div>
   </div>
 
+  <!-- ── HUD bar (bottom) ── -->
   <div class="loader-hud">
     <div class="lhud-sep"></div>
     <div class="lhud-inner">
@@ -145,10 +181,10 @@
       <span class="nav-icon">◈</span><span class="nav-txt">Anime</span>
     </button>
     <button class="nav-link" data-sec="showcase" onclick="showSec('showcase',this)">
-      <span class="nav-icon">▶</span><span class="nav-txt">Showcase</span>
+      <span class="nav-icon">◉</span><span class="nav-txt">Showcase</span>
     </button>
     <button class="nav-link" data-sec="setup" onclick="showSec('setup',this)">
-      <span class="nav-icon">⊕</span><span class="nav-txt">Setup</span>
+      <span class="nav-icon">❖</span><span class="nav-txt">Setup</span>
     </button>
   </nav>
 
@@ -597,6 +633,7 @@ window.addEventListener('load', function () {
   const statusEl = document.getElementById('loaderStatus');
   const tipEl    = document.getElementById('loaderTip');
   const tipAttr  = document.getElementById('loaderTipAttr');
+  const scene    = document.getElementById('ldrScene');
 
   const tips = [
     { text: '"The pursuit of knowledge requires crossing many frontiers."', attr: '— Alhaitham' },
@@ -605,45 +642,57 @@ window.addEventListener('load', function () {
     { text: '"Adventure is out there, Traveler. The world awaits."',        attr: '— Paimon' },
     { text: '"Every journey begins with a single step into the unknown."',  attr: '— Teyvat Traveler' },
     { text: '"The wind carries whispers of distant lands."',                attr: '— Unknown' },
-    { text: '"A true scholar does not fear questions — they fear stopping."', attr: '— House of Daena' },
+    { text: '"A true scholar does not fear questions — only stopping."',    attr: '— House of Daena' },
   ];
   const tip = tips[Math.floor(Math.random() * tips.length)];
   if (tipEl)   tipEl.textContent   = tip.text;
   if (tipAttr) tipAttr.textContent = tip.attr;
 
-  /* spawn dust motes */
-  for (let i = 0; i < 14; i++) {
-    const m = document.createElement('div');
-    m.className = 'lba-mote';
-    m.style.cssText = `left:${3+Math.random()*94}vw;bottom:${Math.random()*30}%;width:${2+Math.random()*5}px;height:${2+Math.random()*5}px;animation-duration:${10+Math.random()*18}s;animation-delay:${Math.random()*14}s;--drift:${(Math.random()>.5?1:-1)*(10+Math.random()*30)}px`;
-    loader.appendChild(m);
+  /* Spawn extra dust motes into scene */
+  if (scene) {
+    for (let i = 0; i < 20; i++) {
+      const m = document.createElement('div');
+      m.className = 'lsc-mote';
+      const sz = 2 + Math.random() * 5;
+      m.style.cssText = [
+        `left:${2+Math.random()*96}vw`,
+        `width:${sz}px`,
+        `height:${sz}px`,
+        `bottom:${Math.random()*25}%`,
+        `animation-duration:${9+Math.random()*18}s`,
+        `animation-delay:${Math.random()*18}s`,
+        `--md:${(Math.random()>.5?1:-1)*(12+Math.random()*35)}px`,
+      ].join(';');
+      scene.appendChild(m);
+    }
   }
 
   const stages = [
-    { pct: 12,  label: 'Initialising…' },
-    { pct: 30,  label: 'Loading Teyvat…' },
-    { pct: 50,  label: 'Fetching Character…' },
-    { pct: 68,  label: 'Syncing Journal…' },
-    { pct: 84,  label: 'Preparing World…' },
-    { pct: 100, label: 'Entering…' },
+    { pct:10,  label:'Initialising…' },
+    { pct:28,  label:'Loading Teyvat…' },
+    { pct:48,  label:'Fetching Character…' },
+    { pct:66,  label:'Syncing Journal…' },
+    { pct:82,  label:'Preparing World…' },
+    { pct:100, label:'Entering…' },
   ];
   let si = 0;
   function nextStage() {
     if (si >= stages.length) return;
     const s = stages[si++];
-    barFill.style.width  = s.pct + '%';
-    statusEl.textContent = s.label;
-    if (si < stages.length) setTimeout(nextStage, 280 + Math.random() * 400);
-    else setTimeout(dismiss, 650);
+    if (barFill)  barFill.style.width  = s.pct + '%';
+    if (statusEl) statusEl.textContent = s.label;
+    if (si < stages.length) setTimeout(nextStage, 300 + Math.random() * 440);
+    else setTimeout(dismiss, 700);
   }
-  setTimeout(nextStage, 380);
+  setTimeout(nextStage, 420);
 
   function dismiss() {
     loader.classList.add('hidden');
     document.body.style.overflow = '';
     document.getElementById('mainPage')?.classList.add('visible');
   }
-  setTimeout(dismiss, 6200);
+  /* Hard cap — never show loader more than 7s */
+  setTimeout(dismiss, 7000);
   document.body.style.overflow = 'hidden';
 })();
 

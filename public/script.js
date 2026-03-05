@@ -384,21 +384,327 @@ function respawnParticles() {
   }
 }
 
-/* ══════════════════════════════════════
-   NAV — SECTION SWITCHING
-══════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   ELEMENT-SPECIFIC PAGE TRANSITION WIPES
+══════════════════════════════════════════════════════════ */
+const _tc = document.getElementById('transitionCanvas');
+const _tx = _tc ? _tc.getContext('2d') : null;
+let _txBusy = false;
+
+function _resizeTC() {
+  if (!_tc) return;
+  _tc.width  = window.innerWidth;
+  _tc.height = window.innerHeight;
+}
+_resizeTC();
+window.addEventListener('resize', _resizeTC);
+
+/* Each element has a wipe function: fn(ctx, W, H, progress 0→1) */
+const ELEMENT_WIPES = {
+
+  dendro(ctx, W, H, p) {
+    // Leaf/petal burst from center — organic blobs scatter outward
+    ctx.clearRect(0, 0, W, H);
+    const ease = p < .5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const count = 24;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + p * 0.8;
+      const dist  = ease * Math.max(W, H) * 1.4;
+      const cx    = W/2 + Math.cos(angle) * dist;
+      const cy    = H/2 + Math.sin(angle) * dist;
+      const r     = (0.25 + Math.sin(angle * 3) * 0.1) * Math.max(W, H) * (0.15 + ease * 0.85);
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      const a = p < 0.75 ? 1 : 1 - (p - 0.75) * 4;
+      g.addColorStop(0, `rgba(90,140,18,${a})`);
+      g.addColorStop(0.5, `rgba(60,100,10,${a * 0.9})`);
+      g.addColorStop(1, `rgba(30,60,5,0)`);
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.fillStyle = g; ctx.fill();
+    }
+    // Overlay fill sweep
+    if (p > 0.05 && p < 0.8) {
+      const sweepA = p < 0.4 ? p/0.4 : 1 - (p-0.4)/0.4;
+      ctx.globalAlpha = sweepA * 0.35;
+      ctx.fillStyle = '#1a3206';
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+  },
+
+  pyro(ctx, W, H, p) {
+    // Flame wipe — rises from bottom, jagged fire edge
+    ctx.clearRect(0, 0, W, H);
+    const ease = 1 - Math.pow(1 - p, 3);
+    // Fill below flame line
+    const flameH = H * 1.1 * ease;
+    // Draw jagged flame top edge
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    const segments = 60;
+    for (let i = 0; i <= segments; i++) {
+      const x = (i / segments) * W;
+      const baseY = H - flameH;
+      const jitter = Math.sin(i * 0.8 + p * 18) * 32
+                   + Math.sin(i * 1.6 + p * 12) * 18
+                   + Math.sin(i * 3.2 + p * 26) * 10;
+      ctx.lineTo(x, baseY + jitter);
+    }
+    ctx.lineTo(W, H); ctx.closePath();
+    const grad = ctx.createLinearGradient(0, H - flameH - 60, 0, H);
+    const fa = p > 0.8 ? 1 - (p - 0.8) * 5 : 1;
+    grad.addColorStop(0,   `rgba(255,140,20,${fa * 0.9})`);
+    grad.addColorStop(0.2, `rgba(220,60,0,${fa})`);
+    grad.addColorStop(0.6, `rgba(160,20,0,${fa})`);
+    grad.addColorStop(1,   `rgba(80,6,0,${fa})`);
+    ctx.fillStyle = grad; ctx.fill();
+    // Glow on top edge
+    ctx.save();
+    ctx.globalAlpha = fa * 0.5;
+    ctx.shadowColor = '#ff8800'; ctx.shadowBlur = 40;
+    ctx.stroke();
+    ctx.restore();
+  },
+
+  hydro(ctx, W, H, p) {
+    // Water ripple flood from center — concentric expanding rings + fill
+    ctx.clearRect(0, 0, W, H);
+    const ease = p < .5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const maxR = Math.hypot(W, H);
+    // Main fill circle
+    const r = ease * maxR * 0.75;
+    const fa = p > 0.8 ? 1 - (p-0.8)*5 : 1;
+    const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, r);
+    g.addColorStop(0,   `rgba(20,100,180,${fa})`);
+    g.addColorStop(0.5, `rgba(10,70,140,${fa})`);
+    g.addColorStop(1,   `rgba(5,40,90,0)`);
+    ctx.beginPath(); ctx.arc(W/2, H/2, r, 0, Math.PI*2);
+    ctx.fillStyle = g; ctx.fill();
+    // Ripple rings
+    for (let ri = 0; ri < 5; ri++) {
+      const ringR = (ease - ri * 0.1) * maxR * 0.8;
+      if (ringR <= 0) continue;
+      const ringA = fa * (1 - ri * 0.18) * 0.6;
+      ctx.beginPath(); ctx.arc(W/2, H/2, ringR, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(80,180,240,${ringA})`; ctx.lineWidth = 3 - ri*0.4; ctx.stroke();
+    }
+  },
+
+  cryo(ctx, W, H, p) {
+    // Frost crystals spread from corners — geometric angular growth
+    ctx.clearRect(0, 0, W, H);
+    const ease = p < .5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const fa = p > 0.82 ? 1 - (p-0.82)*5.8 : 1;
+    const origins = [[0,0],[W,0],[0,H],[W,H],[W/2,H/2]];
+    origins.forEach(([ox,oy], oi) => {
+      const maxR = Math.hypot(W, H) * (0.6 + oi * 0.12);
+      const r    = ease * maxR * (1 - oi * 0.06);
+      if (r <= 0) return;
+      // Hexagonal frost blob
+      ctx.beginPath();
+      const sides = 6;
+      for (let s = 0; s < sides; s++) {
+        const a = (s/sides)*Math.PI*2 + (oi * 0.2);
+        const rx = ox + Math.cos(a) * r * (0.85 + Math.sin(a*3)*0.15);
+        const ry = oy + Math.sin(a) * r * (0.85 + Math.cos(a*2)*0.15);
+        s === 0 ? ctx.moveTo(rx, ry) : ctx.lineTo(rx, ry);
+      }
+      ctx.closePath();
+      const g = ctx.createRadialGradient(ox,oy,0,ox,oy,r);
+      g.addColorStop(0,   `rgba(160,230,255,${fa * (0.9 - oi*0.1)})`);
+      g.addColorStop(0.4, `rgba(80,160,210,${fa * (0.85 - oi*0.1)})`);
+      g.addColorStop(1,   `rgba(20,60,110,0)`);
+      ctx.fillStyle = g; ctx.fill();
+    });
+    // Snowflake sparkles
+    if (ease > 0.2) {
+      for (let i = 0; i < 20; i++) {
+        const sx = (i / 20) * W;
+        const sy = ((i * 37) % H);
+        const sr = (ease - 0.2) * 12 * fa;
+        ctx.save(); ctx.translate(sx, sy); ctx.globalAlpha = fa * 0.7;
+        ctx.strokeStyle = 'rgba(220,245,255,0.9)'; ctx.lineWidth = 1;
+        for (let a = 0; a < 6; a++) {
+          const ang = (a/6)*Math.PI*2;
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(ang)*sr, Math.sin(ang)*sr); ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+  },
+
+  electro(ctx, W, H, p) {
+    // Lightning wipe — jagged vertical strike from top, fans out
+    ctx.clearRect(0, 0, W, H);
+    const ease  = 1 - Math.pow(1-p, 2.5);
+    const fa    = p > 0.75 ? 1 - (p-0.75)*4 : 1;
+    // Background flash
+    ctx.globalAlpha = fa * Math.sin(p * Math.PI) * 0.5;
+    ctx.fillStyle = 'rgba(140,60,255,1)';
+    ctx.fillRect(0,0,W,H);
+    ctx.globalAlpha = 1;
+
+    // Multiple lightning bolts from top
+    const bolts = [W*0.25, W*0.5, W*0.75];
+    bolts.forEach((bx, bi) => {
+      const seg = 18;
+      const totalH = H * ease;
+      ctx.beginPath(); ctx.moveTo(bx, 0);
+      let cx2 = bx, cy2 = 0;
+      for (let s = 1; s <= seg; s++) {
+        cy2 = (s / seg) * totalH;
+        cx2 = bx + (Math.sin(s * 4.5 + bi * 2.8 + p * 30) * 55) * (1 - s/seg * 0.4);
+        ctx.lineTo(cx2, cy2);
+      }
+      const bAlpha = fa * (0.9 - bi * 0.1);
+      ctx.strokeStyle = `rgba(220,160,255,${bAlpha})`; ctx.lineWidth = 3 - bi*0.5;
+      ctx.shadowColor = '#cc80ff'; ctx.shadowBlur = 20; ctx.stroke();
+      ctx.strokeStyle = `rgba(255,255,255,${bAlpha * 0.8})`; ctx.lineWidth = 1.2; ctx.shadowBlur = 0; ctx.stroke();
+    });
+    // Purple flood fill
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,   `rgba(80,10,140,${fa * ease * 0.7})`);
+    g.addColorStop(0.5, `rgba(50,5,100,${fa * ease * 0.6})`);
+    g.addColorStop(1,   `rgba(20,2,50,${fa * ease * 0.5})`);
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H*ease*0.4);
+  },
+
+  anemo(ctx, W, H, p) {
+    // Wind spiral — swirling ribbons of teal from edges, curling inward
+    ctx.clearRect(0, 0, W, H);
+    const ease = p < .5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const fa   = p > 0.78 ? 1-(p-0.78)*4.5 : 1;
+    // Spiraling arcs
+    for (let ri = 0; ri < 8; ri++) {
+      const offset = ri / 8;
+      const startAngle = offset * Math.PI * 2;
+      const arcLen    = ease * Math.PI * 3;
+      const maxR      = Math.hypot(W,H) * 0.6 * (1 - offset * 0.08);
+      ctx.beginPath();
+      for (let t = 0; t <= 60; t++) {
+        const tt   = t / 60;
+        const ang  = startAngle + arcLen * tt;
+        const r2   = maxR * tt * ease;
+        const x    = W/2 + Math.cos(ang) * r2;
+        const y    = H/2 + Math.sin(ang) * r2;
+        t === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      const alpha = fa * (0.7 - ri * 0.06);
+      ctx.strokeStyle = `rgba(40,200,140,${alpha})`; ctx.lineWidth = 6 - ri * 0.5; ctx.stroke();
+    }
+    // Central glow
+    const r = ease * Math.min(W,H) * 0.5;
+    const g = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,r);
+    g.addColorStop(0,   `rgba(40,200,140,${fa * 0.4})`);
+    g.addColorStop(0.5, `rgba(10,120,80,${fa * 0.25})`);
+    g.addColorStop(1,   `rgba(0,50,35,0)`);
+    ctx.beginPath(); ctx.arc(W/2,H/2,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  },
+
+  geo(ctx, W, H, p) {
+    // Rock shatter — polygonal tiles crack from center outward
+    ctx.clearRect(0, 0, W, H);
+    const ease = 1-Math.pow(1-p,3);
+    const fa   = p > 0.8 ? 1-(p-0.8)*5 : 1;
+    const tileSize = 80;
+    const cols = Math.ceil(W / tileSize) + 2;
+    const rows = Math.ceil(H / tileSize) + 2;
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const tx = col * tileSize - tileSize;
+        const ty = row * tileSize - tileSize;
+        const tcx = tx + tileSize/2, tcy = ty + tileSize/2;
+        const dist = Math.hypot(tcx - W/2, tcy - H/2) / Math.hypot(W/2, H/2);
+        const delay = dist * 0.4;
+        const tileP = Math.max(0, Math.min(1, (ease - delay) / (1 - delay)));
+        if (tileP <= 0) continue;
+        // Each tile drops in with an offset
+        const dropY  = (1 - tileP) * 60;
+        const alpha  = tileP * fa;
+        const jx     = ((col * 17 + row * 31) % 20 - 10) * 0.5;
+        const jy     = ((col * 23 + row * 13) % 20 - 10) * 0.5;
+        // Hexagonal-ish tile
+        ctx.save();
+        ctx.translate(tcx + jx, tcy + jy + dropY);
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        const sides = 6;
+        for (let s = 0; s < sides; s++) {
+          const a = (s/sides)*Math.PI*2 + 0.5;
+          const r = tileSize * 0.52;
+          s === 0 ? ctx.moveTo(Math.cos(a)*r, Math.sin(a)*r)
+                  : ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+        }
+        ctx.closePath();
+        const g = ctx.createRadialGradient(0,0,0,0,0,tileSize*0.5);
+        g.addColorStop(0,   `rgba(220,180,30,1)`);
+        g.addColorStop(0.4, `rgba(160,120,10,1)`);
+        g.addColorStop(1,   `rgba(80,55,5,1)`);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = `rgba(255,220,60,0.4)`; ctx.lineWidth = 1; ctx.stroke();
+        ctx.restore();
+      }
+    }
+  },
+};
+
+/* Run a wipe transition then switch sections */
 function showSec(id, btn) {
+  if (_txBusy) return;
+  const current = document.querySelector('.section.active');
+  if (current && current.id === id) return;
+
+  const theme = ELEMENT_THEMES[currentElement];
+  const wipeFn = ELEMENT_WIPES[currentElement] || ELEMENT_WIPES.dendro;
+
+  if (!_tc || !_tx) {
+    // No canvas — instant switch
+    _doSwitch(id, btn); return;
+  }
+
+  _txBusy = true;
+  _tc.classList.add('active');
+  _resizeTC();
+  const W = _tc.width, H = _tc.height;
+
+  const DURATION = 700; // ms
+  const start = performance.now();
+
+  function tick(now) {
+    const raw = (now - start) / DURATION;
+    const p   = Math.min(raw, 1);
+
+    wipeFn(_tx, W, H, p);
+
+    // Switch content at midpoint
+    if (p >= 0.42 && !_tc._switched) {
+      _tc._switched = true;
+      _doSwitch(id, btn);
+    }
+
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      _tx.clearRect(0, 0, W, H);
+      _tc.classList.remove('active');
+      _tc._switched = false;
+      _txBusy = false;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function _doSwitch(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
   const sec = document.getElementById(id);
   if (sec) sec.classList.add('active');
   if (btn) btn.classList.add('active');
-  // Scroll to top of main content on mobile
   if (window.innerWidth <= 800) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Keyboard nav
 document.addEventListener('keydown', e => {
+  if (_txBusy) return;
   const links = Array.from(document.querySelectorAll('.nav-link'));
   const active = links.findIndex(l => l.classList.contains('active'));
   if (e.key === 'ArrowRight' && active < links.length - 1) links[active + 1].click();
