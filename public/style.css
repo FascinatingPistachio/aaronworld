@@ -1442,693 +1442,222 @@ html[data-element] .media-dot{background:var(--a1);box-shadow:0 0 6px var(--glow
 .lany-status-row{display:flex;align-items:center;gap:10px;padding:12px 16px}
 
 /* ════════════════════════════════════════════════════════
-   AARONWORLD — ETHEREAL ENHANCEMENT LAYER
-   Aurora · Holographic · 3D Depth · Cursor · Constellations
+   AARONWORLD — ETHEREAL LAYER v2 · Elegant Edition
    ════════════════════════════════════════════════════════ */
 
-/* ══════════════════════════════════════
-   CUSTOM CURSOR
-══════════════════════════════════════ */
+/* ─── Custom cursor ─── */
 *, *::before, *::after { cursor: none !important; }
 
 #aw-cursor-dot {
-  position: fixed;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--a0, #d8f070);
-  box-shadow: 0 0 12px var(--glow, rgba(168,204,40,.8)), 0 0 28px var(--glow2, rgba(90,144,24,.4));
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: background 0.4s, box-shadow 0.4s, width 0.15s, height 0.15s;
+  position: fixed; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--a0); pointer-events: none; z-index: 999999;
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 10px var(--glow), 0 0 22px var(--glow2);
+  transition: background .35s, box-shadow .35s, width .1s, height .1s;
   mix-blend-mode: screen;
 }
-
 #aw-cursor-ring {
-  position: fixed;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid var(--a1, #a8cc28);
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-  transition: transform 0.12s var(--ease), border-color 0.4s, opacity 0.2s, width 0.18s, height 0.18s;
-  opacity: 0.55;
+  position: fixed; width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--a2); pointer-events: none; z-index: 999998;
+  transform: translate(-50%,-50%); opacity: .5;
+  transition: border-color .35s, width .2s var(--ease), height .2s var(--ease), opacity .2s;
 }
-
-#aw-cursor-dot.clicking {
-  width: 14px; height: 14px;
-  opacity: 0.9;
-}
-#aw-cursor-ring.clicking {
-  width: 18px; height: 18px;
-  opacity: 0.9;
-}
-#aw-cursor-ring.hovering {
-  width: 48px; height: 48px;
-  opacity: 0.35;
-  border-width: 1px;
-}
-
-/* Cursor trail particles */
+#aw-cursor-ring.hovering { width: 44px; height: 44px; opacity: .28; }
+#aw-cursor-ring.clicking { width: 16px; height: 16px; opacity: .85; }
 .cursor-trail {
-  position: fixed;
-  pointer-events: none;
-  z-index: 99997;
-  border-radius: 50%;
-  background: var(--a1, #a8cc28);
-  mix-blend-mode: screen;
-  transform: translate(-50%, -50%);
-  animation: cursorTrailFade 0.7s ease-out forwards;
+  position: fixed; border-radius: 50%; pointer-events: none;
+  z-index: 999997; background: var(--a1); mix-blend-mode: screen;
+  transform: translate(-50%,-50%);
+  animation: trailFade .55s ease-out forwards;
 }
-@keyframes cursorTrailFade {
-  from { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
-  to   { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
-}
+@keyframes trailFade { from{opacity:.5;transform:translate(-50%,-50%) scale(1)} to{opacity:0;transform:translate(-50%,-50%) scale(.05)} }
 
-/* ══════════════════════════════════════
-   AURORA BOREALIS LAYER
-══════════════════════════════════════ */
+/* ─── Aurora canvas ─── */
 #auroraCanvas {
-  position: fixed; inset: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.42;
-  mix-blend-mode: screen;
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+  opacity: .35; mix-blend-mode: screen;
 }
 
-/* ══════════════════════════════════════
-   CONSTELLATION OVERLAY
-══════════════════════════════════════ */
-#constellationCanvas {
-  position: fixed; inset: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.18;
+/* ─── Constellation canvas ─── */
+#constellCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: .15;
 }
 
-/* ══════════════════════════════════════
-   ENHANCED HEADER — shimmer title
-══════════════════════════════════════ */
+/* ─── Header: shimmer title ─── */
 .sh-title {
-  position: relative;
-  background: linear-gradient(
-    120deg,
-    var(--t0) 0%,
-    var(--a0) 25%,
-    #ffffff 45%,
-    var(--a1) 55%,
-    var(--t0) 75%,
-    var(--a0) 100%
-  );
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(120deg, var(--t0) 0%, var(--a0) 28%, #fff 46%, var(--a1) 56%, var(--t0) 78%, var(--a0) 100%);
+  background-size: 280% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: titleShimmer 8s ease-in-out infinite, fadeUp 1s var(--ease) .35s both;
-  filter: drop-shadow(0 0 30px var(--glow)) drop-shadow(0 0 60px var(--glow2));
+  animation: titleShimmer 9s ease-in-out infinite, fadeUp 1s var(--ease) .35s both;
+  filter: drop-shadow(0 0 22px var(--glow2));
 }
-@keyframes titleShimmer {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
-/* Restore em color inside gradient clip */
-.sh-title em {
-  font-style: normal;
+.sh-title em { font-style: normal; }
+@keyframes titleShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+
+/* Firefox fallback */
+@supports not (-webkit-text-fill-color: transparent) {
+  .sh-title { color: var(--a0); background: none; filter: none; }
 }
 
-/* Header aurora glow pulse */
-.site-header::before {
-  content: '';
-  position: absolute; inset: 0; z-index: 0;
-  background: radial-gradient(ellipse 90% 120% at 50% 50%,
-    color-mix(in srgb, var(--a2) 12%, transparent),
-    transparent 70%
-  );
-  animation: headerAurora 6s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes headerAurora {
-  0%,100% { opacity: 0.5; transform: scale(1); }
-  50%     { opacity: 1.0; transform: scale(1.04); }
-}
-
-/* Animated corner lines */
-.sh-corner {
-  transition: border-color 0.6s, opacity 0.3s;
-  animation: cornerPulse 4s ease-in-out infinite;
-}
-.sh-corner.sh-c-tl { animation-delay: 0s; }
-.sh-corner.sh-c-tr { animation-delay: 1s; }
-.sh-corner.sh-c-bl { animation-delay: 2s; }
-.sh-corner.sh-c-br { animation-delay: 3s; }
-@keyframes cornerPulse {
-  0%,100% { opacity: 0.5; }
-  50%     { opacity: 1.0; }
-}
-
-/* ══════════════════════════════════════
-   ENHANCED NAV — liquid active underline
-══════════════════════════════════════ */
-.main-nav {
-  position: relative;
-  overflow: hidden;
-}
-/* Shimmer sweep on nav */
-.main-nav::after {
-  content: '';
-  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.025), transparent);
-  animation: navSweep 7s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes navSweep { 0%,30% { left: -100%; } 100% { left: 150%; } }
-
-.nav-link {
-  transition: color 0.25s, background 0.25s, transform 0.15s;
-}
-.nav-link:hover {
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.02);
-}
-.nav-link.active {
-  color: var(--a0) !important;
-  text-shadow: 0 0 18px var(--glow);
-}
-
-/* ══════════════════════════════════════
-   ENHANCED PANELS — animated borders & 3D
-══════════════════════════════════════ */
-.gi-panel {
-  transform-style: preserve-3d;
-  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
-  transition: border-color 0.6s, box-shadow 0.6s, transform 0.12s ease-out;
-  will-change: transform;
-}
-
-/* Magical rotating border glow — shows on hover */
-.gi-panel .panel-border-glow {
-  position: absolute; inset: -1px;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-  background: conic-gradient(
-    from var(--border-angle, 0deg),
-    transparent 0deg,
-    var(--a1) 60deg,
-    var(--a0) 120deg,
-    transparent 180deg,
-    var(--a2) 240deg,
-    transparent 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  padding: 1px;
-  transition: opacity 0.35s;
-}
-.gi-panel:hover .panel-border-glow {
-  opacity: 0.7;
-  animation: borderRotate 3s linear infinite;
-}
-@property --border-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-@keyframes borderRotate {
-  to { --border-angle: 360deg; }
-}
-
+/* ─── Panel hover: subtle lift + glow, no transform-style (avoids stacking issues) ─── */
+.gi-panel { transition: border-color .6s, box-shadow .6s, transform .18s var(--ease); }
 .gi-panel:hover {
-  transform: perspective(1000px) translateY(-4px);
-  box-shadow: var(--s3), 0 0 60px var(--glow2), 0 0 120px color-mix(in srgb, var(--a2) 8%, transparent);
+  transform: translateY(-3px);
+  box-shadow: var(--s3), 0 0 48px var(--glow2);
+  border-color: color-mix(in srgb, var(--a2) 60%, transparent);
 }
 
-/* ══════════════════════════════════════
-   REVEAL ANIMATION — staggered fade depth
-══════════════════════════════════════ */
+/* ─── Reveal: add gentle blur ─── */
 @keyframes revealUp {
-  from { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(4px); }
-  to   { opacity: 1; transform: translateY(0)    scale(1.00); filter: blur(0); }
+  from { opacity: 0; transform: translateY(18px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
 }
 
-/* ══════════════════════════════════════
-   HOLOGRAPHIC ANIME CARDS
-══════════════════════════════════════ */
+/* ─── Anime card: holographic tilt ─── */
 .anime-card {
-  transform-style: preserve-3d;
-  transition: transform 0.15s ease-out, box-shadow 0.22s, border-color 0.22s !important;
+  transition: transform .16s ease-out, box-shadow .22s, border-color .22s !important;
   will-change: transform;
 }
-
-/* Holographic foil overlay */
-.anime-card .ac-holo {
-  position: absolute; inset: 0;
-  z-index: 10; pointer-events: none;
-  opacity: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    rgba(255,0,128,0) 0%,
-    rgba(255,0,128,0.08) 16%,
-    rgba(255,100,0,0.06) 25%,
-    rgba(255,255,0,0.07) 35%,
-    rgba(0,255,128,0.06) 50%,
-    rgba(0,128,255,0.08) 65%,
-    rgba(128,0,255,0.07) 75%,
-    rgba(255,0,128,0.06) 85%,
-    rgba(255,0,128,0) 100%
-  );
+/* Holographic shimmer layer */
+.ac-holo {
+  position: absolute; inset: 0; z-index: 10; pointer-events: none;
+  opacity: 0; transition: opacity .3s; mix-blend-mode: overlay;
+  background: linear-gradient(135deg,
+    rgba(255,0,128,0) 0%, rgba(255,80,0,.07) 20%, rgba(255,220,0,.07) 35%,
+    rgba(0,255,140,.06) 50%, rgba(0,120,255,.07) 65%,
+    rgba(140,0,255,.06) 80%, rgba(255,0,128,0) 100%);
   background-size: 300% 300%;
-  transition: opacity 0.3s;
-  mix-blend-mode: overlay;
 }
-.anime-card:hover .ac-holo {
-  opacity: 1;
-  animation: holoShift 2.5s ease-in-out infinite;
-}
+.anime-card:hover .ac-holo { opacity: 1; animation: holoShift 3s ease-in-out infinite; }
 @keyframes holoShift {
-  0%   { background-position: 0% 0%;   }
-  25%  { background-position: 100% 0%; }
-  50%  { background-position: 100% 100%; }
-  75%  { background-position: 0% 100%; }
-  100% { background-position: 0% 0%;   }
+  0%{background-position:0% 0%} 33%{background-position:100% 0%}
+  66%{background-position:100% 100%} 100%{background-position:0% 0%}
+}
+.ac-rank.rank-gold { animation: goldPulse 2.4s ease-in-out infinite; }
+@keyframes goldPulse {
+  0%,100%{box-shadow:0 0 14px rgba(212,175,55,.5),0 0 6px rgba(212,175,55,.25)}
+  50%    {box-shadow:0 0 28px rgba(212,175,55,.95),0 0 50px rgba(212,175,55,.45)}
 }
 
-/* Gold rank badge glow-pulse upgrade */
-.ac-rank.rank-gold {
-  animation: goldBadge 2s ease-in-out infinite;
-}
-@keyframes goldBadge {
-  0%,100% { box-shadow: 0 0 12px rgba(212,175,55,.5), 0 0 6px rgba(212,175,55,.3); }
-  50%     { box-shadow: 0 0 32px rgba(212,175,55,1),  0 0 60px rgba(212,175,55,.6), 0 0 0 2px rgba(255,245,160,.3); }
-}
-
-.anime-card:hover {
-  transform: perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(12px) translateY(-6px) !important;
-  box-shadow: var(--s3), 0 0 40px var(--glow2), 0 20px 40px rgba(0,0,0,.5) !important;
-}
-
-/* ══════════════════════════════════════
-   ENHANCED INFO CARDS — glass depth
-══════════════════════════════════════ */
-.info-card {
-  transform-style: preserve-3d;
-  transition: transform 0.15s ease-out, border-color 0.2s, box-shadow 0.2s !important;
-  will-change: transform;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Shimmer sweep on info cards */
-.info-card::after {
-  content: '';
-  position: absolute; top: 0; left: -120%; width: 80%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-  pointer-events: none;
-  transition: left 0s;
-}
-.info-card:hover::after {
-  left: 140%;
-  transition: left 0.5s ease;
-}
-
+/* ─── Info cards: clean hover lift ─── */
+.info-card { transition: border-color .2s, box-shadow .2s, transform .18s var(--ease) !important; }
 .info-card:hover {
-  transform: perspective(600px) translateY(-5px) rotateX(1deg) !important;
-  box-shadow: var(--s3), 0 0 30px var(--glow2), 0 16px 32px rgba(0,0,0,.4) !important;
-  border-color: color-mix(in srgb, var(--a1) 55%, transparent) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: var(--s3), 0 0 28px var(--glow2) !important;
+  border-color: color-mix(in srgb, var(--a1) 50%, transparent) !important;
 }
 
-/* ══════════════════════════════════════
-   LINK CARDS — magnetic lift
-══════════════════════════════════════ */
-.link-card {
-  position: relative; overflow: hidden;
-  transform-style: preserve-3d;
-  transition: border-color 0.2s, background 0.2s, transform 0.15s ease-out, box-shadow 0.2s !important;
-}
+/* ─── Link cards: spotlight glow ─── */
+.link-card { position: relative; overflow: hidden; }
 .link-card::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), 
-    color-mix(in srgb, var(--a2) 8%, transparent), transparent 65%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  z-index: 0;
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%),
+    color-mix(in srgb, var(--a2) 9%, transparent) 0%, transparent 65%);
+  opacity: 0; transition: opacity .3s;
 }
 .link-card:hover::before { opacity: 1; }
 .link-card > * { position: relative; z-index: 1; }
 
-/* ══════════════════════════════════════
-   PROFILE PFP — ethereal rings
-══════════════════════════════════════ */
-.pfp-ring {
-  transition: border-color 0.6s;
-}
-.pfp-ring.r1 { border-width: 1.5px; }
-.pfp-ring.r2 { border-width: 1px; border-style: dashed; }
-.pfp-ring.r3 { border-width: 1px; border-style: dotted; }
+/* ─── Stat values: accent glow ─── */
+.stat-value { color: var(--a0) !important; }
+.stat-row { transition: background .18s, padding-left .18s; }
+.stat-row:hover { background: color-mix(in srgb, var(--a4) 25%, transparent); padding-left: 4px; }
 
-/* Orbit dot on ring 1 */
-.pfp-ring.r1::before {
-  content: '◆';
-  position: absolute;
-  font-size: 5px;
-  color: var(--a1);
-  top: -3px; left: 50%; transform: translateX(-50%);
-  text-shadow: 0 0 8px var(--glow);
-  animation: ringOrbit 9s linear infinite;
-  transform-origin: 50% 50%;
-}
-
-/* ══════════════════════════════════════
-   NOW PLAYING STRIP — waveform upgrade
-══════════════════════════════════════ */
-.nowplaying-strip.active {
-  animation: npReveal 0.5s var(--ease) both;
-}
-@keyframes npReveal {
-  from { opacity: 0; max-height: 0; transform: translateY(-8px); }
-  to   { opacity: 1; max-height: 120px; transform: translateY(0); }
-}
-.np-eq span {
-  background: linear-gradient(to top, var(--a2), var(--a0)) !important;
-  border-radius: 2px;
-}
-
-/* ══════════════════════════════════════
-   DOSSIER ROWS — staggered entrance
-══════════════════════════════════════ */
-.dossier-row {
-  animation: dossierIn 0.4s var(--ease) calc(var(--di, 0) * 0.04s) both;
-  opacity: 0;
-}
-@keyframes dossierIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-.dossier-row:hover {
-  background: color-mix(in srgb, var(--a3) 20%, rgba(120,100,200,0.04)) !important;
-  border-left: 2px solid var(--a2);
-  padding-left: 14px;
-  transition: all 0.2s;
-}
-
-/* ══════════════════════════════════════
-   GI QUOTE — aurora left border pulse
-══════════════════════════════════════ */
+/* ─── Quote: breathing left border ─── */
 .gi-quote {
   border-left: 2px solid var(--a2) !important;
-  box-shadow: -4px 0 20px color-mix(in srgb, var(--a2) 20%, transparent);
-  animation: quoteBorderPulse 3s ease-in-out infinite;
+  animation: quoteBorder 3.5s ease-in-out infinite;
 }
-@keyframes quoteBorderPulse {
-  0%,100% { box-shadow: -4px 0 12px color-mix(in srgb, var(--a2) 15%, transparent); }
-  50%     { box-shadow: -4px 0 30px color-mix(in srgb, var(--a1) 40%, transparent); }
-}
-
-/* ══════════════════════════════════════
-   FOOTER — constellation rule
-══════════════════════════════════════ */
-.site-footer {
-  position: relative; overflow: hidden;
-}
-.site-footer::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%, var(--glow2) 20%,
-    color-mix(in srgb, var(--a1) 60%, white) 50%,
-    var(--glow2) 80%, transparent 100%
-  );
-  animation: shimmerLine 5s ease-in-out infinite;
-}
-.footer-rule {
-  position: relative;
-}
-.fr-gem {
-  animation: gemPulse 2.4s ease-in-out infinite, gemFloat 5s ease-in-out infinite;
-}
-.fr-gem:nth-child(2) { animation-delay: 0.4s, 1.2s; }
-.fr-gem:nth-child(3) { animation-delay: 0.8s, 2.4s; }
-@keyframes gemFloat {
-  0%,100% { transform: rotate(45deg) translateY(0); }
-  50%     { transform: rotate(45deg) translateY(-3px); }
+@keyframes quoteBorder {
+  0%,100%{box-shadow:-3px 0 14px color-mix(in srgb, var(--a2) 18%, transparent)}
+  50%    {box-shadow:-3px 0 26px color-mix(in srgb, var(--a1) 38%, transparent)}
 }
 
-/* ══════════════════════════════════════
-   LOADING SCREEN — enhanced
-══════════════════════════════════════ */
-/* Extend lsc-mote glow */
-.lsc-mote {
-  background: radial-gradient(circle, var(--a0, #d8f070), rgba(168,204,40,0.2));
-  filter: blur(1px);
-  box-shadow: 0 0 6px rgba(200,255,100,0.4);
+/* ─── Now-playing strip: smooth reveal ─── */
+.nowplaying-strip.active { animation: npIn .45s var(--ease) both; }
+@keyframes npIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.np-eq span { background: linear-gradient(to top, var(--a2), var(--a0)) !important; }
+
+/* ─── Profile name: gentle glow pulse ─── */
+.profile-name { animation: nameGlow 4s ease-in-out infinite; }
+@keyframes nameGlow {
+  0%,100%{text-shadow:0 0 16px rgba(140,120,240,.35)}
+  50%    {text-shadow:0 0 28px var(--glow), 0 0 50px var(--glow2)}
 }
 
-/* Extra cinematic vignette pulse */
-.lsc-vignette {
-  animation: vignettePulse 4s ease-in-out infinite;
+/* ─── Dossier rows: hover accent ─── */
+.dossier-row {
+  transition: background .18s, border-left .18s, padding-left .18s;
+  border-left: 2px solid transparent;
 }
-@keyframes vignettePulse {
-  0%,100% { opacity: 0.85; }
-  50%     { opacity: 0.7; }
-}
-
-/* Loading title depth shimmer */
-.lw-title {
-  animation: loaderTitleReveal 1.2s cubic-bezier(.16,1,.3,1) .8s both, loaderTitleShimmer 5s ease-in-out 2s infinite;
-}
-@keyframes loaderTitleReveal {
-  from { opacity: 0; letter-spacing: 28px; filter: blur(8px); }
-  to   { opacity: 1; letter-spacing: 11px; filter: blur(0); }
-}
-@keyframes loaderTitleShimmer {
-  0%,100% { text-shadow: 0 1px 0 rgba(255,255,255,.65), 0 0 80px rgba(200,160,40,.2); }
-  50%     { text-shadow: 0 1px 0 rgba(255,255,255,.9), 0 0 120px rgba(200,160,40,.45), 0 0 200px rgba(200,160,40,.2); }
+.dossier-row:hover {
+  background: color-mix(in srgb, var(--a4) 22%, rgba(120,100,200,.03)) !important;
+  border-left-color: var(--a2);
+  padding-left: 16px;
 }
 
-/* ══════════════════════════════════════
-   LIVE BADGE — pulse upgrade
-══════════════════════════════════════ */
-.live-badge {
-  animation: liveBadgePulse 1.5s ease-in-out infinite;
+/* ─── Body text links ─── */
+.body-text a { position: relative; }
+.body-text a::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 100%;
+  height: 1px; background: var(--a1);
+  transition: right .25s var(--ease);
 }
-@keyframes liveBadgePulse {
-  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,80,80,0.3); }
-  50%     { opacity: 0.7; box-shadow: 0 0 0 4px rgba(255,80,80,0); }
-}
+.body-text a:hover::after { right: 0; }
+.body-text a:hover { color: var(--a0) !important; text-shadow: 0 0 10px var(--glow2); }
 
-/* ══════════════════════════════════════
-   GI-PANEL HEAD — gem glow upgrade
-══════════════════════════════════════ */
-.gi-gem {
-  position: relative;
-}
-.gi-gem::after {
-  content: '';
-  position: absolute; inset: -4px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--glow2), transparent 70%);
-  animation: gemAura 2.8s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes gemAura {
-  0%,100% { opacity: 0.4; transform: scale(1); }
-  50%     { opacity: 1.0; transform: scale(1.5); }
-}
+/* ─── Section enter ─── */
+.section.active { animation: secIn .4s var(--ease) both; }
+@keyframes secIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
-/* ══════════════════════════════════════
-   SCROLLBAR — element themed
-══════════════════════════════════════ */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: rgba(5,4,12,0.9); }
+/* ─── Custom scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: rgba(4,3,10,.9); }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(to bottom, var(--a2), var(--a3));
   border-radius: 3px;
-  box-shadow: 0 0 8px var(--glow2);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, var(--a1), var(--a2));
-  box-shadow: 0 0 14px var(--glow);
-}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, var(--a1), var(--a2)); }
 
-/* ══════════════════════════════════════
-   STAT ROWS — hover upgrade
-══════════════════════════════════════ */
-.stat-row {
-  transition: background 0.2s, padding-left 0.2s;
-  border-radius: 0;
-}
-.stat-row:hover {
-  background: color-mix(in srgb, var(--a4) 30%, transparent);
-  padding-left: 4px;
-}
-.stat-value {
-  color: var(--a0) !important;
-  text-shadow: 0 0 10px var(--glow2);
-}
-
-/* ══════════════════════════════════════
-   BODY TEXT LINKS — glow on hover
-══════════════════════════════════════ */
-.body-text a {
-  position: relative;
-}
-.body-text a::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; left: 0; right: 0; height: 1px;
-  background: var(--a1);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s var(--ease);
-}
-.body-text a:hover::after { transform: scaleX(1); }
-.body-text a:hover {
-  color: var(--a0) !important;
-  text-shadow: 0 0 12px var(--glow);
-}
-
-/* ══════════════════════════════════════
-   SECTION ENTER — warp fade
-══════════════════════════════════════ */
-.section.active {
-  animation: sectionWarpIn 0.5s var(--ease) both;
-}
-@keyframes sectionWarpIn {
-  from { opacity: 0; transform: scale(0.99) translateY(8px); filter: blur(2px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0);   filter: blur(0); }
-}
-
-/* ══════════════════════════════════════
-   PROFILE NAME — glow pulse
-══════════════════════════════════════ */
-.profile-name {
-  animation: profileNameGlow 4s ease-in-out infinite;
-}
-@keyframes profileNameGlow {
-  0%,100% { text-shadow: 0 0 18px rgba(140,120,240,0.4); }
-  50%     { text-shadow: 0 0 32px var(--glow), 0 0 60px var(--glow2); }
-}
-
-/* ══════════════════════════════════════
-   ELEM TAG — enhanced glow
-══════════════════════════════════════ */
-.elem-tag {
-  animation: elemTagPulse 3s ease-in-out infinite;
-}
-@keyframes elemTagPulse {
-  0%,100% { box-shadow: 0 0 0 0 transparent; }
-  50%     { box-shadow: 0 0 16px var(--glow2), inset 0 0 12px color-mix(in srgb, var(--a3) 20%, transparent); }
-}
-
-/* ══════════════════════════════════════
-   SECTION TITLE — shimmer
-══════════════════════════════════════ */
-.gi-head-title {
-  background: linear-gradient(90deg, var(--t0) 0%, var(--a0) 40%, var(--t0) 60%, var(--a1) 80%, var(--t0) 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: titleShimmer 6s ease-in-out infinite;
-}
-
-/* ══════════════════════════════════════
-   SPINNER RING — enhanced
-══════════════════════════════════════ */
-.spinner-ring {
-  animation: spin 1s linear infinite, spinnerGlow 2s ease-in-out infinite;
-}
-@keyframes spinnerGlow {
-  0%,100% { box-shadow: 0 0 8px var(--glow2); }
-  50%     { box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow2); }
-}
-
-
-/* ══════════════════════════════════════
-   PATCH — z-index + compat fixes
-══════════════════════════════════════ */
-
-/* Cursor z-index ensure above loader */
-#aw-cursor-dot  { z-index: 999999 !important; }
-#aw-cursor-ring { z-index: 999998 !important; }
-
-/* Firefox fallback for gradient text */
-@supports not (-webkit-text-fill-color: transparent) {
-  .sh-title { color: var(--a0) !important; background: none !important; }
-  .gi-head-title { color: var(--a0) !important; background: none !important; }
-}
-
-/* Section enter override (remove conflicting .section.active animation) */
-.section.active > .gi-panel {
-  animation: none;
-}
-
-/* Aurora canvas position */
-#auroraCanvas {
-  position: fixed !important; inset: 0 !important;
-  width: 100% !important; height: 100% !important;
-}
-
-/* Constellation canvas position */
-#constellationCanvas {
-  position: fixed !important; inset: 0 !important;
-  width: 100% !important; height: 100% !important;
-}
-
-/* Restore dossier-row visibility (animation sets opacity:0 initially) */
-.section.active .dossier-row {
-  opacity: 0; /* starts hidden, animation reveals */
-}
-
-/* Extra shimmer on panel heads */
-.gi-head::after {
-  content: '';
-  position: absolute; top: 0; right: 0; bottom: 0;
-  width: 40%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.012), transparent);
+/* ─── Gem aura ─── */
+.gi-gem { position: relative; }
+.gi-gem::after {
+  content: ''; position: absolute; inset: -5px; border-radius: 50%;
+  background: radial-gradient(circle, var(--glow2), transparent 70%);
   pointer-events: none;
-  z-index: 2;
-  animation: headShimmer 8s ease-in-out infinite;
+  animation: gemAura 2.8s ease-in-out infinite;
 }
-@keyframes headShimmer {
-  0%,40% { transform: translateX(-200%); opacity: 0; }
-  50%    { opacity: 1; }
-  100%   { transform: translateX(350%); opacity: 0; }
+@keyframes gemAura {
+  0%,100%{opacity:.3;transform:scale(1)} 50%{opacity:.9;transform:scale(1.6)}
 }
 
-/* Floating element particles — brighter + larger */
-.gi-particle {
-  filter: blur(0.3px);
-  mix-blend-mode: screen;
+/* ─── Nav active glow ─── */
+.nav-link.active { text-shadow: 0 0 14px var(--glow2); }
+.nav-link { transition: color .2s, transform .15s; }
+.nav-link:hover { transform: translateY(-1px); }
+
+/* ─── Head title shimmer ─── */
+.gi-head-title {
+  background: linear-gradient(90deg, var(--a0) 0%, var(--t0) 40%, var(--a1) 60%, var(--t0) 80%, var(--a0) 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleShimmer 7s ease-in-out infinite;
+}
+@supports not (-webkit-text-fill-color: transparent) {
+  .gi-head-title { color: var(--a0); background: none; }
 }
 
-/* Enhanced elem-tag border shimmer */
-.elem-tag {
-  background-size: 300% 100%;
-  background-image: linear-gradient(120deg, var(--a4) 0%, var(--a3) 30%, color-mix(in srgb, var(--a3) 80%, var(--a2)) 50%, var(--a3) 70%, var(--a4) 100%) !important;
-  animation: elemTagPulse 3s ease-in-out infinite, elemTagBg 6s ease-in-out infinite;
+/* ─── Footer gems float ─── */
+.fr-gem {
+  animation: gemPulse 2.4s ease-in-out infinite, gemFloat 5s ease-in-out infinite;
 }
-@keyframes elemTagBg {
-  0%,100% { background-position: 0% 50%; }
-  50%     { background-position: 100% 50%; }
+.fr-gem:nth-child(2){animation-delay:.4s,1.2s}
+.fr-gem:nth-child(3){animation-delay:.8s,2.5s}
+@keyframes gemFloat {
+  0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(-3px)}
 }
-
-/* Wii U hack: fix dossier grid in narrow sidebar */
-@media (max-width: 900px) {
-  .dossier-grid { grid-template-columns: 1fr; }
-  .dossier-row { border-right: none !important; }
-  .dossier-row:nth-last-child(-n+1) { border-bottom: none; }
-}
-
-/* Smoother section transitions */
-.section { transition: none; }
-.section.active { animation: sectionWarpIn 0.45s var(--ease) both; }
 

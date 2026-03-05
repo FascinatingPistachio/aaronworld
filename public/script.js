@@ -432,37 +432,83 @@ const ELEMENT_WIPES = {
   },
 
   pyro(ctx, W, H, p) {
-    // Flame wipe — rises from bottom, jagged fire edge
+    // Cinematic camera-pan wipe — a warm amber light sweeps left to right,
+    // like sunlight crossing a wall. Soft leading edge, rich trailing fill.
     ctx.clearRect(0, 0, W, H);
-    const ease = 1 - Math.pow(1 - p, 3);
-    // Fill below flame line
-    const flameH = H * 1.1 * ease;
-    // Draw jagged flame top edge
-    ctx.beginPath();
-    ctx.moveTo(0, H);
-    const segments = 60;
-    for (let i = 0; i <= segments; i++) {
-      const x = (i / segments) * W;
-      const baseY = H - flameH;
-      const jitter = Math.sin(i * 0.8 + p * 18) * 32
-                   + Math.sin(i * 1.6 + p * 12) * 18
-                   + Math.sin(i * 3.2 + p * 26) * 10;
-      ctx.lineTo(x, baseY + jitter);
+
+    // Ease: quick start, decelerates into place
+    const ease = p < 0.5
+      ? 4 * p * p * p
+      : 1 - Math.pow(-2 * p + 2, 3) / 2;
+
+    // The leading edge of the pan (0 → W + bleed)
+    const bleed  = W * 0.38;
+    const leadX  = -bleed + (W + bleed * 2) * ease;
+
+    // Reveal alpha — fades in quickly, holds, then fades out at the end
+    const alpha = p < 0.12 ? p / 0.12
+                : p > 0.82 ? 1 - (p - 0.82) / 0.18
+                : 1;
+
+    // 1 — Deep amber background fill (everything behind the lead edge)
+    const fillGrad = ctx.createLinearGradient(0, 0, W, 0);
+    fillGrad.addColorStop(0,    `rgba(18, 5, 0, ${alpha * 0.82})`);
+    fillGrad.addColorStop(0.35, `rgba(40, 12, 2, ${alpha * 0.78})`);
+    fillGrad.addColorStop(0.75, `rgba(62, 18, 4, ${alpha * 0.72})`);
+    fillGrad.addColorStop(1,    `rgba(80, 22, 4, ${alpha * 0.65})`);
+    ctx.fillStyle = fillGrad;
+    ctx.fillRect(0, 0, Math.min(leadX, W), H);
+
+    // 2 — The leading light column: a tall narrow shaft of warm glow
+    const shaftW = W * 0.14;
+    const shaftX = leadX - shaftW;
+    if (shaftX < W && shaftX + shaftW > 0) {
+      const shaftGrad = ctx.createLinearGradient(shaftX, 0, shaftX + shaftW, 0);
+      shaftGrad.addColorStop(0,   `rgba(80, 22, 4, ${alpha * 0.72})`);
+      shaftGrad.addColorStop(0.3, `rgba(180, 70, 10, ${alpha * 0.6})`);
+      shaftGrad.addColorStop(0.6, `rgba(255, 140, 40, ${alpha * 0.55})`);
+      shaftGrad.addColorStop(0.82,`rgba(255, 200, 100, ${alpha * 0.45})`);
+      shaftGrad.addColorStop(1,   `rgba(255, 230, 160, 0)`);
+      ctx.fillStyle = shaftGrad;
+      ctx.fillRect(Math.max(shaftX, 0), 0, shaftW, H);
     }
-    ctx.lineTo(W, H); ctx.closePath();
-    const grad = ctx.createLinearGradient(0, H - flameH - 60, 0, H);
-    const fa = p > 0.8 ? 1 - (p - 0.8) * 5 : 1;
-    grad.addColorStop(0,   `rgba(255,140,20,${fa * 0.9})`);
-    grad.addColorStop(0.2, `rgba(220,60,0,${fa})`);
-    grad.addColorStop(0.6, `rgba(160,20,0,${fa})`);
-    grad.addColorStop(1,   `rgba(80,6,0,${fa})`);
-    ctx.fillStyle = grad; ctx.fill();
-    // Glow on top edge
-    ctx.save();
-    ctx.globalAlpha = fa * 0.5;
-    ctx.shadowColor = '#ff8800'; ctx.shadowBlur = 40;
-    ctx.stroke();
-    ctx.restore();
+
+    // 3 — Bright leading edge bloom: a thin radiant sliver
+    const bloomW = W * 0.04;
+    const bloomX = leadX - bloomW * 0.5;
+    if (bloomX < W && bloomX + bloomW > 0) {
+      const bloomGrad = ctx.createLinearGradient(bloomX, 0, bloomX + bloomW, 0);
+      bloomGrad.addColorStop(0,   `rgba(255, 200, 110, 0)`);
+      bloomGrad.addColorStop(0.35,`rgba(255, 230, 170, ${alpha * 0.85})`);
+      bloomGrad.addColorStop(0.5, `rgba(255, 248, 220, ${alpha * 0.95})`);
+      bloomGrad.addColorStop(0.65,`rgba(255, 230, 170, ${alpha * 0.85})`);
+      bloomGrad.addColorStop(1,   `rgba(255, 200, 110, 0)`);
+      ctx.fillStyle = bloomGrad;
+      ctx.fillRect(Math.max(bloomX, 0), 0, bloomW, H);
+    }
+
+    // 4 — Subtle vertical vignette bands in the filled zone (depth / atmosphere)
+    if (ease > 0.08) {
+      const bandCount = 4;
+      for (let i = 0; i < bandCount; i++) {
+        const bx   = (i / bandCount) * Math.min(leadX - shaftW, W);
+        const bw   = W * 0.12;
+        const ba   = alpha * 0.06 * Math.sin((i / bandCount) * Math.PI);
+        const bg   = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+        bg.addColorStop(0,   `rgba(255,160,60,0)`);
+        bg.addColorStop(0.5, `rgba(255,160,60,${ba})`);
+        bg.addColorStop(1,   `rgba(255,160,60,0)`);
+        ctx.fillStyle = bg;
+        ctx.fillRect(Math.max(bx, 0), 0, bw, H);
+      }
+    }
+
+    // 5 — Letterbox bars top + bottom for cinematic feel
+    const lbH  = H * 0.045;
+    const lbA  = alpha * 0.88;
+    ctx.fillStyle = `rgba(8, 3, 0, ${lbA})`;
+    ctx.fillRect(0, 0,      W, lbH);
+    ctx.fillRect(0, H - lbH, W, lbH);
   },
 
   hydro(ctx, W, H, p) {
@@ -1179,527 +1225,238 @@ function pollLastFm() {
 })();
 
 /* ════════════════════════════════════════════════════════
-   AARONWORLD — ETHEREAL ENHANCEMENT LAYER
-   Custom Cursor · Aurora · Constellations · 3D Tilt · Magic
+   AARONWORLD — ETHEREAL LAYER v2 · Elegant Edition
    ════════════════════════════════════════════════════════ */
 
-/* ══════════════════════════════════════
-   CUSTOM CURSOR
-══════════════════════════════════════ */
-(function initCursor() {
-  const dot  = document.createElement('div'); dot.id  = 'aw-cursor-dot';
-  const ring = document.createElement('div'); ring.id = 'aw-cursor-ring';
-  document.body.appendChild(dot);
-  document.body.appendChild(ring);
+/* ─── Custom cursor ─── */
+(function() {
+  const dot  = Object.assign(document.createElement('div'), { id:'aw-cursor-dot'  });
+  const ring = Object.assign(document.createElement('div'), { id:'aw-cursor-ring' });
+  document.body.append(dot, ring);
 
-  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-  let rx = mx, ry = my;
-  let trailTimer = 0;
-  const TRAIL_INTERVAL = 38;
+  let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my, lastTrail=0;
 
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
-    dot.style.left  = mx + 'px';
-    dot.style.top   = my + 'px';
-
+    dot.style.left = mx+'px'; dot.style.top = my+'px';
     const now = Date.now();
-    if (now - trailTimer > TRAIL_INTERVAL) {
-      spawnTrail(mx, my);
-      trailTimer = now;
-    }
+    if (now - lastTrail > 42) { spawnTrail(mx, my); lastTrail = now; }
   });
 
   function spawnTrail(x, y) {
     const t = document.createElement('div');
     t.className = 'cursor-trail';
-    const sz = 3 + Math.random() * 5;
-    t.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;`;
+    const sz = 3 + Math.random() * 4;
+    t.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px`;
     document.body.appendChild(t);
-    setTimeout(() => t.remove(), 700);
+    setTimeout(() => t.remove(), 560);
   }
 
-  (function animRing() {
-    rx += (mx - rx) * 0.14;
-    ry += (my - ry) * 0.14;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-    requestAnimationFrame(animRing);
+  (function lerpRing() {
+    rx += (mx - rx) * 0.13; ry += (my - ry) * 0.13;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(lerpRing);
   })();
 
-  document.addEventListener('mousedown', () => { dot.classList.add('clicking'); ring.classList.add('clicking'); });
-  document.addEventListener('mouseup',   () => { dot.classList.remove('clicking'); ring.classList.remove('clicking'); });
+  document.addEventListener('mousedown', () => ring.classList.add('clicking'));
+  document.addEventListener('mouseup',   () => ring.classList.remove('clicking'));
 
-  const hoverEls = 'a, button, .anime-card, .info-card, .link-card, .nav-link, .gi-panel';
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest(hoverEls)) ring.classList.add('hovering');
-  });
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest(hoverEls)) ring.classList.remove('hovering');
-  });
+  const SEL = 'a,button,.anime-card,.info-card,.link-card,.nav-link';
+  document.addEventListener('mouseover', e => { if (e.target.closest(SEL)) ring.classList.add('hovering'); });
+  document.addEventListener('mouseout',  e => { if (e.target.closest(SEL)) ring.classList.remove('hovering'); });
 })();
 
-/* ══════════════════════════════════════
-   AURORA BOREALIS CANVAS
-══════════════════════════════════════ */
-(function initAurora() {
-  const canvas = document.createElement('canvas');
-  canvas.id = 'auroraCanvas';
-  canvas.setAttribute('aria-hidden', 'true');
-  document.body.insertBefore(canvas, document.body.firstChild);
-
-  const ctx = canvas.getContext('2d');
+/* ─── Aurora Borealis ─── */
+(function() {
+  const cv = document.createElement('canvas');
+  cv.id = 'auroraCanvas'; cv.setAttribute('aria-hidden','true');
+  document.body.insertBefore(cv, document.body.firstChild);
+  const ctx = cv.getContext('2d');
   let W, H, t = 0;
 
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
+  const resize = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
+  resize(); addEventListener('resize', resize);
 
-  // Aurora colour bands — update when element changes
-  let aColors = [
-    { h: 140, s: 80, base: 0.00, speed: 0.42, amp: 0.18, width: 0.32 },
-    { h: 160, s: 70, base: 0.12, speed: 0.31, amp: 0.14, width: 0.28 },
-    { h: 180, s: 90, base: 0.06, speed: 0.55, amp: 0.20, width: 0.22 },
-    { h: 200, s: 75, base: 0.20, speed: 0.27, amp: 0.16, width: 0.30 },
-    { h: 270, s: 60, base: 0.16, speed: 0.36, amp: 0.12, width: 0.20 },
-  ];
+  const HUE_MAP = { dendro:128, pyro:18, hydro:200, cryo:192, electro:272, anemo:158, geo:46 };
 
-  function getThemeHue() {
-    const el = document.documentElement.getAttribute('data-element') || 'dendro';
-    const map = { dendro:130, pyro:15, hydro:200, cryo:195, electro:275, anemo:160, geo:48 };
-    return map[el] || 130;
+  function getBaseHue() {
+    return HUE_MAP[document.documentElement.getAttribute('data-element')] ?? 128;
   }
 
-  window._auroraUpdateTheme = function() {
-    const h = getThemeHue();
-    aColors = aColors.map((c, i) => ({ ...c, h: h + i * 18 - 36 }));
-  };
-
-  function drawAurora() {
+  function draw() {
     ctx.clearRect(0, 0, W, H);
-    t += 0.005;
+    t += 0.0045;
+    const h0 = getBaseHue();
 
-    aColors.forEach((band, bi) => {
-      const bandH = H * 0.55;
-      const baseY = H * 0.1 + H * band.base;
-      const waveAmp = H * band.amp;
+    // Three aurora curtains
+    const bands = [
+      { dh:0,  sy:.08, amp:.14, spd:.33, width:.28, alpha:.055 },
+      { dh:18, sy:.14, amp:.11, spd:.51, width:.22, alpha:.045 },
+      { dh:34, sy:.20, amp:.16, spd:.27, width:.20, alpha:.038 },
+    ];
 
-      const path = new Path2D();
-      path.moveTo(0, bandH + 20);
+    bands.forEach(b => {
+      const baseY = H * b.sy;
+      const bandH = H * b.width;
+      const steps = 90;
 
-      // Draw wavy aurora band
-      const steps = 80;
+      ctx.beginPath();
       for (let i = 0; i <= steps; i++) {
         const x = (i / steps) * W;
-        const progress = i / steps;
+        const q = i / steps;
         const y = baseY
-          + Math.sin(progress * Math.PI * 3 + t * band.speed + bi) * waveAmp
-          + Math.sin(progress * Math.PI * 5 + t * band.speed * 1.4 + bi * 0.7) * waveAmp * 0.4
-          + Math.sin(progress * Math.PI * 8 + t * band.speed * 0.8) * waveAmp * 0.2;
-        i === 0 ? path.moveTo(x, y) : path.lineTo(x, y);
+          + Math.sin(q * Math.PI * 2.8 + t * b.spd) * H * b.amp
+          + Math.sin(q * Math.PI * 5.2 + t * b.spd * 1.6) * H * b.amp * .4;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
-      // Bottom of band
       for (let i = steps; i >= 0; i--) {
         const x = (i / steps) * W;
-        const progress = i / steps;
-        const y = baseY
-          + Math.sin(progress * Math.PI * 3 + t * band.speed + bi) * waveAmp
-          + Math.sin(progress * Math.PI * 5 + t * band.speed * 1.4 + bi * 0.7) * waveAmp * 0.4
-          + Math.sin(progress * Math.PI * 8 + t * band.speed * 0.8) * waveAmp * 0.2
-          + H * band.width;
-        path.lineTo(x, y);
+        const q = i / steps;
+        const y = baseY + bandH
+          + Math.sin(q * Math.PI * 2.8 + t * b.spd + .4) * H * b.amp * .5;
+        ctx.lineTo(x, y);
       }
-      path.closePath();
+      ctx.closePath();
 
-      // Gradient top to bottom of band
-      const grad = ctx.createLinearGradient(0, baseY - waveAmp, 0, baseY + waveAmp + H * band.width);
-      const alpha = 0.06 + Math.sin(t * 0.5 + bi) * 0.025;
-      grad.addColorStop(0, `hsla(${band.h},${band.s}%,75%,0)`);
-      grad.addColorStop(0.3, `hsla(${band.h},${band.s}%,68%,${alpha})`);
-      grad.addColorStop(0.5, `hsla(${band.h+15},${band.s}%,72%,${alpha * 1.4})`);
-      grad.addColorStop(0.7, `hsla(${band.h},${band.s}%,68%,${alpha})`);
-      grad.addColorStop(1, `hsla(${band.h},${band.s}%,75%,0)`);
-
-      ctx.fillStyle = grad;
-      ctx.fill(path);
+      const g = ctx.createLinearGradient(0, baseY, 0, baseY + bandH);
+      const pulse = b.alpha * (1 + Math.sin(t * .6) * .25);
+      g.addColorStop(0,    `hsla(${h0+b.dh},75%,70%,0)`);
+      g.addColorStop(0.3,  `hsla(${h0+b.dh},80%,68%,${pulse})`);
+      g.addColorStop(0.55, `hsla(${h0+b.dh+12},78%,72%,${pulse*1.3})`);
+      g.addColorStop(0.8,  `hsla(${h0+b.dh},75%,68%,${pulse*.7})`);
+      g.addColorStop(1,    `hsla(${h0+b.dh},75%,70%,0)`);
+      ctx.fillStyle = g; ctx.fill();
     });
 
-    requestAnimationFrame(drawAurora);
+    requestAnimationFrame(draw);
   }
-
-  window._auroraUpdateTheme();
-  drawAurora();
-
-  // Hook into element theme changes
-  const _origApply = window.applyElementTheme;
-  if (_origApply) {
-    window.applyElementTheme = function(el) {
-      _origApply(el);
-      setTimeout(window._auroraUpdateTheme, 50);
-    };
-  }
+  draw();
 })();
 
-/* ══════════════════════════════════════
-   CONSTELLATION CANVAS
-══════════════════════════════════════ */
-(function initConstellations() {
-  const canvas = document.createElement('canvas');
-  canvas.id = 'constellationCanvas';
-  canvas.setAttribute('aria-hidden', 'true');
-  document.body.insertBefore(canvas, document.body.firstChild);
-
-  const ctx = canvas.getContext('2d');
+/* ─── Constellation network ─── */
+(function() {
+  const cv = document.createElement('canvas');
+  cv.id = 'constellCanvas'; cv.setAttribute('aria-hidden','true');
+  document.body.insertBefore(cv, document.body.firstChild);
+  const ctx = cv.getContext('2d');
   let W, H, nodes = [], t = 0;
 
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    buildNodes();
-  }
+  const resize = () => {
+    W = cv.width = innerWidth; H = cv.height = innerHeight;
+    nodes = Array.from({ length: Math.min(50, Math.floor(W*H/22000)) }, () => ({
+      x: Math.random()*W, y: Math.random()*H*.7,
+      vx:(Math.random()-.5)*.1, vy:(Math.random()-.5)*.05,
+      r:.7+Math.random()*1.2, a:.2+Math.random()*.5,
+      phase: Math.random()*Math.PI*2
+    }));
+  };
+  resize(); addEventListener('resize', resize);
 
-  function buildNodes() {
-    nodes = [];
-    const count = Math.floor(W * H / 28000);
-    for (let i = 0; i < count; i++) {
-      nodes.push({
-        x: Math.random() * W,
-        y: Math.random() * H * 0.75,
-        vx: (Math.random() - 0.5) * 0.12,
-        vy: (Math.random() - 0.5) * 0.06,
-        r: 0.8 + Math.random() * 1.4,
-        a: 0.2 + Math.random() * 0.6,
-        phase: Math.random() * Math.PI * 2,
-      });
-    }
-  }
+  const RGB_MAP = {
+    dendro:'168,204,40', pyro:'255,107,32', hydro:'40,180,232',
+    cryo:'144,216,240', electro:'192,96,255', anemo:'64,216,160', geo:'232,192,32'
+  };
 
-  resize();
-  window.addEventListener('resize', resize);
-
-  const MAX_DIST = 160;
-
-  function drawConstellations() {
+  function draw() {
     ctx.clearRect(0, 0, W, H);
-    t += 0.008;
+    t += 0.007;
+    const el = document.documentElement.getAttribute('data-element') || 'dendro';
+    const rgb = RGB_MAP[el] || RGB_MAP.dendro;
 
-    // Move nodes
     nodes.forEach(n => {
       n.x += n.vx; n.y += n.vy;
       if (n.x < 0) n.x = W; if (n.x > W) n.x = 0;
-      if (n.y < 0) n.y = H * 0.75; if (n.y > H * 0.75) n.y = 0;
+      if (n.y < 0) n.y = H*.7; if (n.y > H*.7) n.y = 0;
     });
 
-    const el = document.documentElement.getAttribute('data-element') || 'dendro';
-    const colorMap = {
-      dendro: '168,204,40', pyro: '255,107,32', hydro: '40,180,232',
-      cryo: '144,216,240', electro: '192,96,255', anemo: '64,216,160', geo: '232,192,32'
-    };
-    const rgb = colorMap[el] || '168,204,40';
-
-    // Draw edges
+    // Edges
     for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const dx = nodes[i].x - nodes[j].x;
-        const dy = nodes[i].y - nodes[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MAX_DIST) {
-          const alpha = (1 - dist / MAX_DIST) * 0.15;
+      for (let j = i+1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 150) {
           ctx.beginPath();
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.strokeStyle = `rgba(${rgb},${alpha})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
+          ctx.strokeStyle = `rgba(${rgb},${(1-d/150)*.12})`;
+          ctx.lineWidth = .4; ctx.stroke();
         }
       }
     }
-
-    // Draw nodes
+    // Dots
     nodes.forEach(n => {
-      const pulse = 0.5 + 0.5 * Math.sin(t * 1.5 + n.phase);
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${rgb},${n.a * pulse})`;
-      ctx.fill();
+      const a = n.a * (.5 + .5*Math.sin(t*1.4 + n.phase));
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${rgb},${a})`; ctx.fill();
     });
 
-    requestAnimationFrame(drawConstellations);
+    requestAnimationFrame(draw);
   }
-
-  drawConstellations();
+  draw();
 })();
 
-/* ══════════════════════════════════════
-   3D CARD TILT
-══════════════════════════════════════ */
-(function initCardTilt() {
-  const TILT = 10; // max degrees
+/* ─── Holographic overlay injection ─── */
+(function() {
+  function inject() {
+    document.querySelectorAll('.anime-card:not([data-holo])').forEach(c => {
+      c.setAttribute('data-holo','1');
+      const h = document.createElement('div');
+      h.className = 'ac-holo'; c.appendChild(h);
+    });
+  }
+  inject();
+  new MutationObserver(inject).observe(document.body, { childList:true, subtree:true });
+})();
 
-  function attachTilt(selector, tiltMag) {
+/* ─── 3D card tilt ─── */
+(function() {
+  const TILT = 9;
+
+  function bindTilt(sel, mag) {
     document.addEventListener('mousemove', e => {
-      const cards = document.querySelectorAll(selector);
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        if (e.clientX < rect.left - 60 || e.clientX > rect.right + 60 ||
-            e.clientY < rect.top  - 60 || e.clientY > rect.bottom + 60) return;
+      document.querySelectorAll(sel).forEach(card => {
+        const r = card.getBoundingClientRect();
+        if (e.clientX < r.left-80 || e.clientX > r.right+80 ||
+            e.clientY < r.top -80 || e.clientY > r.bottom+80) return;
+        const dx = (e.clientX - r.left - r.width/2)  / (r.width/2);
+        const dy = (e.clientY - r.top  - r.height/2) / (r.height/2);
+        card.style.transform = `perspective(700px) rotateX(${-dy*mag}deg) rotateY(${dx*mag}deg) translateZ(8px) translateY(-5px)`;
 
-        const cx = rect.left + rect.width  / 2;
-        const cy = rect.top  + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width  / 2);
-        const dy = (e.clientY - cy) / (rect.height / 2);
-
-        const ry =  dx * tiltMag;
-        const rx = -dy * tiltMag;
-
-        // Store for CSS
-        card.style.setProperty('--rx', rx + 'deg');
-        card.style.setProperty('--ry', ry + 'deg');
-        card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px) translateY(-5px)`;
-
-        // Holographic highlight position
-        const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
-        const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
+        // holo position
         const holo = card.querySelector('.ac-holo');
         if (holo) {
+          const mx = ((e.clientX-r.left)/r.width*100).toFixed(1)+'%';
+          const my = ((e.clientY-r.top)/r.height*100).toFixed(1)+'%';
           holo.style.backgroundPosition = `${mx} ${my}`;
         }
       });
     });
-
-    document.addEventListener('mouseleave', () => {
-      document.querySelectorAll(selector).forEach(card => {
-        card.style.transform = '';
-      });
-    }, true);
   }
 
-  // Reset on mouseleave per card
-  function attachReset(selector) {
-    document.addEventListener('mouseover', e => {});
-    document.querySelectorAll(selector).forEach(card => {
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-      });
-    });
-  }
+  bindTilt('.anime-card', TILT);
 
-  // Observe DOM changes for dynamically added cards
-  const observer = new MutationObserver(() => {
-    attachReset('.anime-card');
-    attachReset('.info-card');
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  attachTilt('.anime-card', TILT);
-  attachTilt('.info-card', 5);
-  attachTilt('.link-card', 4);
-})();
-
-/* ══════════════════════════════════════
-   ANIMATED PANEL BORDER (inject elements)
-══════════════════════════════════════ */
-(function injectPanelBorderGlows() {
-  function inject() {
-    document.querySelectorAll('.gi-panel:not(.glow-injected)').forEach(p => {
-      p.classList.add('glow-injected');
-      const glow = document.createElement('div');
-      glow.className = 'panel-border-glow';
-      p.insertBefore(glow, p.firstChild);
-    });
-  }
-  inject();
-  new MutationObserver(inject).observe(document.body, { childList: true, subtree: true });
-})();
-
-/* ══════════════════════════════════════
-   HOLOGRAPHIC OVERLAY INJECTION
-══════════════════════════════════════ */
-(function injectHoloOverlays() {
-  function inject() {
-    document.querySelectorAll('.anime-card:not(.holo-injected)').forEach(card => {
-      card.classList.add('holo-injected');
-      const holo = document.createElement('div');
-      holo.className = 'ac-holo';
-      card.appendChild(holo);
-    });
-  }
-  inject();
-  new MutationObserver(inject).observe(document.body, { childList: true, subtree: true });
-})();
-
-/* ══════════════════════════════════════
-   DOSSIER STAGGER INDICES
-══════════════════════════════════════ */
-(function initDossierStagger() {
-  function stagger() {
-    document.querySelectorAll('.dossier-row').forEach((row, i) => {
-      row.style.setProperty('--di', i);
-    });
-  }
-  stagger();
-})();
-
-/* ══════════════════════════════════════
-   LINK CARD MOUSE GRADIENT
-══════════════════════════════════════ */
-(function initLinkCardGradient() {
-  document.addEventListener('mousemove', e => {
-    document.querySelectorAll('.link-card').forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
-      const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
-      card.style.setProperty('--mx', mx);
-      card.style.setProperty('--my', my);
-    });
-  });
-})();
-
-/* ══════════════════════════════════════
-   AURORA THEME HOOK
-══════════════════════════════════════ */
-(function hookAuroraToTheme() {
-  // Update aurora on element changes
-  const _orig = window._skyUpdateTheme;
-  window._skyUpdateTheme = function(c) {
-    if (_orig) _orig(c);
-    if (window._auroraUpdateTheme) setTimeout(window._auroraUpdateTheme, 100);
-  };
-})();
-
-/* ══════════════════════════════════════
-   ENHANCED SHOOTING STARS
-   (Adds sparkle burst to existing)
-══════════════════════════════════════ */
-(function enhanceShootingStars() {
-  // Spawn occasional extra-bright shooting stars with sparkle burst
-  function spawnSuperStar() {
-    const canvas = document.getElementById('skyCanvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
-    let x = Math.random() * W * 0.6;
-    let y = Math.random() * H * 0.25;
-    const angle = Math.PI / 6 + Math.random() * Math.PI / 8;
-    const spd = 18 + Math.random() * 12;
-    const vx = Math.cos(angle) * spd, vy = Math.sin(angle) * spd;
-    let life = 1.2;
-
-    function draw() {
-      if (life <= 0) {
-        // Sparkle burst
-        const rgb = '220,210,255';
-        for (let i = 0; i < 8; i++) {
-          const ang = (i / 8) * Math.PI * 2;
-          const dist = (1.2 - life) * 30;
-          ctx.save();
-          ctx.globalAlpha = life * 0.5;
-          ctx.strokeStyle = `rgba(${rgb},0.8)`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + Math.cos(ang) * dist, y + Math.sin(ang) * dist);
-          ctx.stroke();
-          ctx.restore();
-        }
-        return;
+  // Reset on mouse-leave
+  document.addEventListener('mouseover', () => {});
+  new MutationObserver(() => {
+    document.querySelectorAll('.anime-card, .info-card').forEach(c => {
+      if (!c._resetBound) {
+        c._resetBound = true;
+        c.addEventListener('mouseleave', () => { c.style.transform = ''; });
       }
-      ctx.save();
-      ctx.globalAlpha = Math.min(life, 1) * 0.95;
-      const grad = ctx.createLinearGradient(x - vx * 5, y - vy * 5, x, y);
-      grad.addColorStop(0, 'transparent');
-      grad.addColorStop(0.6, 'rgba(200,200,255,0.8)');
-      grad.addColorStop(1, 'rgba(255,255,255,1)');
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2.5;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(x - vx * 5, y - vy * 5);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      ctx.restore();
-      x += vx; y += vy; life -= 0.03;
-      requestAnimationFrame(draw);
-    }
-    draw();
-  }
-
-  setInterval(() => {
-    if (Math.random() < 0.25) spawnSuperStar();
-  }, 6000);
-})();
-
-/* ══════════════════════════════════════
-   SECTION SWITCH ENHANCEMENT
-══════════════════════════════════════ */
-(function enhanceSectionSwitch() {
-  const _orig = window.showSec;
-  if (!_orig) return;
-  window.showSec = function(id, btn) {
-    _orig(id, btn);
-    // Stagger the reveal of child panels
-    const sec = document.getElementById(id);
-    if (!sec) return;
-    sec.querySelectorAll('.reveal').forEach((el, i) => {
-      el.style.animationDelay = (i * 0.06) + 's';
     });
-    // Re-stagger dossier rows
-    sec.querySelectorAll('.dossier-row').forEach((row, i) => {
-      row.style.setProperty('--di', i);
-      row.style.animation = 'none';
-      row.offsetHeight; // reflow
-      row.style.animation = '';
-    });
-  };
-})();
-
-
-/* ══════════════════════════════════════
-   SECTION STAGGER — MutationObserver
-══════════════════════════════════════ */
-(function watchSections() {
-  const allSections = document.querySelectorAll('.section');
-  allSections.forEach(sec => {
-    const obs = new MutationObserver(mutations => {
-      mutations.forEach(m => {
-        if (m.attributeName === 'class' && sec.classList.contains('active')) {
-          // Stagger reveal panels
-          sec.querySelectorAll('.reveal').forEach((el, i) => {
-            el.style.animationDelay = (i * 0.07) + 's';
-            el.style.animationName = 'none';
-            el.offsetHeight;
-            el.style.animationName = '';
-          });
-          // Stagger dossier rows
-          sec.querySelectorAll('.dossier-row').forEach((row, i) => {
-            row.style.setProperty('--di', i);
-            row.style.animation = 'none';
-            row.offsetHeight;
-            row.style.animation = '';
-          });
-        }
-      });
-    });
-    obs.observe(sec, { attributes: true });
+  }).observe(document.body, { childList:true, subtree:true });
+  document.querySelectorAll('.anime-card, .info-card').forEach(c => {
+    c.addEventListener('mouseleave', () => { c.style.transform = ''; });
   });
 })();
 
-/* ══════════════════════════════════════
-   INTERACTIVE MOUSE PARALLAX for pfp
-══════════════════════════════════════ */
-(function initPfpParallax() {
-  const pfp = document.getElementById('pfpOuter');
-  if (!pfp) return;
-
+/* ─── Link-card spotlight ─── */
+(function() {
   document.addEventListener('mousemove', e => {
-    const rect = pfp.getBoundingClientRect();
-    const cx = rect.left + rect.width  / 2;
-    const cy = rect.top  + rect.height / 2;
-    const dx = (e.clientX - cx) / window.innerWidth;
-    const dy = (e.clientY - cy) / window.innerHeight;
-
-    pfp.querySelectorAll('.pfp-ring').forEach((ring, i) => {
-      const factor = (i + 1) * 2.5;
-      ring.style.transform = `rotate(${ring._baseAngle || 0}deg) translate(${dx * factor}px, ${dy * factor}px)`;
+    document.querySelectorAll('.link-card').forEach(c => {
+      const r = c.getBoundingClientRect();
+      c.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+      c.style.setProperty('--my', ((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
     });
   });
 })();
