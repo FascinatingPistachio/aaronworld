@@ -399,9 +399,152 @@ function _resizeTC() {
 _resizeTC();
 window.addEventListener('resize', _resizeTC);
 
-/* Each element has a wipe function: fn(ctx, W, H, progress 0→1) */
-const ELEMENT_WIPES = {
+/* ── Cinematic constellation warp ── */
+/* One unified transition: a star field that rushes past at speed then
+   gracefully decelerates to stillness, element-agnostic, always elegant. */
 
+function _constellationWipe(ctx, W, H, p) {
+  ctx.clearRect(0, 0, W, H);
+
+  // ── Velocity curve: starts at full speed, decelerates with exponential ease-out
+  // integral of (1-t)^2.6 gives position — we track speed separately for streak length
+  const speed = Math.pow(1 - p, 2.4);           // 1.0 → 0.0
+  const traveled = p - Math.pow(1 - p, 3.4) / 3.4 + (1/3.4); // normalized 0→~1
+
+  // ── Master alpha: fade in fast, hold, fade out at the end
+  const alpha = p < 0.1  ? p / 0.1
+              : p > 0.78 ? 1 - (p - 0.78) / 0.22
+              : 1;
+
+  // ── Deep space background
+  const bgAlpha = alpha * 0.91;
+  ctx.fillStyle = `rgba(3, 2, 8, ${bgAlpha})`;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Subtle nebula wash behind the stars
+  if (alpha > 0.05) {
+    const nx = W * 0.55, ny = H * 0.42;
+    const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, W * 0.55);
+    ng.addColorStop(0,   `rgba(30, 20, 60, ${alpha * 0.28})`);
+    ng.addColorStop(0.5, `rgba(18, 12, 40, ${alpha * 0.14})`);
+    ng.addColorStop(1,   'transparent');
+    ctx.fillStyle = ng;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // ── Letterbox bars — thin, cinematic
+  const lbH = H * 0.038;
+  ctx.fillStyle = `rgba(2, 1, 6, ${alpha * 0.95})`;
+  ctx.fillRect(0, 0, W, lbH);
+  ctx.fillRect(0, H - lbH, W, lbH);
+
+  // ── Star field: each star is a deterministic point based on seed i
+  // At high speed they are long horizontal streaks; at low speed, dots
+  const STAR_COUNT = 180;
+  const maxStreakLen = W * 0.55;
+
+  // Parallax "planes" — closer stars move faster and are brighter
+  for (let i = 0; i < STAR_COUNT; i++) {
+    // Deterministic position from seed
+    const seed1 = (i * 2654435761) >>> 0;
+    const seed2 = (i * 1013904223) >>> 0;
+    const seed3 = (i * 1664525)    >>> 0;
+
+    const baseX  = (seed1 % 10000) / 10000;   // 0-1
+    const baseY  = (seed2 % 10000) / 10000;   // 0-1
+    const plane  = (seed3 % 100)   / 100;     // 0-1 depth
+
+    // Stars in closer planes travel further (parallax)
+    const parallelFactor = 0.4 + plane * 1.6;
+
+    // x position: stars stream from right to left as we "pan right"
+    // At p=0 stars are at their seed position; at p=1 they've moved far left
+    const drift = traveled * parallelFactor;
+    const sx = ((baseX - drift) % 1 + 1) % 1;  // wraps 0–1
+    const sy = baseY;
+
+    const px = sx * W;
+    const py = sy * H;
+
+    // Streak length proportional to speed and plane depth
+    const streakLen = speed * maxStreakLen * parallelFactor * 0.7;
+
+    // Star size and brightness from plane (closer = brighter, larger)
+    const brightness = 0.35 + plane * 0.65;
+    const starAlpha  = alpha * brightness * (0.45 + plane * 0.55);
+    const r          = 0.5 + plane * 1.6;
+
+    if (streakLen > 2) {
+      // Streak mode
+      const x0 = Math.min(px + streakLen * 0.15, W + 20);
+      const x1 = Math.max(px - streakLen * 0.85, -20);
+      const g = ctx.createLinearGradient(x0, py, x1, py);
+      const col = plane > 0.75 ? `255,248,230` : plane > 0.4 ? `220,230,255` : `180,190,255`;
+      g.addColorStop(0,    `rgba(${col},0)`);
+      g.addColorStop(0.15, `rgba(${col},${starAlpha * 0.6})`);
+      g.addColorStop(0.7,  `rgba(${col},${starAlpha})`);
+      g.addColorStop(1,    `rgba(${col},${starAlpha * 0.4})`);
+      ctx.beginPath();
+      ctx.moveTo(x0, py);
+      ctx.lineTo(x1, py);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = r * 0.9;
+      ctx.stroke();
+    } else {
+      // Point/dot mode — when nearly stopped
+      const col = plane > 0.75 ? `255,248,230` : plane > 0.4 ? `220,230,255` : `180,190,255`;
+      // Soft glow for brighter stars
+      if (plane > 0.6) {
+        const gg = ctx.createRadialGradient(px, py, 0, px, py, r * 4);
+        gg.addColorStop(0,   `rgba(${col},${starAlpha * 0.5})`);
+        gg.addColorStop(1,   'transparent');
+        ctx.fillStyle = gg;
+        ctx.beginPath(); ctx.arc(px, py, r * 4, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${col},${starAlpha})`;
+      ctx.fill();
+    }
+  }
+
+  // ── Constellation lines: appear only as speed approaches zero
+  if (speed < 0.18 && alpha > 0.1) {
+    const lineAlpha = alpha * (1 - speed / 0.18) * 0.32;
+    // Fixed constellation pattern — a graceful arc of ~10 nodes
+    const nodes = [
+      [0.18, 0.22], [0.28, 0.16], [0.40, 0.20], [0.52, 0.14],
+      [0.63, 0.18], [0.74, 0.25], [0.82, 0.20], [0.70, 0.35],
+      [0.58, 0.38], [0.44, 0.32], [0.32, 0.36],
+    ];
+    // Draw lines
+    ctx.beginPath();
+    nodes.forEach(([nx, ny], idx) => {
+      const px2 = nx * W, py2 = ny * H;
+      idx === 0 ? ctx.moveTo(px2, py2) : ctx.lineTo(px2, py2);
+    });
+    ctx.strokeStyle = `rgba(200, 215, 255, ${lineAlpha})`;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // Draw node dots
+    nodes.forEach(([nx, ny]) => {
+      const px2 = nx * W, py2 = ny * H;
+      const dotAlpha = lineAlpha * 2.5;
+      const dg = ctx.createRadialGradient(px2, py2, 0, px2, py2, 5);
+      dg.addColorStop(0,   `rgba(230, 240, 255, ${Math.min(dotAlpha, 0.9)})`);
+      dg.addColorStop(1,   'transparent');
+      ctx.fillStyle = dg;
+      ctx.beginPath(); ctx.arc(px2, py2, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px2, py2, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(dotAlpha * 1.4, 1)})`;
+      ctx.fill();
+    });
+  }
+}
+
+/* Each element had a wipe function — now replaced by the unified constellation pan.
+   Keep the object so no other code breaks if it references ELEMENT_WIPES. */
+const ELEMENT_WIPES = {
   dendro(ctx, W, H, p) {
     // Leaf/petal burst from center — organic blobs scatter outward
     ctx.clearRect(0, 0, W, H);
@@ -699,11 +842,7 @@ function showSec(id, btn) {
   const current = document.querySelector('.section.active');
   if (current && current.id === id) return;
 
-  const theme = ELEMENT_THEMES[currentElement];
-  const wipeFn = ELEMENT_WIPES[currentElement] || ELEMENT_WIPES.dendro;
-
   if (!_tc || !_tx) {
-    // No canvas — instant switch
     _doSwitch(id, btn); return;
   }
 
@@ -712,17 +851,17 @@ function showSec(id, btn) {
   _resizeTC();
   const W = _tc.width, H = _tc.height;
 
-  const DURATION = 700; // ms
+  // Longer duration so the deceleration arc is clearly felt
+  const DURATION = 900;
   const start = performance.now();
 
   function tick(now) {
-    const raw = (now - start) / DURATION;
-    const p   = Math.min(raw, 1);
+    const p = Math.min((now - start) / DURATION, 1);
 
-    wipeFn(_tx, W, H, p);
+    _constellationWipe(_tx, W, H, p);
 
-    // Switch content at midpoint
-    if (p >= 0.42 && !_tc._switched) {
+    // Switch content just past the midpoint, while overlay is fully opaque
+    if (p >= 0.44 && !_tc._switched) {
       _tc._switched = true;
       _doSwitch(id, btn);
     }
