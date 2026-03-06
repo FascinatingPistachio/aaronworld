@@ -662,11 +662,10 @@ window.addEventListener('load', function () {
   }
 
   const stages = [
-    { pct:10,  label:'Initialising…' },
-    { pct:28,  label:'Loading Teyvat…' },
-    { pct:48,  label:'Fetching Character…' },
-    { pct:66,  label:'Syncing Journal…' },
-    { pct:82,  label:'Preparing World…' },
+    { pct:15,  label:'Initialising…' },
+    { pct:38,  label:'Loading Teyvat…' },
+    { pct:62,  label:'Fetching Character…' },
+    { pct:82,  label:'Syncing Journal…' },
     { pct:100, label:'Entering…' },
   ];
   let si = 0;
@@ -675,36 +674,21 @@ window.addEventListener('load', function () {
     const s = stages[si++];
     if (barFill)  barFill.style.width  = s.pct + '%';
     if (statusEl) statusEl.textContent = s.label;
-    if (si < stages.length) setTimeout(nextStage, 300 + Math.random() * 440);
-    else setTimeout(dismiss, 700);
+    if (si < stages.length) setTimeout(nextStage, 180 + Math.random() * 220);
+    else setTimeout(dismiss, 420);
   }
-  setTimeout(nextStage, 420);
+  setTimeout(nextStage, 200);
 
   function dismiss() {
     loader.classList.add('hidden');
     document.body.style.overflow = '';
     document.getElementById('mainPage')?.classList.add('visible');
   }
-  /* Hard cap — never show loader more than 7s */
-  setTimeout(dismiss, 7000);
+  /* Hard cap — never more than 3.5s */
+  setTimeout(dismiss, 3500);
   document.body.style.overflow = 'hidden';
 })();
 
-/* ── FAVICON ── */
-window._setFaviconToElement = function(iconUrl) {
-  if (!iconUrl) return;
-  const link = document.getElementById('faviconLink');
-  if (!link) return;
-  const img = new Image(); img.crossOrigin='anonymous';
-  img.onload = function() {
-    try {
-      const c = document.createElement('canvas'); c.width=32; c.height=32;
-      c.getContext('2d').drawImage(img,0,0,32,32); link.href=c.toDataURL('image/png');
-    } catch(e){ link.href=iconUrl; }
-  };
-  img.onerror = function(){ link.href=iconUrl; };
-  img.src = iconUrl;
-};
 </script>
 </body>
 </html>
