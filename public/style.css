@@ -496,9 +496,16 @@ html[data-element] .gi-head-line{background:linear-gradient(90deg,var(--a2),tran
 html[data-element] .pfp-ring{border-color:color-mix(in srgb,var(--a2) 42%,transparent)}
 @keyframes ringOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-.pfp-outer.playing .pfp-ring.r1{border-color:var(--a1);opacity:.9;animation-duration:4s}
-.pfp-outer.playing .pfp-ring.r2{border-color:var(--a0);opacity:.6;animation-duration:7s}
-.pfp-outer.playing .pfp-ring.r3{border-color:var(--a1);opacity:.35;animation-duration:12s}
+/* Rings always in energised state since VFX is always on */
+.pfp-ring.r1{border-color:var(--a1) !important;opacity:.75;animation-duration:5s !important}
+.pfp-ring.r2{border-color:var(--a0) !important;opacity:.45;animation-duration:9s !important}
+.pfp-ring.r3{border-color:var(--a1) !important;opacity:.25;animation-duration:15s !important}
+html[data-element] .pfp-ring{border-color:color-mix(in srgb,var(--a1) 70%,transparent) !important}
+
+/* Playing state bumps them up */
+.pfp-outer.playing .pfp-ring.r1{opacity:.95;animation-duration:3.5s !important}
+.pfp-outer.playing .pfp-ring.r2{opacity:.65;animation-duration:6s !important}
+.pfp-outer.playing .pfp-ring.r3{opacity:.4;animation-duration:11s !important}
 .pfp-outer.playing .pfp-img{box-shadow:0 0 30px var(--glow),0 0 60px var(--glow2),0 0 0 3px color-mix(in srgb,var(--a2) 55%,transparent)}
 
 .pfp-img{
@@ -516,11 +523,11 @@ html[data-element] .pfp-img{
   box-shadow:0 0 22px var(--glow),0 0 50px var(--glow2);
 }
 
-/* VFX canvas */
+/* VFX canvas — always visible */
 #pfpVfx{
   position:absolute;inset:-80px;
   width:calc(100% + 160px);height:calc(100% + 160px);
-  pointer-events:none;z-index:3;opacity:0;transition:opacity .8s;
+  pointer-events:none;z-index:3;opacity:1;transition:opacity .8s;
 }
 #pfpVfx.active{opacity:1}
 
@@ -536,39 +543,6 @@ html[data-element] .pfp-img{
 }
 html[data-element] .pfp-elem-badge{border-color:var(--a2)}
 .pfp-elem-badge img{width:17px;height:17px}
-
-/* ── Headphones ────────────────────────────────────── */
-/* SVG viewBox 172×164 maps exactly to these dims.
-   top:-50px → band peaks comfortably above the avatar head. */
-#pfpHeadphones{
-  position:absolute;
-  top:-50px; left:50%;
-  transform:translateX(-50%) scale(0) translateY(8px);
-  width:172px; height:164px;
-  z-index:5; pointer-events:none; opacity:0;
-  transition:
-    transform .7s cubic-bezier(.34,1.4,.64,1),
-    opacity   .5s cubic-bezier(.4,0,.2,1);
-  will-change:transform,opacity;
-}
-#pfpHeadphones.active{
-  transform:translateX(-50%) scale(1) translateY(0);
-  opacity:1;
-  animation:hpFloat 5.5s ease-in-out .7s infinite;
-}
-@keyframes hpFloat{
-  0%,100%{ transform:translateX(-50%) translateY(0)   scale(1); }
-  35%    { transform:translateX(-50%) translateY(-5px) scale(1.006); }
-  70%    { transform:translateX(-50%) translateY(-2px) scale(1.002); }
-}
-/* Headphone LED pulse — glow breathes in time with element */
-#pfpHeadphones.active svg{
-  animation: hpLedBreath 2.8s ease-in-out infinite;
-}
-@keyframes hpLedBreath{
-  0%,100%{ filter: drop-shadow(0 0 5px var(--glow2)) drop-shadow(0 0 12px var(--glow)); }
-  50%    { filter: drop-shadow(0 0 12px var(--glow))  drop-shadow(0 0 28px var(--glow2)); }
-}
 
 /* Profile text */
 .profile-name{
@@ -1078,7 +1052,6 @@ img.emoji{height:1.15em;width:1.15em;margin:0 .06em 0 .1em;vertical-align:-.18em
   .dossier-row:nth-last-child(-n+2){border-bottom:1px solid rgba(120,100,200,.08)}
   .dossier-row:last-child{border-bottom:none}
   .anime-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
-  #pfpHeadphones{ width:148px; height:140px; top:-36px; }
 }
 
 /* Mobile landscape (short + wide) */
@@ -1109,7 +1082,6 @@ img.emoji{height:1.15em;width:1.15em;margin:0 .06em 0 .1em;vertical-align:-.18em
   .gi-body.center-body{padding:clamp(12px,3vw,16px) clamp(12px,3vw,16px) 4px}
   .anime-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
   #pfpOuter{width:clamp(140px,50vw,200px);height:clamp(140px,50vw,200px)}
-  #pfpHeadphones{width:clamp(130px,48vw,165px);height:clamp(130px,48vw,165px);top:-28px}
 }
 
 /* Very small phones */

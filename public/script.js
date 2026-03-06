@@ -350,7 +350,6 @@ function applyElementTheme(element) {
   if (window._skyUpdateTheme) window._skyUpdateTheme(theme.skyColors);
 
   // Rebuild headphones
-  buildHeadphonesSVG();
 
   // Respawn particles
   respawnParticles();
@@ -899,312 +898,7 @@ document.addEventListener('keydown', e => {
 /* ══════════════════════════════════════
    HEADPHONES SVG
 ══════════════════════════════════════ */
-function buildHeadphonesSVG() {
-  const el = document.getElementById('pfpHeadphones');
-  if (!el) return;
-  const t  = ELEMENT_THEMES[currentElement];
-  const c1 = t.headColors[0];
-  const c2 = t.headColors[1];
-  const c3 = t.headColors[2];
-  const h2r = h => {
-    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-      h.replace(/^#([a-f\d]{3})$/i,(_,a,b,c)=>`#${a+a}${b+b}${c+c}`));
-    return m?`${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)}`:'180,180,180';
-  };
-  const r1=h2r(c1), r2=h2r(c2), r3=h2r(c3);
 
-  /* ════════════════════════════════════════════════════════════
-     3D PROJECTION DERIVATION (orthographic, viewer in -Z)
-     ────────────────────────────────────────────────────────────
-     SVG viewBox 172×164  |  Container top:-50px, centred
-     pfp-outer 116×116    →  avatar circle cx=86 cy=108 r=58
-
-     Ear level y=104.  At y=104 on the avatar circle:
-       dx = √(58²−(108−104)²) = √3348 ≈ 57.9
-       Avatar left x = 28.1  right x = 143.9
-
-     Cup face tilt: 38° forward from pure sideways.
-       Normal (left): (−cos38°, 0, sin38°) = (−0.788, 0, 0.616)
-       Projected rx = cupR·sin(38°) = 26·0.616 ≈ 16
-       Projected ry = cupR = 26
-
-     Cup housing depth = 12px (projected screen shift toward head)
-       depth_shift_x = 12·|cos38°| = 12·0.788 ≈ 9.5 → 9 px
-
-     Front face LEFT:  cx=12 cy=104 rx=16 ry=26
-       inner_edge = 12+16 = 28 ✓ (avatar left edge)
-     Back  face LEFT:  cx=21 cy=104  (shifted 9px toward head)
-
-     Front face RIGHT: cx=160 cy=104 rx=16 ry=26
-       inner_edge = 160−16 = 144 ✓ (avatar right edge)
-     Back  face RIGHT: cx=151 cy=104
-
-     Cup top y = 104−26 = 78.
-
-     Headband arc: endpoints at avatar-temple level (y=88)
-       At y=88: dx = √(58²−20²) = √2964 ≈ 54.4
-       Endpoints (30,88) and (142,88)  [2px outside avatar]
-       Arc ellipse: centre(86,88) rx=56 ry=78 → peak (86,10)
-       Verify: ((30−86)/56)² = 1.0 ✓
-
-     Yoke: y=78→88  (10px height between cup top and band endpoint)
-
-     Rim SVG paths (outer half-ellipse front, then back):
-       LEFT : M 12 78 A 16 26 0 0 1 12 130 L 21 130 A 16 26 0 0 0 21 78 Z
-       RIGHT: M 160 78 A 16 26 0 0 0 160 130 L 151 130 A 16 26 0 0 1 151 78 Z
-  ════════════════════════════════════════════════════════════ */
-
-  el.innerHTML = `
-<svg viewBox="0 0 172 164" fill="none" xmlns="http://www.w3.org/2000/svg"
-     style="width:100%;height:100%;overflow:visible;display:block">
-<defs>
-
-  <!-- ── BAND gradients ── -->
-  <linearGradient id="hbA" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%"   stop-color="#2c2c2c"/>
-    <stop offset="42%"  stop-color="#1a1a1a"/>
-    <stop offset="100%" stop-color="#0d0d0d"/>
-  </linearGradient>
-  <linearGradient id="hbS" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%"   stop-color="rgba(255,255,255,.24)"/>
-    <stop offset="55%"  stop-color="rgba(255,255,255,.04)"/>
-    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-  </linearGradient>
-  <linearGradient id="hbE" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%"   stop-color="${c3}" stop-opacity="0"/>
-    <stop offset="28%"  stop-color="${c1}" stop-opacity=".6"/>
-    <stop offset="50%"  stop-color="${c2}" stop-opacity=".95"/>
-    <stop offset="72%"  stop-color="${c1}" stop-opacity=".6"/>
-    <stop offset="100%" stop-color="${c3}" stop-opacity="0"/>
-  </linearGradient>
-
-  <!-- ── YOKE metal ── -->
-  <linearGradient id="ykM" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%"   stop-color="#141414"/>
-    <stop offset="50%"  stop-color="#232323"/>
-    <stop offset="100%" stop-color="#141414"/>
-  </linearGradient>
-
-  <!-- ── CUP FRONT FACE ── -->
-  <!-- Left cup: lit upper-right (inward+up face gets light), shadows lower-left/outer -->
-  <linearGradient id="cpL" x1="1" y1="0" x2="0" y2="1">
-    <stop offset="0%"   stop-color="#2e2e2e"/>
-    <stop offset="32%"  stop-color="#1f1f1f"/>
-    <stop offset="68%"  stop-color="#141414"/>
-    <stop offset="100%" stop-color="#090909"/>
-  </linearGradient>
-  <!-- Right cup: lit upper-left (mirror) -->
-  <linearGradient id="cpR" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0%"   stop-color="#2e2e2e"/>
-    <stop offset="32%"  stop-color="#1f1f1f"/>
-    <stop offset="68%"  stop-color="#141414"/>
-    <stop offset="100%" stop-color="#090909"/>
-  </linearGradient>
-
-  <!-- ── RIM FILL — visible depth strip (top-lit inner housing edge) ── -->
-  <linearGradient id="rimF" x1="0" y1="0" x2="0" y2="1"
-                  gradientUnits="userSpaceOnUse" y1="78" y2="130">
-    <stop offset="0%"   stop-color="rgba(62,62,62,1)"/>
-    <stop offset="22%"  stop-color="rgba(38,38,38,1)"/>
-    <stop offset="60%"  stop-color="rgba(18,18,18,1)"/>
-    <stop offset="100%" stop-color="rgba(7,7,7,1)"/>
-  </linearGradient>
-  <!-- Thin element-tinted top edge of rim -->
-  <linearGradient id="rimEl" x1="0" y1="0" x2="0" y2="1"
-                  gradientUnits="userSpaceOnUse" y1="78" y2="130">
-    <stop offset="0%"   stop-color="rgba(${r1},.35)"/>
-    <stop offset="30%"  stop-color="rgba(${r1},.08)"/>
-    <stop offset="100%" stop-color="rgba(${r1},0)"/>
-  </linearGradient>
-
-  <!-- ── EMBLEM recess ── -->
-  <radialGradient id="emb" cx="46%" cy="38%" r="56%">
-    <stop offset="0%"   stop-color="#1c1c1c"/>
-    <stop offset="65%"  stop-color="#111"/>
-    <stop offset="100%" stop-color="#070707"/>
-  </radialGradient>
-
-  <!-- ── SPECULAR flares (upper-outer corner of each cup) ── -->
-  <!-- Left: flare at upper-right of cup face (inner-top, lit area) -->
-  <radialGradient id="hiL" cx="74%" cy="21%" r="44%">
-    <stop offset="0%"   stop-color="rgba(255,255,255,.20)"/>
-    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-  </radialGradient>
-  <!-- Right: mirror -->
-  <radialGradient id="hiR" cx="26%" cy="21%" r="44%">
-    <stop offset="0%"   stop-color="rgba(255,255,255,.20)"/>
-    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-  </radialGradient>
-
-  <!-- ── FILTERS ── -->
-  <!-- LED glow: expand outward for the arc stroke -->
-  <filter id="lg" x="-120%" y="-55%" width="340%" height="210%">
-    <feGaussianBlur stdDeviation="2.4" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
-  <!-- Soft ambient halo -->
-  <filter id="ah" x="-80%" y="-80%" width="260%" height="260%">
-    <feGaussianBlur stdDeviation="7"/>
-  </filter>
-  <!-- AO shadow -->
-  <filter id="ao" x="-60%" y="-40%" width="220%" height="180%">
-    <feGaussianBlur stdDeviation="3.5"/>
-  </filter>
-</defs>
-
-<!-- ══ 1. AMBIENT HALOS — blurred element-colour glow behind cups ══ -->
-<ellipse cx="12"  cy="104" rx="22" ry="32" fill="rgba(${r1},.10)" filter="url(#ah)"/>
-<ellipse cx="160" cy="104" rx="22" ry="32" fill="rgba(${r1},.10)" filter="url(#ah)"/>
-
-<!-- ══ 2. AMBIENT OCCLUSION — soft shadow where cup meets head ══ -->
-<!-- Left: at avatar left edge (x=28), ear level (y=104) -->
-<ellipse cx="28" cy="104" rx="6" ry="18" fill="rgba(0,0,0,.30)" filter="url(#ao)"/>
-<!-- Right: avatar right edge (x=144) -->
-<ellipse cx="144" cy="104" rx="6" ry="18" fill="rgba(0,0,0,.30)" filter="url(#ao)"/>
-
-<!-- ══ 3. HEADBAND ══ -->
-<!-- 3a. Outer drop-shadow stroke -->
-<path d="M 30 88 A 56 78 0 0 1 142 88"
-      stroke="#030303" stroke-width="11.5" stroke-linecap="round" fill="none"/>
-<!-- 3b. Main metal tube body -->
-<path d="M 30 88 A 56 78 0 0 1 142 88"
-      stroke="url(#hbA)" stroke-width="9" stroke-linecap="round" fill="none"/>
-<!-- 3c. Specular — top edge of tube (lighter, facing up toward light) -->
-<path d="M 32 85 A 54 75 0 0 1 140 85"
-      stroke="url(#hbS)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".9"/>
-<!-- 3d. Element accent stripe (runs along the middle of the band) -->
-<path d="M 38 82 A 48 68 0 0 1 134 82"
-      stroke="url(#hbE)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-<!-- 3e. Micro stitching at crown — top-centre of band -->
-<path d="M 54 36 C 70 20 102 20 118 36"
-      stroke="rgba(255,255,255,.05)" stroke-width=".7"
-      stroke-dasharray="2.2 4.8" stroke-linecap="round" fill="none"/>
-
-<!-- ══ 4. CUP SYSTEM: draw back→rim→front so front occludes rim ══ -->
-
-<!-- ── 4a. BACK FACES (cup housing inner-wall depth) ── -->
-<!-- Left back face: cx=21, same rx/ry as front but shifted 9px toward head -->
-<ellipse cx="21"  cy="104" rx="16" ry="26" fill="#090909" opacity=".9"/>
-<!-- Right back face: cx=151 -->
-<ellipse cx="151" cy="104" rx="16" ry="26" fill="#090909" opacity=".9"/>
-
-<!-- ── 4b. RIM FILLS (the 3D depth strip: outer half, front→back→front loop) ──
-     Path traces:  front-top → outer-arc front → front-bottom
-                   → back-bottom → outer-arc back (reverse) → back-top → close
-     LEFT : front outer arc is LEFT half (sweep=0 = CCW = goes left/outer)
-     RIGHT: front outer arc is RIGHT half (sweep=1 = CW  = goes right/outer) -->
-<!-- Left rim fill -->
-<path d="M 12 78 A 16 26 0 0 1 12 130 L 21 130 A 16 26 0 0 0 21 78 Z"
-      fill="url(#rimF)"/>
-<!-- Left rim element tint overlay -->
-<path d="M 12 78 A 16 26 0 0 1 12 130 L 21 130 A 16 26 0 0 0 21 78 Z"
-      fill="url(#rimEl)"/>
-<!-- Right rim fill -->
-<path d="M 160 78 A 16 26 0 0 0 160 130 L 151 130 A 16 26 0 0 1 151 78 Z"
-      fill="url(#rimF)"/>
-<!-- Right rim element tint overlay -->
-<path d="M 160 78 A 16 26 0 0 0 160 130 L 151 130 A 16 26 0 0 1 151 78 Z"
-      fill="url(#rimEl)"/>
-
-<!-- ── 4c. RIM EDGES — top/bottom bright lines showing housing shelf ── -->
-<!-- Left: top edge line (front-top to back-top) — brightly lit shelf -->
-<line x1="12" y1="78" x2="21" y2="78"
-      stroke="rgba(255,255,255,.28)" stroke-width=".9"/>
-<!-- Left: bottom edge — in shadow -->
-<line x1="12" y1="130" x2="21" y2="130"
-      stroke="rgba(255,255,255,.07)" stroke-width=".6"/>
-<!-- Right: top edge -->
-<line x1="160" y1="78" x2="151" y2="78"
-      stroke="rgba(255,255,255,.28)" stroke-width=".9"/>
-<!-- Right: bottom edge -->
-<line x1="160" y1="130" x2="151" y2="130"
-      stroke="rgba(255,255,255,.07)" stroke-width=".6"/>
-
-<!-- ── 4d. FRONT FACE SHELLS ── -->
-<!-- Left cup front face shadow -->
-<ellipse cx="13"  cy="105" rx="17" ry="27" fill="rgba(0,0,0,.45)"/>
-<!-- Left cup front face body -->
-<ellipse cx="12"  cy="104" rx="16" ry="26" fill="url(#cpL)"/>
-<!-- Left cup element rim stroke -->
-<ellipse cx="12"  cy="104" rx="16" ry="26"
-         fill="none" stroke="url(#rimEl)" stroke-width="1.7" opacity=".9"/>
-<!-- Left cup specular flare -->
-<ellipse cx="12"  cy="104" rx="16" ry="26" fill="url(#hiL)"/>
-
-<!-- Right cup front face shadow -->
-<ellipse cx="159" cy="105" rx="17" ry="27" fill="rgba(0,0,0,.45)"/>
-<!-- Right cup front face body -->
-<ellipse cx="160" cy="104" rx="16" ry="26" fill="url(#cpR)"/>
-<ellipse cx="160" cy="104" rx="16" ry="26"
-         fill="none" stroke="url(#rimEl)" stroke-width="1.7" opacity=".9"/>
-<ellipse cx="160" cy="104" rx="16" ry="26" fill="url(#hiR)"/>
-
-<!-- ── 4e. CUP FACE DETAILS ── -->
-<!-- EMBLEM RECESS — recessed oval logo area on cup face -->
-<!-- Left emblem -->
-<ellipse cx="12" cy="104" rx="8.5" ry="13" fill="url(#emb)"/>
-<ellipse cx="12" cy="104" rx="8.5" ry="13"
-         fill="none" stroke="rgba(${r1},.32)" stroke-width=".85"/>
-<!-- Left inner detail ring -->
-<ellipse cx="12" cy="104" rx="5"   ry="7.5"
-         fill="none" stroke="rgba(${r1},.18)" stroke-width=".65"/>
-<!-- Left centre accent dot -->
-<ellipse cx="12" cy="104" rx="2"   ry="2.8"
-         fill="rgba(${r2},.55)"/>
-<!-- Left specular micro-bead (upper inner corner — most lit area) -->
-<ellipse cx="16" cy="99"  rx="1.4" ry="1.6" fill="rgba(255,255,255,.25)"/>
-
-<!-- Right emblem -->
-<ellipse cx="160" cy="104" rx="8.5" ry="13" fill="url(#emb)"/>
-<ellipse cx="160" cy="104" rx="8.5" ry="13"
-         fill="none" stroke="rgba(${r1},.32)" stroke-width=".85"/>
-<ellipse cx="160" cy="104" rx="5"   ry="7.5"
-         fill="none" stroke="rgba(${r1},.18)" stroke-width=".65"/>
-<ellipse cx="160" cy="104" rx="2"   ry="2.8"  fill="rgba(${r2},.55)"/>
-<ellipse cx="156" cy="99"  rx="1.4" ry="1.6"  fill="rgba(255,255,255,.25)"/>
-
-<!-- ── 4f. LED ARCS — element-colour glow strip on cup outer edge ── -->
-<!-- Left LED: arc along outer portion of left cup face, mid-height
-     Points: at y=92 and y=116 on outer arc of ellipse(cx=12,rx=16,ry=26)
-     x = 12 − 16·√(1−((y−104)/26)²)
-     y=92: x = 12 − 16·√(1−144/676) = 12 − 16·(23.2/26) ≈ 12−14.3 = −2.3 ≈ −2
-     y=116: same x ≈ −2  (symmetric)
-     Arc: CCW sweep from (−2,92) around outer (−4,104) to (−2,116) -->
-<path d="M -2 92 A 16 26 0 0 1 -2 116"
-      stroke="${c1}" stroke-width="1.4" stroke-linecap="round" fill="none"
-      opacity=".9" filter="url(#lg)"/>
-<!-- Right LED: mirror — CW sweep on right side of cx=160 cup -->
-<path d="M 174 92 A 16 26 0 0 0 174 116"
-      stroke="${c1}" stroke-width="1.4" stroke-linecap="round" fill="none"
-      opacity=".9" filter="url(#lg)"/>
-
-<!-- ── 4g. MOUNT SCREW DETAILS ── -->
-<circle cx="24" cy="80"  r="1.2" fill="rgba(255,255,255,.12)"/>
-<circle cx="24" cy="128" r="1.2" fill="rgba(255,255,255,.12)"/>
-<circle cx="148" cy="80" r="1.2" fill="rgba(255,255,255,.12)"/>
-<circle cx="148" cy="128" r="1.2" fill="rgba(255,255,255,.12)"/>
-
-<!-- ══ 5. YOKE ARMS — drawn last so they appear over band endpoints ══ -->
-<!-- Left yoke: x=19–32, y=78–88  (centred at x=25.5, bridges cup top to band) -->
-<rect x="19" y="78" width="13" height="10" rx="2"
-      fill="url(#ykM)" stroke="rgba(255,255,255,.07)" stroke-width=".6"/>
-<!-- Adjustment notches on yoke face -->
-<line x1="20.5" y1="81" x2="30.5" y2="81" stroke="rgba(255,255,255,.11)" stroke-width=".5"/>
-<line x1="20.5" y1="83.5" x2="30.5" y2="83.5" stroke="rgba(255,255,255,.11)" stroke-width=".5"/>
-<line x1="20.5" y1="86" x2="30.5" y2="86" stroke="rgba(255,255,255,.11)" stroke-width=".5"/>
-<!-- Yoke outer-edge specular (thin bright line on left face of left yoke) -->
-<line x1="19.5" y1="78" x2="19.5" y2="88" stroke="rgba(255,255,255,.16)" stroke-width=".6"/>
-
-<!-- Right yoke: x=140–153, y=78–88 -->
-<rect x="140" y="78" width="13" height="10" rx="2"
-      fill="url(#ykM)" stroke="rgba(255,255,255,.07)" stroke-width=".6"/>
-<line x1="141.5" y1="81" x2="151.5" y2="81" stroke="rgba(255,255,255,.11)" stroke-width=".5"/>
-<line x1="141.5" y1="83.5" x2="151.5" y2="83.5" stroke="rgba(255,255,255,.11)" stroke-width=".5"/>
-<line x1="141.5" y1="86" x2="151.5" y2="86" stroke="rgba(255,255,255,.11)" stroke-width=".5"/>
-<line x1="152.5" y1="78" x2="152.5" y2="88" stroke="rgba(255,255,255,.16)" stroke-width=".6"/>
-
-</svg>`;
-}
 
 
 
@@ -1214,11 +908,9 @@ function buildHeadphonesSVG() {
 ══════════════════════════════════════ */
 function activateNowPlayingVfx() {
   const outer  = document.getElementById('pfpOuter');
-  const phones = document.getElementById('pfpHeadphones');
   const canvas = document.getElementById('pfpVfx');
   if (!outer || !canvas || canvas._stopVfx) return;
   outer.classList.add('playing');
-  phones?.classList.add('active');
   canvas.classList.add('active');
 
   const W = canvas.offsetWidth || 264, H = canvas.offsetHeight || 264;
@@ -1277,8 +969,8 @@ function activateNowPlayingVfx() {
   }
 
   function spawnAmbient() {
-    if (particles.length < 32) particles.push(new P(false));
-    if (orbs.length < 10)      orbs.push(new Orb());
+    if (particles.length < 48) particles.push(new P(false));
+    if (orbs.length < 14)      orbs.push(new Orb());
   }
   function spawnBurst(strong) {
     const n = strong ? 14 : 7; for (let i = 0; i < n; i++) particles.push(new P(true));
@@ -1288,19 +980,30 @@ function activateNowPlayingVfx() {
   let sigilA = 0;
   function drawSigil() {
     const r = 50, t = ELEMENT_THEMES[currentElement];
-    ctx.save(); ctx.globalAlpha = 0.065; ctx.translate(cx,cy); ctx.rotate(sigilA);
-    ctx.strokeStyle = t.headColors[0]; ctx.lineWidth = 0.8;
+    // Outer hex — slow rotation
+    ctx.save(); ctx.globalAlpha = 0.10; ctx.translate(cx,cy); ctx.rotate(sigilA);
+    ctx.strokeStyle = t.headColors[0]; ctx.lineWidth = 0.9;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) { const a = (Math.PI/3)*i; i===0 ? ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r) : ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); }
-    ctx.closePath(); ctx.stroke(); ctx.restore();
-    sigilA += 0.003;
+    ctx.closePath(); ctx.stroke();
+    // Inner hex counter-rotating
+    ctx.rotate(-sigilA * 2.4); ctx.globalAlpha = 0.06;
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) { const a = (Math.PI/3)*i + Math.PI/6; i===0 ? ctx.moveTo(Math.cos(a)*r*.6,Math.sin(a)*r*.6) : ctx.lineTo(Math.cos(a)*r*.6,Math.sin(a)*r*.6); }
+    ctx.closePath(); ctx.stroke();
+    ctx.restore();
+    sigilA += 0.004;
   }
 
+  // Autonomous ambient pulse — slow gentle rings even without music
+  let ambientPulse = 0;
   function beatCheck(ts) {
-    const bpm = 118 + Math.sin(ts*0.00008)*10, interval = (60/bpm)*1000;
-    if (ts - lastBeat > interval) {
+    // Slow ambient pulse (every ~2.2s) — always plays
+    ambientPulse += 0.016;
+    const ambInterval = 2200;
+    if (ts - lastBeat > ambInterval) {
       lastBeat = ts; beatPhase++;
-      const strong = beatPhase % 4 === 0;
+      const strong = beatPhase % 3 === 0;
       spawnBurst(strong);
       rings.push({ ts, strong });
     }
@@ -1332,7 +1035,7 @@ function activateNowPlayingVfx() {
   canvas._stopVfx = () => {
     cancelAnimationFrame(animId); ctx.clearRect(0,0,W,H);
     canvas._stopVfx = null; canvas.classList.remove('active');
-    phones?.classList.remove('active'); outer.classList.remove('playing');
+    outer.classList.remove('playing');
   };
 }
 
@@ -1616,9 +1319,6 @@ function pollLastFm() {
    INIT
 ══════════════════════════════════════ */
 (function init() {
-  // Build headphones immediately
-  buildHeadphonesSVG();
-
   // Restore cached element
   try {
     const saved = sessionStorage.getItem('aw_elem');
@@ -1631,6 +1331,9 @@ function pollLastFm() {
   setInterval(fetchEnka, 300000);
   pollLastFm();
   setInterval(pollLastFm, 15000);
+
+  // VFX always on — particles emanate from pfp regardless of music
+  activateNowPlayingVfx();
 })();
 
 /* ════════════════════════════════════════════════════════
