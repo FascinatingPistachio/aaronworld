@@ -950,8 +950,8 @@ function buildHeadphonesSVG() {
      Yoke: y=78→88  (10px height between cup top and band endpoint)
 
      Rim SVG paths (outer half-ellipse front, then back):
-       LEFT : M 12 78 A 16 26 0 0 0 12 130 L 21 130 A 16 26 0 0 1 21 78 Z
-       RIGHT: M 160 78 A 16 26 0 0 1 160 130 L 151 130 A 16 26 0 0 0 151 78 Z
+       LEFT : M 12 78 A 16 26 0 0 1 12 130 L 21 130 A 16 26 0 0 0 21 78 Z
+       RIGHT: M 160 78 A 16 26 0 0 0 160 130 L 151 130 A 16 26 0 0 1 151 78 Z
   ════════════════════════════════════════════════════════════ */
 
   el.innerHTML = `
@@ -1064,16 +1064,16 @@ function buildHeadphonesSVG() {
 
 <!-- ══ 3. HEADBAND ══ -->
 <!-- 3a. Outer drop-shadow stroke -->
-<path d="M 30 88 A 56 78 0 0 0 142 88"
+<path d="M 30 88 A 56 78 0 0 1 142 88"
       stroke="#030303" stroke-width="11.5" stroke-linecap="round" fill="none"/>
 <!-- 3b. Main metal tube body -->
-<path d="M 30 88 A 56 78 0 0 0 142 88"
+<path d="M 30 88 A 56 78 0 0 1 142 88"
       stroke="url(#hbA)" stroke-width="9" stroke-linecap="round" fill="none"/>
 <!-- 3c. Specular — top edge of tube (lighter, facing up toward light) -->
-<path d="M 32 85 A 54 75 0 0 0 140 85"
+<path d="M 32 85 A 54 75 0 0 1 140 85"
       stroke="url(#hbS)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".9"/>
 <!-- 3d. Element accent stripe (runs along the middle of the band) -->
-<path d="M 38 82 A 48 68 0 0 0 134 82"
+<path d="M 38 82 A 48 68 0 0 1 134 82"
       stroke="url(#hbE)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
 <!-- 3e. Micro stitching at crown — top-centre of band -->
 <path d="M 54 36 C 70 20 102 20 118 36"
@@ -1094,16 +1094,16 @@ function buildHeadphonesSVG() {
      LEFT : front outer arc is LEFT half (sweep=0 = CCW = goes left/outer)
      RIGHT: front outer arc is RIGHT half (sweep=1 = CW  = goes right/outer) -->
 <!-- Left rim fill -->
-<path d="M 12 78 A 16 26 0 0 0 12 130 L 21 130 A 16 26 0 0 1 21 78 Z"
+<path d="M 12 78 A 16 26 0 0 1 12 130 L 21 130 A 16 26 0 0 0 21 78 Z"
       fill="url(#rimF)"/>
 <!-- Left rim element tint overlay -->
-<path d="M 12 78 A 16 26 0 0 0 12 130 L 21 130 A 16 26 0 0 1 21 78 Z"
+<path d="M 12 78 A 16 26 0 0 1 12 130 L 21 130 A 16 26 0 0 0 21 78 Z"
       fill="url(#rimEl)"/>
 <!-- Right rim fill -->
-<path d="M 160 78 A 16 26 0 0 1 160 130 L 151 130 A 16 26 0 0 0 151 78 Z"
+<path d="M 160 78 A 16 26 0 0 0 160 130 L 151 130 A 16 26 0 0 1 151 78 Z"
       fill="url(#rimF)"/>
 <!-- Right rim element tint overlay -->
-<path d="M 160 78 A 16 26 0 0 1 160 130 L 151 130 A 16 26 0 0 0 151 78 Z"
+<path d="M 160 78 A 16 26 0 0 0 160 130 L 151 130 A 16 26 0 0 1 151 78 Z"
       fill="url(#rimEl)"/>
 
 <!-- ── 4c. RIM EDGES — top/bottom bright lines showing housing shelf ── -->
@@ -1170,11 +1170,11 @@ function buildHeadphonesSVG() {
      y=92: x = 12 − 16·√(1−144/676) = 12 − 16·(23.2/26) ≈ 12−14.3 = −2.3 ≈ −2
      y=116: same x ≈ −2  (symmetric)
      Arc: CCW sweep from (−2,92) around outer (−4,104) to (−2,116) -->
-<path d="M -2 92 A 16 26 0 0 0 -2 116"
+<path d="M -2 92 A 16 26 0 0 1 -2 116"
       stroke="${c1}" stroke-width="1.4" stroke-linecap="round" fill="none"
       opacity=".9" filter="url(#lg)"/>
 <!-- Right LED: mirror — CW sweep on right side of cx=160 cup -->
-<path d="M 174 92 A 16 26 0 0 1 174 116"
+<path d="M 174 92 A 16 26 0 0 0 174 116"
       stroke="${c1}" stroke-width="1.4" stroke-linecap="round" fill="none"
       opacity=".9" filter="url(#lg)"/>
 
