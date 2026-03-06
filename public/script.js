@@ -902,224 +902,226 @@ document.addEventListener('keydown', e => {
 function buildHeadphonesSVG() {
   const el = document.getElementById('pfpHeadphones');
   if (!el) return;
-  const t  = ELEMENT_THEMES[currentElement];
-  const c1 = t.headColors[0]; // bright accent
-  const c2 = t.headColors[1]; // highlight / specular
-  const c3 = t.headColors[2]; // mid/shadow
+  const t   = ELEMENT_THEMES[currentElement];
+  const c1  = t.headColors[0]; // primary accent
+  const c2  = t.headColors[1]; // bright highlight
+  const c3  = t.headColors[2]; // shadow/deep
 
   const hex2rgb = h => {
     const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-      h.replace(/^#([a-f\d])([a-f\d])([a-f\d])$/i,'#$1$1$2$2$3$3')
-    );
-    return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '200,200,200';
+      h.replace(/^#([a-f\d])([a-f\d])([a-f\d])$/i,'#$1$1$2$2$3$3'));
+    return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '180,180,180';
   };
   const rgb1 = hex2rgb(c1), rgb2 = hex2rgb(c2), rgb3 = hex2rgb(c3);
 
-  // Viewbox: 140 wide, 120 tall — tight, centred
-  // Headband arc from (22,66) to (118,66), peaks at y≈14
-  // Left cup  centred at (18, 88) — small offset so yoke attaches to top of cup
-  // Right cup centred at (122, 88)
-  // Cup face: rx=22 ry=24 — nearly circular, slight height > width gives
-  //   a subtle "facing you with a tiny tilt" read
+  // ── Coordinate map ──────────────────────────────────────────────────
+  // Container: 172 × 164 px, positioned top:-44px over the 104×104 pfp-outer.
+  // In viewBox(0 0 172 164):
+  //   pfp circle center  = (86, 96)   [44 + 52 = 96]
+  //   pfp radius         ≈ 52
+  //   pfp top edge       = y 44
+  //   pfp left/right     = x 34 / x 138
+  //   "ear" y-level      ≈ y 90  (slightly below center)
+  //
+  // Headband arc peaks above pfp-top (~y 10), descends to yoke attachment
+  // points at ~(30,86) left and ~(142,86) right.
+  //
+  // Cups show their OUTER FACE — the convex shell viewers see from front.
+  // Left  cup centered at  (9, 90),  rx 15 ry 22
+  // Right cup centered at (163, 90), rx 15 ry 22
+  // ─────────────────────────────────────────────────────────────────────
 
   el.innerHTML = `
-  <svg viewBox="0 0 140 118" fill="none" xmlns="http://www.w3.org/2000/svg"
-    style="width:100%;height:100%;overflow:visible;
-           filter:drop-shadow(0 0 7px rgba(${rgb1},.5)) drop-shadow(0 2px 16px rgba(${rgb3},.3))">
-    <defs>
-      <!-- Headband: dark metal -->
-      <linearGradient id="hband" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stop-color="#252525"/>
-        <stop offset="55%" stop-color="#1a1a1a"/>
-        <stop offset="100%" stop-color="#111"/>
-      </linearGradient>
-      <!-- Headband inner highlight -->
-      <linearGradient id="hbhi" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stop-color="rgba(255,255,255,.2)"/>
-        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-      </linearGradient>
-      <!-- Element accent stripe -->
-      <linearGradient id="hbacc" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%"   stop-color="${c3}" stop-opacity="0"/>
-        <stop offset="35%"  stop-color="${c1}" stop-opacity=".75"/>
-        <stop offset="50%"  stop-color="${c2}" stop-opacity=".9"/>
-        <stop offset="65%"  stop-color="${c1}" stop-opacity=".75"/>
-        <stop offset="100%" stop-color="${c3}" stop-opacity="0"/>
-      </linearGradient>
-      <!-- Cup body: dark matte with subtle radial sheen -->
-      <radialGradient id="cupbodyL" cx="38%" cy="34%" r="60%">
-        <stop offset="0%"   stop-color="#2d2d2d"/>
-        <stop offset="50%"  stop-color="#1c1c1c"/>
-        <stop offset="100%" stop-color="#0e0e0e"/>
-      </radialGradient>
-      <radialGradient id="cupbodyR" cx="62%" cy="34%" r="60%">
-        <stop offset="0%"   stop-color="#2d2d2d"/>
-        <stop offset="50%"  stop-color="#1c1c1c"/>
-        <stop offset="100%" stop-color="#0e0e0e"/>
-      </radialGradient>
-      <!-- Cup rim: thin element-colour ring -->
-      <linearGradient id="rimL" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%"   stop-color="${c2}" stop-opacity=".85"/>
-        <stop offset="100%" stop-color="${c3}" stop-opacity=".45"/>
-      </linearGradient>
-      <linearGradient id="rimR" x1="1" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="${c2}" stop-opacity=".85"/>
-        <stop offset="100%" stop-color="${c3}" stop-opacity=".45"/>
-      </linearGradient>
-      <!-- Ear cushion: soft plush inner oval -->
-      <radialGradient id="cushL" cx="44%" cy="38%" r="56%">
-        <stop offset="0%"   stop-color="#1f1f1f"/>
-        <stop offset="68%"  stop-color="#141414"/>
-        <stop offset="100%" stop-color="#0a0a0a"/>
-      </radialGradient>
-      <radialGradient id="cushR" cx="56%" cy="38%" r="56%">
-        <stop offset="0%"   stop-color="#1f1f1f"/>
-        <stop offset="68%"  stop-color="#141414"/>
-        <stop offset="100%" stop-color="#0a0a0a"/>
-      </radialGradient>
-      <!-- Driver membrane glow -->
-      <radialGradient id="drvL" cx="46%" cy="42%" r="52%">
-        <stop offset="0%"   stop-color="rgba(${rgb1},.22)"/>
-        <stop offset="40%"  stop-color="rgba(${rgb3},.09)"/>
-        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-      </radialGradient>
-      <radialGradient id="drvR" cx="54%" cy="42%" r="52%">
-        <stop offset="0%"   stop-color="rgba(${rgb1},.22)"/>
-        <stop offset="40%"  stop-color="rgba(${rgb3},.09)"/>
-        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
-      </radialGradient>
-      <!-- Cup top specular -->
-      <radialGradient id="hiL" cx="34%" cy="28%" r="44%">
-        <stop offset="0%"  stop-color="rgba(255,255,255,.13)"/>
-        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-      </radialGradient>
-      <radialGradient id="hiR" cx="66%" cy="28%" r="44%">
-        <stop offset="0%"  stop-color="rgba(255,255,255,.13)"/>
-        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-      </radialGradient>
-      <!-- Cushion element glow ring -->
-      <radialGradient id="glowL" cx="50%" cy="50%" r="50%">
-        <stop offset="58%"  stop-color="rgba(${rgb1},0)"/>
-        <stop offset="82%"  stop-color="rgba(${rgb1},.07)"/>
-        <stop offset="100%" stop-color="rgba(${rgb1},.2)"/>
-      </radialGradient>
-      <radialGradient id="glowR" cx="50%" cy="50%" r="50%">
-        <stop offset="58%"  stop-color="rgba(${rgb1},0)"/>
-        <stop offset="82%"  stop-color="rgba(${rgb1},.07)"/>
-        <stop offset="100%" stop-color="rgba(${rgb1},.2)"/>
-      </radialGradient>
-      <!-- LED glow filter -->
-      <filter id="led" x="-60%" y="-60%" width="220%" height="220%">
-        <feGaussianBlur stdDeviation="2.5" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <!-- Yoke gradient -->
-      <linearGradient id="yoke" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%"   stop-color="#1a1a1a"/>
-        <stop offset="50%"  stop-color="#2a2a2a"/>
-        <stop offset="100%" stop-color="#161616"/>
-      </linearGradient>
-    </defs>
+<svg viewBox="0 0 172 164" fill="none" xmlns="http://www.w3.org/2000/svg"
+  style="width:100%;height:100%;overflow:visible;display:block">
+  <defs>
+    <!-- Headband metal tube -->
+    <linearGradient id="hb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#2e2e2e"/>
+      <stop offset="40%"  stop-color="#1c1c1c"/>
+      <stop offset="100%" stop-color="#0e0e0e"/>
+    </linearGradient>
+    <!-- Band specular -->
+    <linearGradient id="hbSpec" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(255,255,255,.22)"/>
+      <stop offset="60%"  stop-color="rgba(255,255,255,.04)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- Band element stripe -->
+    <linearGradient id="hbEl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="${c3}" stop-opacity="0"/>
+      <stop offset="32%"  stop-color="${c1}" stop-opacity=".7"/>
+      <stop offset="50%"  stop-color="${c2}" stop-opacity=".95"/>
+      <stop offset="68%"  stop-color="${c1}" stop-opacity=".7"/>
+      <stop offset="100%" stop-color="${c3}" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Yoke metal -->
+    <linearGradient id="yoke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#1a1a1a"/>
+      <stop offset="55%"  stop-color="#282828"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <!-- Cup outer shell — convex face lit from above -->
+    <!-- Left cup: specular at upper-right of face -->
+    <radialGradient id="faceL" cx="62%" cy="28%" r="65%">
+      <stop offset="0%"   stop-color="#303030"/>
+      <stop offset="38%"  stop-color="#202020"/>
+      <stop offset="75%"  stop-color="#151515"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <!-- Right cup: specular at upper-left of face -->
+    <radialGradient id="faceR" cx="38%" cy="28%" r="65%">
+      <stop offset="0%"   stop-color="#303030"/>
+      <stop offset="38%"  stop-color="#202020"/>
+      <stop offset="75%"  stop-color="#151515"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <!-- Cup element rim -->
+    <linearGradient id="rimL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="${c2}" stop-opacity=".9"/>
+      <stop offset="45%"  stop-color="${c1}" stop-opacity=".75"/>
+      <stop offset="100%" stop-color="${c3}" stop-opacity=".4"/>
+    </linearGradient>
+    <linearGradient id="rimR" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="${c2}" stop-opacity=".9"/>
+      <stop offset="45%"  stop-color="${c1}" stop-opacity=".75"/>
+      <stop offset="100%" stop-color="${c3}" stop-opacity=".4"/>
+    </linearGradient>
+    <!-- Central emblem on cup face -->
+    <radialGradient id="embL" cx="50%" cy="42%" r="55%">
+      <stop offset="0%"   stop-color="#1e1e1e"/>
+      <stop offset="65%"  stop-color="#121212"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <radialGradient id="embR" cx="50%" cy="42%" r="55%">
+      <stop offset="0%"   stop-color="#1e1e1e"/>
+      <stop offset="65%"  stop-color="#121212"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <!-- Element ring on emblem -->
+    <linearGradient id="elRingL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${c1}" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="${c3}" stop-opacity=".2"/>
+    </linearGradient>
+    <linearGradient id="elRingR" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${c1}" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="${c3}" stop-opacity=".2"/>
+    </linearGradient>
+    <!-- Specular flare on cup -->
+    <radialGradient id="hiL" cx="65%" cy="26%" r="38%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.16)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <radialGradient id="hiR" cx="35%" cy="26%" r="38%">
+      <stop offset="0%"  stop-color="rgba(255,255,255,.16)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <!-- LED glow filter -->
+    <filter id="ledglow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+  </defs>
 
-    <!-- ══ AMBIENT GLOW BEHIND CUPS ══ -->
-    <ellipse cx="18"  cy="90" rx="26" ry="28" fill="rgba(${rgb1},.06)" filter="url(#led)"/>
-    <ellipse cx="122" cy="90" rx="26" ry="28" fill="rgba(${rgb1},.06)" filter="url(#led)"/>
+  <!-- ══ AMBIENT HALO (behind everything) ══ -->
+  <ellipse cx="9"   cy="90" rx="20" ry="26" fill="rgba(${rgb1},.07)" filter="url(#softglow)"/>
+  <ellipse cx="163" cy="90" rx="20" ry="26" fill="rgba(${rgb1},.07)" filter="url(#softglow)"/>
 
-    <!-- ══ HEADBAND ══ -->
-    <!-- Shadow depth arc -->
-    <path d="M 24 68 C 24 16 116 16 116 68"
-          stroke="#060606" stroke-width="10" stroke-linecap="round" fill="none"/>
-    <!-- Main band body -->
-    <path d="M 24 68 C 24 16 116 16 116 68"
-          stroke="url(#hband)" stroke-width="8" stroke-linecap="round" fill="none"/>
-    <!-- Inner highlight -->
-    <path d="M 26 66 C 26 21 114 21 114 66"
-          stroke="url(#hbhi)" stroke-width="3" stroke-linecap="round" fill="none" opacity=".7"/>
-    <!-- Element accent stripe -->
-    <path d="M 30 63 C 30 26 110 26 110 63"
-          stroke="url(#hbacc)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-    <!-- Top stitching -->
-    <path d="M 46 36 C 62 22 78 20 94 36"
-          stroke="rgba(255,255,255,.05)" stroke-width=".8"
-          stroke-dasharray="2.5 4.5" stroke-linecap="round" fill="none"/>
+  <!-- ══ HEADBAND ══ -->
+  <!-- outer shadow -->
+  <path d="M 30 88 C 30 8 142 8 142 88"
+        stroke="#050505" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- body -->
+  <path d="M 30 88 C 30 8 142 8 142 88"
+        stroke="url(#hb)" stroke-width="8.5" stroke-linecap="round" fill="none"/>
+  <!-- top specular -->
+  <path d="M 33 85 C 33 14 139 14 139 85"
+        stroke="url(#hbSpec)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".8"/>
+  <!-- element accent stripe -->
+  <path d="M 38 80 C 38 22 134 22 134 80"
+        stroke="url(#hbEl)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+  <!-- top-centre stitching -->
+  <path d="M 54 36 C 70 20 102 20 118 36"
+        stroke="rgba(255,255,255,.045)" stroke-width=".8"
+        stroke-dasharray="2.5 5" stroke-linecap="round" fill="none"/>
 
-    <!-- ══ YOKE ARMS ══ -->
-    <!-- Left yoke: connects band end (24,68) to cup top (18,66) -->
-    <rect x="14" y="62" width="10" height="22" rx="3.5"
-          fill="url(#yoke)" stroke="rgba(255,255,255,.05)" stroke-width=".6"/>
-    <!-- Adjustment notches -->
-    <line x1="15" y1="68" x2="23" y2="68" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
-    <line x1="15" y1="72" x2="23" y2="72" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
-    <line x1="15" y1="76" x2="23" y2="76" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
-    <!-- Right yoke -->
-    <rect x="116" y="62" width="10" height="22" rx="3.5"
-          fill="url(#yoke)" stroke="rgba(255,255,255,.05)" stroke-width=".6"/>
-    <line x1="117" y1="68" x2="125" y2="68" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
-    <line x1="117" y1="72" x2="125" y2="72" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
-    <line x1="117" y1="76" x2="125" y2="76" stroke="rgba(255,255,255,.08)" stroke-width=".5"/>
+  <!-- ══ YOKE ARMS ══ -->
+  <!-- Left yoke: rectangular slider connecting band to cup top -->
+  <!-- Band endpoint ≈ (30,88); cup inner-top ≈ (18,70) -->
+  <rect x="16" y="70" width="16" height="20" rx="3"
+        fill="url(#yoke)" stroke="rgba(255,255,255,.06)" stroke-width=".6"/>
+  <!-- notches -->
+  <line x1="17" y1="76" x2="31" y2="76" stroke="rgba(255,255,255,.09)" stroke-width=".5"/>
+  <line x1="17" y1="80" x2="31" y2="80" stroke="rgba(255,255,255,.09)" stroke-width=".5"/>
+  <line x1="17" y1="84" x2="31" y2="84" stroke="rgba(255,255,255,.09)" stroke-width=".5"/>
+  <!-- Right yoke -->
+  <rect x="140" y="70" width="16" height="20" rx="3"
+        fill="url(#yoke)" stroke="rgba(255,255,255,.06)" stroke-width=".6"/>
+  <line x1="141" y1="76" x2="155" y2="76" stroke="rgba(255,255,255,.09)" stroke-width=".5"/>
+  <line x1="141" y1="80" x2="155" y2="80" stroke="rgba(255,255,255,.09)" stroke-width=".5"/>
+  <line x1="141" y1="84" x2="155" y2="84" stroke="rgba(255,255,255,.09)" stroke-width=".5"/>
 
-    <!-- ══ LEFT EAR CUP (faces viewer, centred at 18,90) ══ -->
+  <!-- ══ LEFT EAR CUP — outer face ══ -->
+  <!-- Cups sit at the SIDES of the avatar head; we see their convex outer shell. -->
+  <!-- Left cup center: (9, 90). Slight clockwise rotation (-8°) for perspective. -->
+  <g transform="rotate(-8, 9, 90)">
     <!-- Drop shadow -->
-    <ellipse cx="19" cy="92" rx="24" ry="26" fill="rgba(0,0,0,.5)"/>
-    <!-- Outer shell -->
-    <ellipse cx="18" cy="90" rx="23" ry="25" fill="url(#cupbodyL)"/>
-    <!-- Rim element colour -->
-    <ellipse cx="18" cy="90" rx="23" ry="25"
-             fill="none" stroke="url(#rimL)" stroke-width="1.6" opacity=".8"/>
-    <!-- Specular highlight -->
-    <ellipse cx="18" cy="90" rx="23" ry="25" fill="url(#hiL)"/>
-    <!-- Ear cushion (inset oval — faces viewer squarely) -->
-    <ellipse cx="18" cy="90" rx="17" ry="19" fill="url(#cushL)"/>
-    <!-- Cushion element glow -->
-    <ellipse cx="18" cy="90" rx="17" ry="19" fill="url(#glowL)"/>
-    <!-- Cushion stitching ring -->
-    <ellipse cx="18" cy="90" rx="17" ry="19"
-             fill="none" stroke="rgba(255,255,255,.045)"
-             stroke-width=".9" stroke-dasharray="2 3.5"/>
-    <!-- Driver membrane + concentric rings -->
-    <ellipse cx="18" cy="90" rx="11" ry="12" fill="url(#drvL)"/>
-    <ellipse cx="18" cy="90" rx="11" ry="12"
-             fill="none" stroke="rgba(${rgb1},.14)" stroke-width=".7"/>
-    <ellipse cx="18" cy="90" rx="7" ry="7.5"
-             fill="none" stroke="rgba(${rgb1},.1)"  stroke-width=".6"/>
-    <ellipse cx="18" cy="90" rx="3.5" ry="3.8"
-             fill="none" stroke="rgba(${rgb1},.16)" stroke-width=".7"/>
-    <!-- Central driver dome -->
-    <ellipse cx="18" cy="90" rx="2" ry="2.2" fill="rgba(${rgb2},.6)"/>
-    <!-- LED accent — inner-edge only, thin and elegant -->
-    <path d="M 0 83 Q -1 90 0 97"
-          stroke="url(#rimL)" stroke-width="1.8" stroke-linecap="round"
-          fill="none" filter="url(#led)" opacity=".8"/>
-    <!-- Screw details -->
-    <circle cx="30" cy="78" r="1.2" fill="rgba(255,255,255,.07)"/>
-    <circle cx="30" cy="102" r="1.2" fill="rgba(255,255,255,.07)"/>
+    <ellipse cx="10" cy="92" rx="17" ry="24" fill="rgba(0,0,0,.55)"/>
+    <!-- Outer shell face -->
+    <ellipse cx="9"  cy="90" rx="16" ry="23" fill="url(#faceL)"/>
+    <!-- Accent rim -->
+    <ellipse cx="9"  cy="90" rx="16" ry="23"
+             fill="none" stroke="url(#rimL)" stroke-width="1.8" opacity=".9"/>
+    <!-- Specular flare -->
+    <ellipse cx="9"  cy="90" rx="16" ry="23" fill="url(#hiL)"/>
+    <!-- Emblem circle (recessed logo area) -->
+    <ellipse cx="9"  cy="90" rx="9"  ry="11" fill="url(#embL)"/>
+    <ellipse cx="9"  cy="90" rx="9"  ry="11"
+             fill="none" stroke="url(#elRingL)" stroke-width=".9"/>
+    <!-- Inner emblem accent dot -->
+    <ellipse cx="9"  cy="90" rx="3"  ry="3.5" fill="rgba(${rgb1},.3)"/>
+    <!-- Micro specular bead on emblem -->
+    <ellipse cx="10.5" cy="87" rx="1.2" ry="1.4" fill="rgba(255,255,255,.18)"/>
+    <!-- Bottom mesh — very subtle fabric grille hint -->
+    <line x1="4"  y1="100" x2="14" y2="100" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+    <line x1="3"  y1="103" x2="15" y2="103" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+    <line x1="4"  y1="106" x2="14" y2="106" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+    <!-- LED arc on outer edge -->
+    <path d="M -5 80 Q -8 90 -5 100"
+          stroke="${c1}" stroke-width="1.6" stroke-linecap="round" fill="none"
+          opacity=".8" filter="url(#ledglow)"/>
+    <!-- Screw details at yoke attachment corners -->
+    <circle cx="20" cy="71" r="1.1" fill="rgba(255,255,255,.09)"/>
+    <circle cx="20" cy="109" r="1.1" fill="rgba(255,255,255,.09)"/>
+  </g>
 
-    <!-- ══ RIGHT EAR CUP (mirror, centred at 122,90) ══ -->
-    <ellipse cx="121" cy="92" rx="24" ry="26" fill="rgba(0,0,0,.5)"/>
-    <ellipse cx="122" cy="90" rx="23" ry="25" fill="url(#cupbodyR)"/>
-    <ellipse cx="122" cy="90" rx="23" ry="25"
-             fill="none" stroke="url(#rimR)" stroke-width="1.6" opacity=".8"/>
-    <ellipse cx="122" cy="90" rx="23" ry="25" fill="url(#hiR)"/>
-    <ellipse cx="122" cy="90" rx="17" ry="19" fill="url(#cushR)"/>
-    <ellipse cx="122" cy="90" rx="17" ry="19" fill="url(#glowR)"/>
-    <ellipse cx="122" cy="90" rx="17" ry="19"
-             fill="none" stroke="rgba(255,255,255,.045)"
-             stroke-width=".9" stroke-dasharray="2 3.5"/>
-    <ellipse cx="122" cy="90" rx="11" ry="12" fill="url(#drvR)"/>
-    <ellipse cx="122" cy="90" rx="11" ry="12"
-             fill="none" stroke="rgba(${rgb1},.14)" stroke-width=".7"/>
-    <ellipse cx="122" cy="90" rx="7" ry="7.5"
-             fill="none" stroke="rgba(${rgb1},.1)"  stroke-width=".6"/>
-    <ellipse cx="122" cy="90" rx="3.5" ry="3.8"
-             fill="none" stroke="rgba(${rgb1},.16)" stroke-width=".7"/>
-    <ellipse cx="122" cy="90" rx="2" ry="2.2" fill="rgba(${rgb2},.6)"/>
-    <path d="M 140 83 Q 141 90 140 97"
-          stroke="url(#rimR)" stroke-width="1.8" stroke-linecap="round"
-          fill="none" filter="url(#led)" opacity=".8"/>
-    <circle cx="110" cy="78" r="1.2" fill="rgba(255,255,255,.07)"/>
-    <circle cx="110" cy="102" r="1.2" fill="rgba(255,255,255,.07)"/>
-  </svg>`;
+  <!-- ══ RIGHT EAR CUP — outer face (mirror) ══ -->
+  <g transform="rotate(8, 163, 90)">
+    <ellipse cx="162" cy="92" rx="17" ry="24" fill="rgba(0,0,0,.55)"/>
+    <ellipse cx="163" cy="90" rx="16" ry="23" fill="url(#faceR)"/>
+    <ellipse cx="163" cy="90" rx="16" ry="23"
+             fill="none" stroke="url(#rimR)" stroke-width="1.8" opacity=".9"/>
+    <ellipse cx="163" cy="90" rx="16" ry="23" fill="url(#hiR)"/>
+    <ellipse cx="163" cy="90" rx="9"  ry="11" fill="url(#embR)"/>
+    <ellipse cx="163" cy="90" rx="9"  ry="11"
+             fill="none" stroke="url(#elRingR)" stroke-width=".9"/>
+    <ellipse cx="163" cy="90" rx="3"  ry="3.5" fill="rgba(${rgb1},.3)"/>
+    <ellipse cx="161.5" cy="87" rx="1.2" ry="1.4" fill="rgba(255,255,255,.18)"/>
+    <line x1="158" y1="100" x2="168" y2="100" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+    <line x1="157" y1="103" x2="169" y2="103" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+    <line x1="158" y1="106" x2="168" y2="106" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
+    <path d="M 177 80 Q 180 90 177 100"
+          stroke="${c1}" stroke-width="1.6" stroke-linecap="round" fill="none"
+          opacity=".8" filter="url(#ledglow)"/>
+    <circle cx="152" cy="71" r="1.1" fill="rgba(255,255,255,.09)"/>
+    <circle cx="152" cy="109" r="1.1" fill="rgba(255,255,255,.09)"/>
+  </g>
+</svg>`;
 }
+
 
 
 /* ══════════════════════════════════════

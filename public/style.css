@@ -479,7 +479,7 @@ html[data-element] .gi-head-line{background:linear-gradient(90deg,var(--a2),tran
 ══════════════════════════════════════ */
 .pfp-outer{
   position:relative;
-  width:104px;height:104px;
+  width:116px;height:116px;
   margin:0 auto 4px;
 }
 
@@ -502,7 +502,7 @@ html[data-element] .pfp-ring{border-color:color-mix(in srgb,var(--a2) 42%,transp
 .pfp-outer.playing .pfp-img{box-shadow:0 0 30px var(--glow),0 0 60px var(--glow2),0 0 0 3px color-mix(in srgb,var(--a2) 55%,transparent)}
 
 .pfp-img{
-  width:104px;height:104px;
+  width:116px;height:116px;
   border-radius:50%;
   object-fit:cover;
   border:2px solid rgba(120,100,220,.6);
@@ -537,33 +537,37 @@ html[data-element] .pfp-img{
 html[data-element] .pfp-elem-badge{border-color:var(--a2)}
 .pfp-elem-badge img{width:17px;height:17px}
 
-/* Headphones */
+/* ── Headphones ────────────────────────────────────── */
+/* SVG viewBox 172×164 maps exactly to these dims.
+   top:-50px → band peaks comfortably above the avatar head. */
 #pfpHeadphones{
   position:absolute;
-  top:-44px;left:50%;
-  transform:translateX(-50%) scale(0) translateY(6px);
-  width:172px;height:164px;
-  z-index:5;pointer-events:none;opacity:0;
-  transition:transform .65s cubic-bezier(.34,1.38,.64,1), opacity .5s cubic-bezier(.4,0,.2,1);
+  top:-50px; left:50%;
+  transform:translateX(-50%) scale(0) translateY(8px);
+  width:172px; height:164px;
+  z-index:5; pointer-events:none; opacity:0;
+  transition:
+    transform .7s cubic-bezier(.34,1.4,.64,1),
+    opacity   .5s cubic-bezier(.4,0,.2,1);
   will-change:transform,opacity;
 }
 #pfpHeadphones.active{
   transform:translateX(-50%) scale(1) translateY(0);
   opacity:1;
-  animation:hpFloat 5s ease-in-out 0.65s infinite;
+  animation:hpFloat 5.5s ease-in-out .7s infinite;
 }
 @keyframes hpFloat{
-  0%,100%{ transform:translateX(-50%) translateY(0px) scale(1); }
-  30%    { transform:translateX(-50%) translateY(-4px) scale(1.008); }
-  65%    { transform:translateX(-50%) translateY(-2px) scale(1.004); }
+  0%,100%{ transform:translateX(-50%) translateY(0)   scale(1); }
+  35%    { transform:translateX(-50%) translateY(-5px) scale(1.006); }
+  70%    { transform:translateX(-50%) translateY(-2px) scale(1.002); }
 }
-/* Headphone LED pulse — the SVG LEDs breathe with glow */
+/* Headphone LED pulse — glow breathes in time with element */
 #pfpHeadphones.active svg{
-  animation:hpLedBreath 2.8s ease-in-out infinite;
+  animation: hpLedBreath 2.8s ease-in-out infinite;
 }
 @keyframes hpLedBreath{
-  0%,100%{ filter:drop-shadow(0 0 6px rgba(var(--a-rgb-approx,168,204,40),0.45)) drop-shadow(0 2px 14px rgba(var(--a-rgb-approx,168,204,40),0.25)); }
-  50%    { filter:drop-shadow(0 0 14px rgba(var(--a-rgb-approx,168,204,40),0.8))  drop-shadow(0 2px 32px rgba(var(--a-rgb-approx,168,204,40),0.5)); }
+  0%,100%{ filter: drop-shadow(0 0 5px var(--glow2)) drop-shadow(0 0 12px var(--glow)); }
+  50%    { filter: drop-shadow(0 0 12px var(--glow))  drop-shadow(0 0 28px var(--glow2)); }
 }
 
 /* Profile text */
