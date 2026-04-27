@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AaronWorld — Where Justice Flows Like Water</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-navy: #020b18;
+            --ocean-blue: #0a4a8a;
+            --teal-core: #00c8f0;
+            --teal-glow: #00ffee;
+            --gold: #c9a227;
+            --silver: #c0d8e8;
+            --dark-teal: #003d5c;
+            --accent-glow: 0 0 20px rgba(0, 200, 240, 0.6);
+            --accent-glow-intense: 0 0 40px rgba(0, 255, 238, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, var(--deep-navy) 0%, #051530 50%, var(--ocean-blue) 100%);
+            color: var(--silver);
+            line-height: 1.8;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+
+        /* ===== LOADER ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--deep-navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-seal {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .loader-seal svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px var(--teal-glow));
+        }
+
+        .loader-droplet {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            animation: dropletFall 2s ease-in infinite;
+            filter: drop-shadow(0 0 10px var(--teal-glow));
+        }
+
+        @keyframes dropletFall {
+            0% {
+                transform: translateY(-100px) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .loader-text {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 24px;
+            color: var(--teal-glow);
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px var(--teal-core);
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 3px;
+            background: rgba(0, 200, 240, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--teal-core), var(--teal-glow));
+            width: 0%;
+            animation: progressFill 2.5s ease-out forwards;
+            box-shadow: var(--accent-glow-intense);
+        }
+
+        @keyframes progressFill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* ===== HYDRO METER (Sidebar) ===== */
+        .hydro-meter {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 200px;
+            background: rgba(0, 200, 240, 0.1);
+            border-radius: 2px;
+            z-index: 100;
+            border: 1px solid var(--teal-core);
+        }
+
+        .hydro-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(180deg, var(--teal-core), var(--teal-glow));
+            border-radius: 2px;
+            transition: height 0.1s ease-out;
+            box-shadow: var(--accent-glow);
+        }
+
+        /* ===== CUSTOM CURSOR ===== */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: screen;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: var(--accent-glow-intense);
+        }
+
+        .cursor-ring {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--teal-core);
+            border-radius: 50%;
+            position: absolute;
+            animation: ringPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes ringPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.3;
+            }
+        }
+
+        /* ===== AUDIO TOGGLE ===== */
+        .audio-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 200, 240, 0.15);
+            border: 2px solid var(--teal-core);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 200;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 200, 240, 0.3);
+        }
+
+        .audio-toggle:hover {
+            background: rgba(0, 200, 240, 0.3);
+            box-shadow: var(--accent-glow);
+            transform: scale(1.1);
+        }
+
+        .audio-toggle.muted {
+            opacity: 0.5;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 50px;
+            z-index: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(2, 11, 24, 0.8), transparent);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--teal-core), var(--teal-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(0, 200, 240, 0.5);
+            filter: drop-shadow(0 0 10px rgba(0, 255, 238, 0.3));
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+        }
+
+        nav a {
+            font-family: 'Cinzel', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--silver);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--teal-core), var(--teal-glow));
+            transition: width 0.3s ease;
+            box-shadow: var(--accent-glow);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            position: relative;
+            padding-top: 100px;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--teal-core), var(--teal-glow), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+            text-shadow: 0 0 40px rgba(0, 200, 240, 0.4);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 238, 0.3));
+        }
+
+        .section-subtitle {
+            font-family: 'Cinzel', sans-serif;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--teal-glow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* ===== HERO SECTION ===== */
+        #hero {
+            position: relative;
+            min-height: 120vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(2, 11, 24, 0.5), rgba(10, 74, 138, 0.3));
+        }
+
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 96px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--teal-glow), var(--teal-core), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            text-shadow: 0 0 60px rgba(0, 255, 238, 0.5);
+            filter: drop-shadow(0 0 30px rgba(0, 200, 240, 0.4));
+            line-height: 1.1;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 30px rgba(0, 200, 240, 0.4));
+            }
+            50% {
+                filter: drop-shadow(0 0 50px rgba(0, 255, 238, 0.6));
+            }
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-style: italic;
+            color: var(--teal-glow);
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(0, 200, 240, 0.3);
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--teal-core), var(--teal-glow));
+            color: var(--deep-navy);
+            text-decoration: none;
+            font-family: 'Cinzel', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 200, 240, 0.5);
+            cursor: pointer;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(0, 255, 238, 0.8);
+            background: linear-gradient(135deg, var(--teal-glow), var(--teal-core));
+        }
+
+        /* ===== RIPPLE CANVAS ===== */
+        #ripple-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* ===== PARTICLES CANVAS ===== */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ===== ABOUT SECTION ===== */
+        #about {
+            background: linear-gradient(180deg, rgba(2, 11, 24, 0.3), rgba(10, 74, 138, 0.2));
+        }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .about-text {
+            font-size: 18px;
+            line-height: 2;
+            color: var(--silver);
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .about-text strong {
+            color: var(--teal-glow);
+        }
+
+        .about-portrait {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(0, 200, 240, 0.1), rgba(0, 255, 238, 0.05));
+            border: 2px solid var(--teal-core);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 200, 240, 0.3), inset 0 0 40px rgba(0, 200, 240, 0.1);
+            animation: portraitGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes portraitGlow {
+            0%, 100% {
+                box-shadow: 0 0 40px rgba(0, 200, 240, 0.3), inset 0 0 40px rgba(0, 200, 240, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 60px rgba(0, 255, 238, 0.5), inset 0 0 60px rgba(0, 255, 238, 0.2);
+            }
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        #features {
+            background: linear-gradient(180deg, rgba(10, 74, 138, 0.2), rgba(2, 11, 24, 0.3));
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(0, 200, 240, 0.08), rgba(0, 255, 238, 0.04));
+            border: 1px solid var(--teal-core);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 238, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            background: linear-gradient(135deg, rgba(0, 200, 240, 0.15), rgba(0, 255, 238, 0.1));
+            border-color: var(--teal-glow);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 200, 240, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-family: 'Cinzel', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--teal-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .feature-desc {
+            font-size: 16px;
+            color: var(--silver);
+            line-height: 1.6;
+        }
+
+        /* ===== PORTFOLIO SECTION ===== */
+        #portfolio {
+            background: linear-gradient(180deg, rgba(2, 11, 24, 0.3), rgba(10, 74, 138, 0.2));
+        }
+
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .archive-item {
+            background: linear-gradient(135deg, rgba(0, 200, 240, 0.08), rgba(0, 255, 238, 0.04));
+            border: 1px solid var(--teal-core);
+            border-radius: 10px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .archive-item:hover {
+            background: linear-gradient(135deg, rgba(0, 200, 240, 0.15), rgba(0, 255, 238, 0.1));
+            border-color: var(--teal-glow);
+            transform: translateX(10px);
+            box-shadow: 0 20px 40px rgba(0, 200, 240, 0.3);
+        }
+
+        .archive-item:nth-child(2n) {
+            margin-top: 40px;
+        }
+
+        .archive-tag {
+            display: inline-block;
+            font-family: 'Cinzel', sans-serif;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 15px;
+            padding: 5px 15px;
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+        }
+
+        .archive-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--teal-glow);
+        }
+
+        .archive-desc {
+            font-size: 16px;
+            color: var(--silver);
+            line-height: 1.6;
+        }
+
+        /* ===== CONTACT SECTION ===== */
+        #contact {
+            background: linear-gradient(180deg, rgba(10, 74, 138, 0.2), rgba(2, 11, 24, 0.5));
+            flex-direction: column;
+        }
+
+        .contact-content {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .contact-text {
+            font-size: 18px;
+            margin-bottom: 50px;
+            line-height: 1.8;
+            color: var(--silver);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 200, 240, 0.1);
+            border: 2px solid var(--teal-core);
+            border-radius: 50%;
+            font-size: 24px;
+            text-decoration: none;
+            color: var(--teal-glow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-link:hover {
+            background: rgba(0, 200, 240, 0.3);
+            border-color: var(--teal-glow);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 200, 240, 0.5);
+        }
+
+        .seal-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            filter: drop-shadow(0 0 30px rgba(0, 200, 240, 0.4));
+            animation: sealRotate 20s linear infinite;
+        }
+
+        @keyframes sealRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: rgba(2, 11, 24, 0.8);
+            padding: 30px;
+            text-align: center;
+            color: var(--silver);
+            font-size: 14px;
+            border-top: 1px solid var(--teal-core);
+        }
+
+        footer a {
+            color: var(--teal-glow);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 10px var(--teal-core);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                padding: 20px 30px;
+            }
+
+            nav {
+                gap: 20px;
+            }
+
+            nav a {
+                font-size: 12px;
+            }
+
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 40px;
+            }
+
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .archive-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .archive-item:nth-child(2n) {
+                margin-top: 0;
+            }
+
+            section {
+                padding: 40px 20px;
+            }
+
+            .hydro-meter {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="loader-seal">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="url(#sealGradient)" stroke-width="2" opacity="0.8"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="url(#sealGradient)" stroke-width="1" opacity="0.5"/>
+                <path d="M 50 20 Q 70 35 70 50 Q 70 65 50 80 Q 30 65 30 50 Q 30 35 50 20" fill="none" stroke="url(#sealGradient)" stroke-width="2"/>
+                <defs>
+                    <linearGradient id="sealGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00c8f0;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00ffee;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div class="loader-droplet" style="left: 50%; top: 10%; animation-delay: 0s;"></div>
+            <div class="loader-droplet" style="left: 30%; top: 30%; animation-delay: 0.3s;"></div>
+            <div class="loader-droplet" style="left: 70%; top: 30%; animation-delay: 0.6s;"></div>
+            <div class="loader-droplet" style="left: 20%; top: 50%; animation-delay: 0.9s;"></div>
+            <div class="loader-droplet" style="left: 80%; top: 50%; animation-delay: 1.2s;"></div>
+        </div>
+        <div class="loader-text">AARONWORLD</div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor" id="cursor">
+        <div class="cursor-dot"></div>
+        <div class="cursor-ring"></div>
+    </div>
+
+    <!-- HYDRO METER -->
+    <div class="hydro-meter">
+        <div class="hydro-fill" id="hydro-fill"></div>
+    </div>
+
+    <!-- AUDIO TOGGLE -->
+    <button class="audio-toggle" id="audio-toggle" title="Toggle Music">🎵</button>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">⚖ AARONWORLD</div>
+        <nav>
+            <a href="#hero">Home</a>
+            <a href="#about">About</a>
+            <a href="#features">Realm</a>
+            <a href="#portfolio">Archive</a>
+            <a href="#contact">Covenant</a>
+        </nav>
+    </header>
+
+    <!-- CANVASES -->
+    <canvas id="hero-canvas"></canvas>
+    <canvas id="ripple-canvas"></canvas>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- HERO SECTION -->
+        <section id="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">AARONWORLD</h1>
+                <p class="hero-subtitle">"Where Justice Flows Like Water, and Every Tide Tells a Story"</p>
+                <a href="#about" class="hero-cta">Explore the Depths</a>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about">
+            <div class="about-container">
+                <div class="about-text">
+                    <h2 class="section-subtitle">The Chronicler</h2>
+                    <p>Welcome to <strong>AaronWorld</strong>, a sanctuary where code flows like water and creativity knows no bounds. Inspired by the wisdom of <strong>Neuvillette</strong> and the ethereal beauty of <strong>Fontaine</strong>, this realm exists to chronicle the journey of a creator navigating the vast ocean of possibilities.</p>
+                    <p>Here, every project tells a story. Every line of code carries intention. Every design choice reflects a commitment to excellence and artistry.</p>
+                    <p>Like the Oratrice Mécanique d'Cardinale, this space seeks truth through creation, balance through design, and harmony through innovation.</p>
+                </div>
+                <div class="about-portrait">⚖</div>
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION -->
+        <section id="features">
+            <div style="width: 100%;">
+                <h2 class="section-title">The Realm</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎬</div>
+                        <div class="feature-title">Cinematic Design</div>
+                        <div class="feature-desc">Animated sequences and fluid transitions that feel like the opening of an anime masterpiece.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎵</div>
+                        <div class="feature-title">Procedural Audio</div>
+                        <div class="feature-desc">Web Audio API orchestral ambient with pentatonic melodies, reverb, and dynamic soundscapes.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💧</div>
+                        <div class="feature-title">Water Effects</div>
+                        <div class="feature-desc">Canvas-based flowing streams and particle systems responding to your every movement.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✨</div>
+                        <div class="feature-title">Particle System</div>
+                        <div class="feature-desc">120 floating particles with mouse repulsion and sine-wave drift for organic motion.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌊</div>
+                        <div class="feature-title">Ripple Dynamics</div>
+                        <div class="feature-desc">Click anywhere to create water ripples with synchronized audio feedback and visual impact.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎮</div>
+                        <div class="feature-title">Interactive Magic</div>
+                        <div class="feature-desc">Custom cursor, scroll animations, and hidden Easter eggs await the curious explorer.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO SECTION -->
+        <section id="portfolio">
+            <div style="width: 100%;">
+                <h2 class="section-title">The Archive</h2>
+                <div class="archive-grid">
+                    <div class="archive-item">
+                        <div class="archive-tag">Creative</div>
+                        <h3 class="archive-title">Web Design</h3>
+                        <p class="archive-desc">Crafting immersive digital experiences that blend aesthetics with functionality, inspired by anime and gaming worlds.</p>
+                    </div>
+                    <div class="archive-item">
+                        <div class="archive-tag">Technical</div>
+                        <h3 class="archive-title">Full Stack Dev</h3>
+                        <p class="archive-desc">Building scalable applications with modern frameworks, real-time interactions, and elegant architecture.</p>
+                    </div>
+                    <div class="archive-item">
+                        <div class="archive-tag">Audio</div>
+                        <h3 class="archive-title">Sound Design</h3>
+                        <p class="archive-desc">Procedural audio generation, ambient soundscapes, and interactive music systems using Web Audio API.</p>
+                    </div>
+                    <div class="archive-item">
+                        <div class="archive-tag">Visual</div>
+                        <h3 class="archive-title">Animation</h3>
+                        <p class="archive-desc">GSAP-powered animations, canvas effects, and scroll-triggered reveals that bring stories to life.</p>
+                    </div>
+                    <div class="archive-item">
+                        <div class="archive-tag">Innovation</div>
+                        <h3 class="archive-title">Experimental</h3>
+                        <p class="archive-desc">Pushing boundaries with cutting-edge web technologies, generative art, and interactive installations.</p>
+                    </div>
+                    <div class="archive-item">
+                        <div class="archive-tag">Community</div>
+                        <h3 class="archive-title">Open Source</h3>
+                        <p class="archive-desc">Contributing to the creative coding community through shared knowledge, tools, and collaborative projects.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact">
+            <div class="contact-content">
+                <h2 class="section-title">The Covenant</h2>
+                <p class="contact-text">Join me in this journey across the digital seas. Whether you seek collaboration, conversation, or simply wish to explore the depths of creativity, the waters are open.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link" title="GitHub">🐙</a>
+                    <a href="#" class="social-link" title="Twitter">𝕏</a>
+                    <a href="#" class="social-link" title="LinkedIn">💼</a>
+                    <a href="#" class="social-link" title="Email">✉</a>
+                    <a href="#" class="social-link" title="Discord">🎮</a>
+                </div>
+                <div class="seal-container">⚖</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>Built with water and code. Inspired by the Hydro Sovereign. © 2026 AaronWorld. <em>"The law of water is impartial — it flows equally to all."</em></p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        // ===== LOADER =====
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2500);
+        });
+
+        // ===== CUSTOM CURSOR =====
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.left = (mouseX - 10) + 'px';
+            cursor.style.top = (mouseY - 10) + 'px';
+        });
+
+        // Hide default cursor
+        document.body.style.cursor = 'none';
+
+        // ===== HYDRO METER =====
+        const hydroFill = document.getElementById('hydro-fill');
+        window.addEventListener('scroll', () => {
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = (window.scrollY / scrollHeight) * 100;
+            hydroFill.style.height = scrolled + '%';
+        });
+
+        // ===== AUDIO ENGINE =====
+        class AudioEngine {
+            constructor() {
+                this.audioContext = null;
+                this.isPlaying = false;
+                this.isMuted = false;
+                this.masterGain = null;
+                this.nodes = [];
+            }
+
+            init() {
+                if (this.audioContext) return;
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.masterGain = this.audioContext.createGain();
+                this.masterGain.connect(this.audioContext.destination);
+                this.masterGain.gain.value = 0.3;
+            }
+
+            start() {
+                this.init();
+                if (this.isPlaying) return;
+                this.isPlaying = true;
+
+                // Drone layer
+                const drone1 = this.audioContext.createOscillator();
+                const drone2 = this.audioContext.createOscillator();
+                const droneGain = this.audioContext.createGain();
+
+                drone1.frequency.value = 55;
+                drone2.frequency.value = 110;
+                drone1.detune.value = -5;
+                drone2.detune.value = 5;
+                droneGain.gain.value = 0.15;
+
+                drone1.connect(droneGain);
+                drone2.connect(droneGain);
+                droneGain.connect(this.masterGain);
+
+                drone1.start();
+                drone2.start();
+                this.nodes.push(drone1, drone2);
+
+                // Shimmer layer
+                const shimmer = this.audioContext.createOscillator();
+                const shimmerGain = this.audioContext.createGain();
+                const lfo = this.audioContext.createOscillator();
+                const lfoGain = this.audioContext.createGain();
+
+                shimmer.frequency.value = 880;
+                lfo.frequency.value = 0.5;
+                lfoGain.gain.value = 100;
+
+                lfo.connect(lfoGain);
+                lfoGain.connect(shimmer.frequency);
+                shimmerGain.gain.value = 0.08;
+
+                shimmer.connect(shimmerGain);
+                shimmerGain.connect(this.masterGain);
+
+                shimmer.start();
+                lfo.start();
+                this.nodes.push(shimmer, lfo);
+
+                // Melody
+                const melodyNotes = [196, 220, 261, 293, 349]; // D minor pentatonic
+                let noteIndex = 0;
+                const playMelody = () => {
+                    if (!this.isPlaying) return;
+                    const melody = this.audioContext.createOscillator();
+                    const melodyGain = this.audioContext.createGain();
+
+                    melody.frequency.value = melodyNotes[noteIndex];
+                    melodyGain.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    melodyGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 1.5);
+
+                    melody.connect(melodyGain);
+                    melodyGain.connect(this.masterGain);
+
+                    melody.start();
+                    melody.stop(this.audioContext.currentTime + 1.5);
+
+                    noteIndex = (noteIndex + 1) % melodyNotes.length;
+                    setTimeout(playMelody, 2000);
+                };
+                playMelody();
+            }
+
+            stop() {
+                this.isPlaying = false;
+                this.nodes.forEach(node => {
+                    try { node.stop(); } catch (e) {}
+                });
+                this.nodes = [];
+            }
+
+            toggle() {
+                if (this.isPlaying) {
+                    this.stop();
+                } else {
+                    this.start();
+                }
+            }
+
+            setMuted(muted) {
+                this.isMuted = muted;
+                if (this.masterGain) {
+                    this.masterGain.gain.value = muted ? 0 : 0.3;
+                }
+            }
+        }
+
+        const audioEngine = new AudioEngine();
+
+        // Audio toggle button
+        document.getElementById('audio-toggle').addEventListener('click', () => {
+            audioEngine.toggle();
+            const toggle = document.getElementById('audio-toggle');
+            if (audioEngine.isPlaying) {
+                toggle.classList.remove('muted');
+            } else {
+                toggle.classList.add('muted');
+            }
+        });
+
+        // ===== HERO CANVAS - WATER STREAMS =====
+        const heroCanvas = document.getElementById('hero-canvas');
+        const heroCtx = heroCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            heroCanvas.width = window.innerWidth;
+            heroCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class WaterStream {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.life = 1;
+                this.maxLife = 1;
+            }
+
+            update(mouseX, mouseY) {
+                // Repel from mouse
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    const angle = Math.atan2(dy, dx);
+                    this.vx += Math.cos(angle) * 0.5;
+                    this.vy += Math.sin(angle) * 0.5;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.1; // gravity
+                this.life -= 0.01;
+            }
+
+            draw(ctx) {
+                const alpha = this.life * 0.6;
+                ctx.strokeStyle = `rgba(0, 200, 240, ${alpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.vx, this.y - this.vy);
+                ctx.stroke();
+
+                // Glow
+                ctx.strokeStyle = `rgba(0, 255, 238, ${alpha * 0.5})`;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.vx, this.y - this.vy);
+                ctx.stroke();
+            }
+        }
+
+        let waterStreams = [];
+        let mouseX = 0, mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            if (Math.random() < 0.3) {
+                waterStreams.push(new WaterStream(mouseX + (Math.random() - 0.5) * 50, mouseY + (Math.random() - 0.5) * 50));
+            }
+        });
+
+        function animateWaterStreams() {
+            heroCtx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+
+            waterStreams = waterStreams.filter(stream => stream.life > 0);
+            waterStreams.forEach(stream => {
+                stream.update(mouseX, mouseY);
+                stream.draw(heroCtx);
+            });
+
+            requestAnimationFrame(animateWaterStreams);
+        }
+        animateWaterStreams();
+
+        // ===== RIPPLE CANVAS =====
+        const rippleCanvas = document.getElementById('ripple-canvas');
+        const rippleCtx = rippleCanvas.getContext('2d');
+
+        rippleCanvas.width = window.innerWidth;
+        rippleCanvas.height = window.innerHeight;
+        window.addEventListener('resize', () => {
+            rippleCanvas.width = window.innerWidth;
+            rippleCanvas.height = window.innerHeight;
+        });
+
+        class Ripple {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0;
+                this.maxRadius = 200;
+                this.life = 1;
+            }
+
+            update() {
+                this.radius += 4;
+                this.life = 1 - (this.radius / this.maxRadius);
+            }
+
+            draw(ctx) {
+                ctx.strokeStyle = `rgba(0, 255, 238, ${this.life * 0.8})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = `rgba(0, 200, 240, ${this.life * 0.4})`;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius - 10, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        let ripples = [];
+
+        document.addEventListener('click', (e) => {
+            ripples.push(new Ripple(e.clientX, e.clientY));
+
+            // Play water drop sound
+            if (audioEngine.audioContext) {
+                const now = audioEngine.audioContext.currentTime;
+                const osc = audioEngine.audioContext.createOscillator();
+                const gain = audioEngine.audioContext.createGain();
+
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+
+                osc.connect(gain);
+                gain.connect(audioEngine.masterGain);
+
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        });
+
+        function animateRipples() {
+            rippleCtx.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
+
+            ripples = ripples.filter(ripple => ripple.life > 0);
+            ripples.forEach(ripple => {
+                ripple.update();
+                ripple.draw(rippleCtx);
+            });
+
+            requestAnimationFrame(animateRipples);
+        }
+        animateRipples();
+
+        // ===== PARTICLES CANVAS =====
+        const particlesCanvas = document.getElementById('particles-canvas');
+        const particlesCtx = particlesCanvas.getContext('2d');
+
+        particlesCanvas.width = window.innerWidth;
+        particlesCanvas.height = window.innerHeight;
+        window.addEventListener('resize', () => {
+            particlesCanvas.width = window.innerWidth;
+            particlesCanvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * particlesCanvas.width;
+                this.y = Math.random() * particlesCanvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.life = 1;
+                this.angle = Math.random() * Math.PI * 2;
+            }
+
+            update(mouseX, mouseY) {
+                // Sine wave drift
+                this.angle += 0.02;
+                this.x += Math.sin(this.angle) * 0.3;
+                this.y += Math.cos(this.angle) * 0.2;
+
+                // Repel from mouse
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 200) {
+                    const angle = Math.atan2(dy, dx);
+                    this.x += Math.cos(angle) * 2;
+                    this.y += Math.sin(angle) * 2;
+                }
+
+                // Wrap around
+                if (this.x < 0) this.x = particlesCanvas.width;
+                if (this.x > particlesCanvas.width) this.x = 0;
+                if (this.y < 0) this.y = particlesCanvas.height;
+                if (this.y > particlesCanvas.height) this.y = 0;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = `rgba(0, 200, 240, ${this.life * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = `rgba(0, 255, 238, ${this.life * 0.3})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const particles = Array.from({ length: 120 }, () => new Particle());
+
+        function animateParticles() {
+            particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+
+            particles.forEach(particle => {
+                particle.update(mouseX, mouseY);
+                particle.draw(particlesCtx);
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // ===== GSAP SCROLL ANIMATIONS =====
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate sections on scroll
+        gsap.utils.toArray('section').forEach((section) => {
+            gsap.from(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 80%',
+                    end: 'top 20%',
+                    scrub: false,
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1,
+            });
+        });
+
+        // Animate cards
+        gsap.utils.toArray('.feature-card, .archive-item').forEach((card) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 90%',
+                },
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                stagger: 0.1,
+            });
+        });
+
+        // ===== KONAMI CODE EASTER EGG =====
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    activateEasterEgg();
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        function activateEasterEgg() {
+            // Rainbow glow effect
+            document.body.style.animation = 'none';
+            setTimeout(() => {
+                document.body.style.filter = 'hue-rotate(360deg)';
+                document.body.style.transition = 'filter 3s ease-in-out';
+            }, 10);
+
+            // Play a special sound
+            if (audioEngine.audioContext) {
+                const now = audioEngine.audioContext.currentTime;
+                const notes = [523.25, 587.33, 659.25, 783.99]; // C, D, E, G
+                notes.forEach((freq, i) => {
+                    const osc = audioEngine.audioContext.createOscillator();
+                    const gain = audioEngine.audioContext.createGain();
+
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+
+                    osc.connect(gain);
+                    gain.connect(audioEngine.masterGain);
+
+                    osc.start(now + i * 0.1);
+                    osc.stop(now + i * 0.1 + 0.3);
+                });
+            }
+
+            // Alert
+            setTimeout(() => {
+                alert('🌊 You found the Easter Egg! 🌊\n\n"The law of water is impartial — it flows equally to all."\n\n— Neuvillette');
+            }, 500);
+        }
+
+        // ===== PREVENT AUDIO AUTOPLAY ISSUES =====
+        document.addEventListener('click', () => {
+            if (audioEngine.audioContext && audioEngine.audioContext.state === 'suspended') {
+                audioEngine.audioContext.resume();
+            }
+        });
+    </script>
+</body>
+</html>
