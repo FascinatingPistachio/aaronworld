@@ -1,0 +1,8 @@
+{
+  "buildCommand": "",
+  "installCommand": "",
+  "framework": "static",
+  "outputDirectory": ".",
+  "env": {},
+  "regions": ["iad1"]
+}
