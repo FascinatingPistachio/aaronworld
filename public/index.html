@@ -1,138 +1,118 @@
 <!DOCTYPE html>
-<html lang="en" data-element="dendro">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>AARONWORLD — Traveler's Journal</title>
-  <meta name="description" content="Aaron's personal corner of the web — Genshin Impact, anime, Nintendo, and more.">
-  <meta name="theme-color" content="#050510">
-  <link rel="icon" id="faviconLink" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+  <title>AARONWORLD — Fontaine Dossier</title>
+  <meta name="description" content="Aaron's personal corner of the web — archived by the Oratrice Mécanique d'Analyse Cardinale.">
+  <meta name="theme-color" content="#060a14">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<!-- ══ SKY LAYERS ══ -->
+<!-- ══ BACKGROUND CANVAS ══ -->
 <canvas id="skyCanvas" aria-hidden="true"></canvas>
-<div id="nebulaLayer" aria-hidden="true"></div>
+<div id="causticLayer" aria-hidden="true"></div>
+<div id="particleLayer" aria-hidden="true"></div>
 
-<!-- ══ ELEMENT FLASH OVERLAY ══ -->
-<div id="elemTransitionOverlay" aria-hidden="true"></div>
-
-<!-- ══ PAGE TRANSITION CANVAS ══ -->
+<!-- ══ PAGE TRANSITION ══ -->
 <canvas id="transitionCanvas" aria-hidden="true"></canvas>
 
-<!-- ══════════════════════════════════════
-     LOADING SCREEN — Genshin Web Event
-══════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     LOADING SCREEN — Oratrice Mécanique
+══════════════════════════════════════════ -->
 <div id="gi-loader" role="status" aria-label="Loading AARONWORLD">
 
-  <!-- ── Cinematic scene (camera pans across this) ── -->
+  <!-- Cinematic scene -->
   <div class="ldr-scene" id="ldrScene" aria-hidden="true">
     <div class="ldr-scene-pan">
-
-    <!-- Sky gradient layers -->
-    <div class="lsc-sky"></div>
-    <div class="lsc-sky2"></div>
-
-    <!-- Distant mountain silhouettes (slow parallax) -->
-    <div class="lsc-layer lsc-mtn-far"></div>
-    <div class="lsc-layer lsc-mtn-mid"></div>
-    <div class="lsc-layer lsc-mtn-near"></div>
-
-    <!-- Ruins / architecture layer -->
-    <div class="lsc-layer lsc-ruins"></div>
-
-    <!-- Foreground foliage -->
-    <div class="lsc-layer lsc-foliage"></div>
-
-    <!-- Crepuscular rays (wide, slow breath) -->
-    <div class="lsc-rays">
-      <div class="lsc-ray" style="--ra:-32deg;--rx:5%;--rw:280px;--rd:0s;--ro:.16"></div>
-      <div class="lsc-ray" style="--ra:-18deg;--rx:18%;--rw:160px;--rd:1.4s;--ro:.11"></div>
-      <div class="lsc-ray" style="--ra:-5deg;--rx:32%;--rw:340px;--rd:2.8s;--ro:.18"></div>
-      <div class="lsc-ray" style="--ra:7deg;--rx:50%;--rw:220px;--rd:.8s;--ro:.13"></div>
-      <div class="lsc-ray" style="--ra:18deg;--rx:64%;--rw:300px;--rd:2.1s;--ro:.17"></div>
-      <div class="lsc-ray" style="--ra:28deg;--rx:80%;--rw:200px;--rd:.4s;--ro:.12"></div>
-      <div class="lsc-ray" style="--ra:38deg;--rx:92%;--rw:140px;--rd:1.8s;--ro:.09"></div>
+      <div class="lsc-sky"></div>
+      <div class="lsc-sky2"></div>
+      <div class="lsc-layer lsc-mtn-far"></div>
+      <div class="lsc-layer lsc-mtn-mid"></div>
+      <div class="lsc-layer lsc-arch"></div>
+      <div class="lsc-layer lsc-columns"></div>
+      <div class="lsc-water-surface"></div>
+      <div class="lsc-rays">
+        <div class="lsc-ray" style="--ra:-28deg;--rx:8%;--rw:260px;--rd:0s;--ro:.14"></div>
+        <div class="lsc-ray" style="--ra:-12deg;--rx:22%;--rw:180px;--rd:1.6s;--ro:.10"></div>
+        <div class="lsc-ray" style="--ra:2deg;--rx:38%;--rw:320px;--rd:0.7s;--ro:.17"></div>
+        <div class="lsc-ray" style="--ra:15deg;--rx:55%;--rw:240px;--rd:2.2s;--ro:.12"></div>
+        <div class="lsc-ray" style="--ra:25deg;--rx:72%;--rw:280px;--rd:1.1s;--ro:.15"></div>
+        <div class="lsc-ray" style="--ra:36deg;--rx:88%;--rw:160px;--rd:3s;--ro:.09"></div>
+      </div>
+      <div class="lsc-mist"></div>
+      <div class="lsc-mist lsc-mist2"></div>
+      <!-- Water bubbles -->
+      <div class="lsc-bubble" style="left:12%;animation-duration:8s;animation-delay:0s;width:6px;height:6px"></div>
+      <div class="lsc-bubble" style="left:28%;animation-duration:12s;animation-delay:2s;width:4px;height:4px"></div>
+      <div class="lsc-bubble" style="left:47%;animation-duration:9s;animation-delay:1s;width:8px;height:8px"></div>
+      <div class="lsc-bubble" style="left:63%;animation-duration:14s;animation-delay:4s;width:5px;height:5px"></div>
+      <div class="lsc-bubble" style="left:82%;animation-duration:11s;animation-delay:0.5s;width:7px;height:7px"></div>
     </div>
-
-    <!-- Ground mist -->
-    <div class="lsc-mist"></div>
-    <div class="lsc-mist lsc-mist2"></div>
-
-    <!-- Floating dust motes -->
-    <div class="lsc-mote" style="left:8%;width:3px;height:3px;animation-duration:14s;animation-delay:0s;--md:-18px"></div>
-    <div class="lsc-mote" style="left:25%;width:5px;height:5px;animation-duration:20s;animation-delay:3s;--md:22px"></div>
-    <div class="lsc-mote" style="left:52%;width:4px;height:4px;animation-duration:16s;animation-delay:1.5s;--md:-10px"></div>
-    <div class="lsc-mote" style="left:71%;width:3px;height:3px;animation-duration:22s;animation-delay:5s;--md:28px"></div>
-    <div class="lsc-mote" style="left:88%;width:4px;height:4px;animation-duration:18s;animation-delay:2s;--md:-15px"></div>
-
-    </div><!-- /ldr-scene-pan -->
-
-    <!-- Vignette and letterbox are NOT inside the pan — they stay fixed -->
     <div class="lsc-vignette"></div>
     <div class="lsc-letterbox-top"></div>
     <div class="lsc-letterbox-bot"></div>
   </div>
 
-  <!-- ── Central identity stage ── -->
+  <!-- Central stage -->
   <div class="ldr-stage" aria-hidden="true">
-    <div class="ldr-ornament">
-      <div class="lorn-line"></div>
-      <div class="lorn-gems">
-        <div class="lorn-gem sm" style="animation-delay:.4s"></div>
-        <div class="lorn-gem md" style="animation-delay:.15s"></div>
-        <div class="lorn-gem lg"></div>
-        <div class="lorn-gem md" style="animation-delay:.25s"></div>
-        <div class="lorn-gem sm" style="animation-delay:.5s"></div>
-      </div>
-      <div class="lorn-line"></div>
+
+    <!-- Oratrice gear rings -->
+    <div class="oratrice-rings">
+      <div class="or-ring or-ring-1"></div>
+      <div class="or-ring or-ring-2"></div>
+      <div class="or-ring or-ring-3"></div>
+      <div class="or-ring or-ring-core"></div>
+      <!-- Scales of justice icon in center -->
+      <div class="or-scales">⚖</div>
     </div>
+
     <div class="ldr-wordmark">
-      <div class="lw-eyebrow">✦ &nbsp; Traveler's Personal Journal &nbsp; ✦</div>
+      <div class="lw-eyebrow">✦ &nbsp; Oratrice Mécanique d'Analyse Cardinale &nbsp; ✦</div>
       <div class="lw-title">AARON<em>WORLD</em></div>
       <div class="lw-divider">
         <div class="lw-div-line"></div>
-        <div class="lw-div-gem"></div>
-        <div class="lw-div-gem" style="animation-delay:.35s"></div>
-        <div class="lw-div-gem" style="animation-delay:.7s"></div>
+        <div class="lw-div-gem" style="animation-delay:0s"></div>
+        <div class="lw-div-gem" style="animation-delay:.3s"></div>
+        <div class="lw-div-gem" style="animation-delay:.6s"></div>
         <div class="lw-div-line rev"></div>
       </div>
-      <div class="lw-sub">EU Server &nbsp;·&nbsp; AR 27 &nbsp;·&nbsp; Dendro Traveler</div>
+      <div class="lw-sub">Fontaine Archive · EU Server · Traveler's Dossier</div>
     </div>
   </div>
 
-  <!-- ── HUD bar (bottom) ── -->
+  <!-- HUD bar -->
   <div class="loader-hud">
     <div class="lhud-sep"></div>
     <div class="lhud-inner">
       <div class="lhud-tip">
-        <div class="lhud-tip-label"><span class="lhud-tip-rule"></span>Traveler's Tip<span class="lhud-tip-rule"></span></div>
-        <div class="lhud-tip-text" id="loaderTip">"The pursuit of knowledge requires crossing many frontiers."</div>
-        <div class="lhud-tip-attr" id="loaderTipAttr">— Alhaitham</div>
+        <div class="lhud-tip-label"><span class="lhud-tip-rule"></span>Court Adage<span class="lhud-tip-rule"></span></div>
+        <div class="lhud-tip-text" id="loaderTip">"All are equal before the law."</div>
+        <div class="lhud-tip-attr" id="loaderTipAttr">— Neuvillette, Iudex of Fontaine</div>
       </div>
       <div class="lhud-brand">
-        <div class="lhud-brand-gem"></div>
+        <div class="lhud-brand-gem">⚖</div>
         <div class="lhud-brand-name">AARONWORLD</div>
-        <div class="lhud-brand-sub">Teyvat · EU Server</div>
+        <div class="lhud-brand-sub">Fontaine · EU Server</div>
       </div>
     </div>
     <div class="lhud-progress">
       <div class="lhud-bar-wrap">
         <div class="lhud-bar-track">
           <div class="lhud-bar-fill" id="loaderBarFill"></div>
+          <div class="lhud-bar-ripple" id="loaderBarRipple"></div>
         </div>
       </div>
-      <div class="lhud-status" id="loaderStatus">Initialising…</div>
+      <div class="lhud-status" id="loaderStatus">Convening the court…</div>
     </div>
   </div>
 
 </div>
-<!-- /loader -->
 
 <!-- ══════════════════════════════════════
      MAIN SITE
@@ -143,50 +123,48 @@
   <header class="site-header" id="siteHeader">
     <div class="sh-corner sh-c-tl"></div><div class="sh-corner sh-c-tr"></div>
     <div class="sh-corner sh-c-bl"></div><div class="sh-corner sh-c-br"></div>
-    <div class="sh-corner2 sh-c2-tl"></div><div class="sh-corner2 sh-c2-tr"></div>
-    <div class="sh-corner2 sh-c2-bl"></div><div class="sh-corner2 sh-c2-br"></div>
     <div class="sh-top-line"></div>
+    <div class="sh-gear-l" aria-hidden="true">⚙</div>
+    <div class="sh-gear-r" aria-hidden="true">⚙</div>
 
-    <div class="sh-eyebrow">✦ &emsp; Traveler's Personal Journal &emsp; ✦</div>
+    <div class="sh-eyebrow">✦ &emsp; Archived by the Oratrice Mécanique d'Analyse Cardinale &emsp; ✦</div>
 
     <div class="sh-title-row">
-      <img class="sh-elem-icon" id="headerElemIconL" src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
-        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:26px;filter:drop-shadow(0 0 8px currentColor)'}))">
+      <div class="sh-scales-icon" aria-hidden="true">⚖</div>
       <h1 class="sh-title">AARON<em>WORLD</em></h1>
-      <img class="sh-elem-icon" id="headerElemIconR" src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt=""
-        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿',style:'font-size:26px;filter:drop-shadow(0 0 8px currentColor)'}))">
+      <div class="sh-scales-icon" aria-hidden="true">⚖</div>
     </div>
 
-    <div class="sh-tagline">✦ &emsp; Welcome to my corner of the web — may the wind lead you &emsp; ✦</div>
+    <div class="sh-tagline">✦ &emsp; Welcome, Traveler — may justice and the tides guide your path &emsp; ✦</div>
 
     <div class="sh-status-bar" id="enka-header-bar">
       <span class="sh-stat" id="sh-ar">AR 27</span>
-      <span class="sh-sep">✦</span>
+      <span class="sh-sep">◆</span>
       <span class="sh-stat" id="sh-wl">WL 2</span>
-      <span class="sh-sep">✦</span>
-      <span class="sh-stat" id="sh-main">Dendro Main</span>
-      <span class="sh-sep">✦</span>
+      <span class="sh-sep">◆</span>
+      <span class="sh-stat" id="sh-main">Hydro Main</span>
+      <span class="sh-sep">◆</span>
       <span class="sh-stat">EU</span>
     </div>
   </header>
 
   <!-- ── NAV ── -->
   <nav class="main-nav" id="mainNav" role="navigation" aria-label="Main navigation">
-    <div class="nav-shimmer"></div>
+    <div class="nav-water-line" aria-hidden="true"></div>
     <button class="nav-link active" data-sec="home" onclick="showSec('home',this)">
-      <span class="nav-icon">⌂</span><span class="nav-txt">Home</span>
+      <span class="nav-icon">⌂</span><span class="nav-txt">Dossier</span>
     </button>
     <button class="nav-link" data-sec="about" onclick="showSec('about',this)">
-      <span class="nav-icon">✦</span><span class="nav-txt">About</span>
+      <span class="nav-icon">◈</span><span class="nav-txt">Profile</span>
     </button>
     <button class="nav-link" data-sec="anime" onclick="showSec('anime',this)">
-      <span class="nav-icon">◈</span><span class="nav-txt">Anime</span>
+      <span class="nav-icon">✦</span><span class="nav-txt">Archive</span>
     </button>
     <button class="nav-link" data-sec="showcase" onclick="showSec('showcase',this)">
-      <span class="nav-icon">◉</span><span class="nav-txt">Showcase</span>
+      <span class="nav-icon">◉</span><span class="nav-txt">Activity</span>
     </button>
     <button class="nav-link" data-sec="setup" onclick="showSec('setup',this)">
-      <span class="nav-icon">❖</span><span class="nav-txt">Setup</span>
+      <span class="nav-icon">❖</span><span class="nav-txt">Arsenal</span>
     </button>
   </nav>
 
@@ -196,11 +174,10 @@
     <!-- ── SIDEBAR ── -->
     <aside class="sidebar" aria-label="Profile sidebar">
 
-      <!-- Profile card -->
       <div class="gi-panel">
         <div class="gi-head">
           <div class="gi-gem"></div>
-          <span class="gi-head-title">Traveler Profile</span>
+          <span class="gi-head-title">Traveler's Record</span>
           <div class="gi-head-line"></div>
         </div>
         <div class="gi-body center-body">
@@ -213,19 +190,16 @@
             <img class="pfp-img" id="pfpImg"
               src="https://raw.githubusercontent.com/UserPFP/img/main/Avatars/7/789872551731527690.gif"
               alt="Aaron's avatar"
-              onerror="this.src='https://ui-avatars.com/api/?name=Aaron&background=0d1b0a&color=a8cc28&size=100&bold=true'">
-            <div class="pfp-elem-badge" id="pfpElemBadge">
-              <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="Dendro element"
-                onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🌿'}))">
-            </div>
+              onerror="this.src='https://ui-avatars.com/api/?name=Aaron&background=060a14&color=3ee8f0&size=100&bold=true'">
+            <div class="pfp-elem-badge" id="pfpElemBadge">💧</div>
           </div>
 
           <div class="profile-name">Aaron</div>
           <div class="profile-sub">Traveler · Teyvat · EU</div>
 
           <div class="elem-tag" id="elemTag">
-            <img src="https://i.ibb.co/fz1vj9B3/Element_Dendro.webp" alt="" onerror="this.style.display='none'" aria-hidden="true">
-            <span>Dendro Main</span>
+            <span class="elem-drop">💧</span>
+            <span>Hydro Main</span>
           </div>
 
           <div class="stats-block">
@@ -242,8 +216,8 @@
               <span class="stat-value" id="enka-region">EU</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">Main</span>
-              <span class="stat-value" id="enka-main">Dendro Traveler</span>
+              <span class="stat-label">Current Main</span>
+              <span class="stat-value" id="enka-main">Neuvillette</span>
             </div>
             <div class="stat-row">
               <span class="stat-label">Achievements</span>
@@ -263,7 +237,7 @@
 
         </div>
 
-        <!-- Now Playing strip -->
+        <!-- Now Playing -->
         <div class="nowplaying-strip" id="sidebarNowPlaying">
           <div class="np-divider">
             <div class="np-div-line"></div>
@@ -284,32 +258,31 @@
         </div>
 
       </div>
-      <!-- /profile card -->
 
     </aside>
 
     <!-- ── MAIN CONTENT ── -->
     <main class="main-col" id="mainContent">
 
-      <!-- HOME -->
+      <!-- HOME / DOSSIER -->
       <section id="home" class="section active" aria-label="Home">
 
         <div class="gi-panel reveal">
           <div class="gi-head">
             <div class="gi-gem"></div>
-            <span class="gi-head-title">Greetings, Traveler</span>
+            <span class="gi-head-title">Welcome, Traveler</span>
             <div class="gi-head-line"></div>
           </div>
           <div class="gi-body">
-            <p class="body-text">Welcome to <strong>AARONWORLD</strong> — my personal little corner of the internet, made with love. I built this place because I wanted somewhere truly mine.</p>
-            <p class="body-text">I spend most of my free time traversing <strong>Teyvat</strong> in Genshin Impact, watching <strong>anime</strong>, and tinkering with <strong>HTML &amp; CSS</strong>. This site is always under construction — check back often, something new is always growing here!</p>
+            <p class="body-text">Welcome to <strong>AARONWORLD</strong> — my personal corner of the internet, archived in the vaults of the Palais Mermonia. Built because I wanted somewhere truly mine.</p>
+            <p class="body-text">I spend most of my free time traversing <strong>Teyvat</strong> in Genshin Impact, watching <strong>anime</strong>, and tinkering with <strong>HTML &amp; CSS</strong>. This site is always under construction — the Oratrice never rests, and neither does this page!</p>
             <blockquote class="gi-quote">
-              The forest whispers to those who listen. May the wind lead you! 🌿
+              "The law knows no favourites. May the tides of Fontaine wash away all uncertainty."
+              <cite>— Neuvillette, Iudex of Fontaine</cite>
             </blockquote>
           </div>
         </div>
 
-        <!-- Quick links / social -->
         <div class="gi-panel reveal" style="animation-delay:.06s">
           <div class="gi-head">
             <div class="gi-gem"></div>
@@ -335,7 +308,7 @@
                 <div class="lc-arrow">›</div>
               </a>
               <a class="link-card" href="https://enka.network/u/764275665" target="_blank" rel="noopener">
-                <div class="lc-icon">🌿</div>
+                <div class="lc-icon">💧</div>
                 <div class="lc-info">
                   <div class="lc-label">Enka Profile</div>
                   <div class="lc-val">UID 764275665</div>
@@ -348,20 +321,21 @@
 
       </section>
 
-      <!-- ABOUT -->
+      <!-- ABOUT / PROFILE -->
       <section id="about" class="section" aria-label="About Aaron">
 
         <div class="gi-panel reveal">
           <div class="gi-head">
             <div class="gi-gem"></div>
-            <span class="gi-head-title">About This Traveler</span>
+            <span class="gi-head-title">Concerning This Traveler</span>
             <div class="gi-head-line"></div>
           </div>
           <div class="gi-body">
             <p class="body-text">Hi, I'm <strong>Aaron</strong>.</p>
-            <p class="body-text">I'm a massive Nintendo fan with a slightly unreasonable console collection, a Genshin player who will defend Dendro to the grave, and someone who will not apologise for having strong opinions on anime. JJK is mid and I said what I said.</p>
+            <p class="body-text">I'm a massive Nintendo fan with a slightly unreasonable console collection, a Genshin player who will defend Neuvillette to the grave, and someone who will not apologise for having strong opinions on anime. JJK is mid and I said what I said.</p>
             <blockquote class="gi-quote">
-              「The pursuit of knowledge requires crossing many frontiers.」— Alhaitham
+              "The pursuit of knowledge requires crossing many frontiers."
+              <cite>— Alhaitham</cite>
             </blockquote>
           </div>
         </div>
@@ -369,16 +343,16 @@
         <div class="gi-panel reveal" style="animation-delay:.06s">
           <div class="gi-head">
             <div class="gi-gem"></div>
-            <span class="gi-head-title">Traveler's Dossier</span>
+            <span class="gi-head-title">Court Dossier</span>
             <div class="gi-head-line"></div>
           </div>
           <div class="gi-body no-pad">
             <div class="dossier-grid">
               <div class="dossier-row"><div class="dr-icon">🎮</div><div class="dr-body"><div class="dr-label">Currently Playing</div><div class="dr-val">Genshin Impact · Fortnite · Rocket League</div></div></div>
-              <div class="dossier-row"><div class="dr-icon">🌿</div><div class="dr-body"><div class="dr-label">Fave Element</div><div class="dr-val">Dendro</div></div></div>
-              <div class="dossier-row"><div class="dr-icon">🗺️</div><div class="dr-body"><div class="dr-label">Fave Region</div><div class="dr-val">Sumeru</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">💧</div><div class="dr-body"><div class="dr-label">Fave Element</div><div class="dr-val">Hydro</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">⚖</div><div class="dr-body"><div class="dr-label">Fave Region</div><div class="dr-val">Fontaine</div></div></div>
               <div class="dossier-row"><div class="dr-icon">📺</div><div class="dr-body"><div class="dr-label">Currently Watching</div><div class="dr-val">Whatever's on the anime list</div></div></div>
-              <div class="dossier-row"><div class="dr-icon">🚫</div><div class="dr-body"><div class="dr-label">Certified Bad Anime</div><div class="dr-val">Jujutsu Kaisen (overrated, sorry not sorry)</div></div></div>
+              <div class="dossier-row"><div class="dr-icon">🚫</div><div class="dr-body"><div class="dr-label">Certified Mid Anime</div><div class="dr-val">Jujutsu Kaisen (overrated, sorry not sorry)</div></div></div>
               <div class="dossier-row"><div class="dr-icon">🕹️</div><div class="dr-body"><div class="dr-label">Consoles Owned</div><div class="dr-val">Switch 2 · Modded Switch · Wii U · GCN · N64</div></div></div>
               <div class="dossier-row"><div class="dr-icon">🔓</div><div class="dr-body"><div class="dr-label">Switch CFW</div><div class="dr-val">Atmosphere + Hekate</div></div></div>
               <div class="dossier-row"><div class="dr-icon">💿</div><div class="dr-body"><div class="dr-label">Wii U CFW</div><div class="dr-val">Aroma</div></div></div>
@@ -390,7 +364,7 @@
 
       </section>
 
-      <!-- ANIME -->
+      <!-- ANIME / ARCHIVE -->
       <section id="anime" class="section" aria-label="Anime rankings">
 
         <div class="gi-panel reveal">
@@ -400,11 +374,11 @@
             <div class="gi-head-line"></div>
           </div>
           <div class="gi-body">
-            <p class="body-text subtle" style="margin-bottom:18px;">Ranked in order of my personal preference — #1 is my all-time favourite.</p>
+            <p class="body-text subtle" style="margin-bottom:18px;">Personal rankings — #1 is my all-time favourite. The Oratrice has rendered its verdict.</p>
             <div class="anime-grid">
               <div class="anime-card" style="--i:0"><div class="ac-rank rank-gold">1</div><div class="ac-poster"><img src="https://i.ibb.co/bjbCxsxB/252b8c2532-jpg.webp" alt="Tougen Anki" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Tougen Anki</div></div></div>
-              <div class="anime-card" style="--i:1"><div class="ac-rank">2</div><div class="ac-poster"><img src="https://i.ibb.co/7dNbp992/63172b00a1-jpg.webp" alt="Jack of all trades" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Jack of all trades: party of none</div></div></div>
-              <div class="anime-card" style="--i:2"><div class="ac-rank">3</div><div class="ac-poster"><img src="https://i.ibb.co/SDBfBgfx/d9aeed41f7-jpg.webp" alt="Dr. Stone" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Dr. Stone</div></div></div>
+              <div class="anime-card" style="--i:1"><div class="ac-rank rank-silver">2</div><div class="ac-poster"><img src="https://i.ibb.co/7dNbp992/63172b00a1-jpg.webp" alt="Jack of all trades" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Jack of all trades: party of none</div></div></div>
+              <div class="anime-card" style="--i:2"><div class="ac-rank rank-bronze">3</div><div class="ac-poster"><img src="https://i.ibb.co/SDBfBgfx/d9aeed41f7-jpg.webp" alt="Dr. Stone" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Dr. Stone</div></div></div>
               <div class="anime-card" style="--i:3"><div class="ac-rank">4</div><div class="ac-poster"><img src="https://i.ibb.co/LDyhzp0C/b913b9d60a-jpg.webp" alt="Death Note" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Death Note</div></div></div>
               <div class="anime-card" style="--i:4"><div class="ac-rank">5</div><div class="ac-poster"><img src="https://i.ibb.co/Rk3Gy2Lf/530ac6c560-jpg.webp" alt="Tokyo Ghoul" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Tokyo Ghoul</div></div></div>
               <div class="anime-card" style="--i:5"><div class="ac-rank">6</div><div class="ac-poster"><img src="https://i.ibb.co/tPXjTGmR/495b0bcfe5-jpg.webp" alt="Black Clover" loading="lazy"></div><div class="ac-foot"><div class="ac-title">Black Clover</div></div></div>
@@ -423,7 +397,7 @@
 
       </section>
 
-      <!-- SHOWCASE -->
+      <!-- SHOWCASE / ACTIVITY -->
       <section id="showcase" class="section" aria-label="Activity showcase">
 
         <div class="gi-panel reveal">
@@ -435,7 +409,7 @@
           </div>
           <div class="gi-body">
             <p class="body-text subtle" style="margin-bottom:16px;">Live Discord presence via <a href="https://lanyard.rest" target="_blank" rel="noopener">Lanyard</a> — updates every 15 seconds.</p>
-            <div id="lanyardWidget"><div class="gi-spinner"><div class="spinner-ring"></div><span>Connecting…</span></div></div>
+            <div id="lanyardWidget"><div class="gi-spinner"><div class="spinner-ring"></div><span>Connecting to Fontaine…</span></div></div>
           </div>
         </div>
 
@@ -462,11 +436,11 @@
             <p class="body-text subtle" style="margin-bottom:18px;">Games I play regularly — no particular order.</p>
             <div class="cards-grid">
               <div class="info-card">
-                <div class="ic-head"><div class="ic-icon">🌿</div><div><div class="ic-name">Genshin Impact</div><div class="ic-sub">PC · F2P</div></div></div>
+                <div class="ic-head"><div class="ic-icon">💧</div><div><div class="ic-name">Genshin Impact</div><div class="ic-sub">PC · F2P</div></div></div>
                 <div class="ic-rows">
                   <div class="ic-row"><span class="ic-l">AR</span><span class="ic-v" id="gc-ar">—</span></div>
                   <div class="ic-row"><span class="ic-l">Server</span><span class="ic-v">Europe</span></div>
-                  <div class="ic-row"><span class="ic-l">Element</span><span class="ic-v">Dendro</span></div>
+                  <div class="ic-row"><span class="ic-l">Main</span><span class="ic-v">Neuvillette</span></div>
                   <div class="ic-row"><span class="ic-l">Hours</span><span class="ic-v">Too many</span></div>
                 </div>
               </div>
@@ -506,19 +480,18 @@
 
       </section>
 
-      <!-- SETUP -->
+      <!-- SETUP / ARSENAL -->
       <section id="setup" class="section" aria-label="Console collection">
 
         <div class="gi-panel reveal">
           <div class="gi-head">
             <div class="gi-gem"></div>
-            <span class="gi-head-title">Console Collection</span>
+            <span class="gi-head-title">Console Arsenal</span>
             <div class="gi-head-line"></div>
           </div>
           <div class="gi-body">
-            <p class="body-text subtle" style="margin-bottom:18px;">Every console I own. Modded ones run custom firmware for homebrew, backups &amp; emulation.</p>
+            <p class="body-text subtle" style="margin-bottom:18px;">Every console in the collection. Modded units run custom firmware for homebrew, backups &amp; emulation.</p>
             <div class="cards-grid">
-
               <div class="info-card">
                 <div class="ic-head"><div class="ic-icon">🆕</div><div><div class="ic-name">Nintendo Switch 2</div><div class="ic-sub">Stock</div></div></div>
                 <div class="ic-rows">
@@ -527,7 +500,6 @@
                   <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">Keeping it clean for now</span></div>
                 </div>
               </div>
-
               <div class="info-card">
                 <div class="ic-head"><div class="ic-icon">🔓</div><div><div class="ic-name">Nintendo Switch</div><div class="ic-sub">Custom Firmware</div></div></div>
                 <div class="ic-rows">
@@ -537,7 +509,6 @@
                   <div class="ic-row"><span class="ic-l">Guide</span><span class="ic-v"><a href="https://switch.hacks.guide" target="_blank" rel="noopener">switch.hacks.guide</a></span></div>
                 </div>
               </div>
-
               <div class="info-card">
                 <div class="ic-head"><div class="ic-icon">📀</div><div><div class="ic-name">Nintendo Wii U</div><div class="ic-sub">Custom Firmware</div></div></div>
                 <div class="ic-rows">
@@ -547,7 +518,6 @@
                   <div class="ic-row"><span class="ic-l">Guide</span><span class="ic-v"><a href="https://wiiu.hacks.guide" target="_blank" rel="noopener">wiiu.hacks.guide</a></span></div>
                 </div>
               </div>
-
               <div class="info-card">
                 <div class="ic-head"><div class="ic-icon">🟪</div><div><div class="ic-name">Nintendo GameCube</div><div class="ic-sub">Modded</div></div></div>
                 <div class="ic-rows">
@@ -556,7 +526,6 @@
                   <div class="ic-row"><span class="ic-l">Guide</span><span class="ic-v"><a href="https://www.gc-forever.com/wiki/" target="_blank" rel="noopener">gc-forever wiki</a></span></div>
                 </div>
               </div>
-
               <div class="info-card">
                 <div class="ic-head"><div class="ic-icon">🟥</div><div><div class="ic-name">Nintendo 64</div><div class="ic-sub">Retro</div></div></div>
                 <div class="ic-rows">
@@ -565,7 +534,6 @@
                   <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">Old enough to be my parent. Slaps.</span></div>
                 </div>
               </div>
-
               <div class="info-card">
                 <div class="ic-head"><div class="ic-icon">🃏</div><div><div class="ic-name">Game &amp; Watch</div><div class="ic-sub">Mario + Zelda editions</div></div></div>
                 <div class="ic-rows">
@@ -574,7 +542,6 @@
                   <div class="ic-row"><span class="ic-l">Notes</span><span class="ic-v">Actually really cool</span></div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -583,7 +550,6 @@
 
     </main>
   </div>
-  <!-- /body-grid -->
 
   <!-- ── FOOTER ── -->
   <footer class="site-footer">
@@ -594,12 +560,11 @@
       <div class="fr-gem" style="animation-delay:.8s"></div>
       <div class="fr-line rev"></div>
     </div>
-    <div class="footer-copy">© AARONWORLD &emsp;✦&emsp; Hand-crafted in the forests of Sumeru &emsp;✦&emsp; All rights reserved</div>
-    <div class="footer-sub">Built with love &amp; too much caffeine</div>
+    <div class="footer-copy">© AARONWORLD &emsp;◆&emsp; Archived by the Oratrice Mécanique &emsp;◆&emsp; Fontaine · EU Server</div>
+    <div class="footer-sub">Built with love &amp; the tides of Fontaine</div>
   </footer>
 
 </div>
-<!-- /page -->
 
 <script src="script.js"></script>
 <script>
@@ -629,43 +594,42 @@ window.addEventListener('load', function () {
   const scene    = document.getElementById('ldrScene');
 
   const tips = [
+    { text: '"All are equal before the law of Fontaine."',            attr: '— Neuvillette, Iudex of Fontaine' },
+    { text: '"The Oratrice never errs. Only mortals do."',            attr: '— Fontaine Court Adage' },
+    { text: '"The sea holds no grudges — it simply remembers."',      attr: '— Fontaine Proverb' },
+    { text: '"Truth, like water, finds every crack."',                attr: '— Furina' },
+    { text: '"Justice delayed is justice denied."',                   attr: '— Palais Mermonia Inscription' },
+    { text: '"Even the tide must bow to the Hydro Sovereign."',       attr: '— Ancient Fontaine Scroll' },
     { text: '"The pursuit of knowledge requires crossing many frontiers."', attr: '— Alhaitham' },
-    { text: '"The forest whispers to those who listen."',                   attr: '— Sumeru Proverb' },
-    { text: '"Even the smallest leaf holds the secrets of the world."',     attr: '— Collei' },
-    { text: '"Adventure is out there, Traveler. The world awaits."',        attr: '— Paimon' },
-    { text: '"Every journey begins with a single step into the unknown."',  attr: '— Teyvat Traveler' },
-    { text: '"The wind carries whispers of distant lands."',                attr: '— Unknown' },
-    { text: '"A true scholar does not fear questions — only stopping."',    attr: '— House of Daena' },
   ];
   const tip = tips[Math.floor(Math.random() * tips.length)];
   if (tipEl)   tipEl.textContent   = tip.text;
   if (tipAttr) tipAttr.textContent = tip.attr;
 
-  /* Spawn extra dust motes into scene */
+  /* Extra bubbles in scene */
   if (scene) {
-    for (let i = 0; i < 20; i++) {
-      const m = document.createElement('div');
-      m.className = 'lsc-mote';
-      const sz = 2 + Math.random() * 5;
-      m.style.cssText = [
-        `left:${2+Math.random()*96}vw`,
+    for (let i = 0; i < 25; i++) {
+      const b = document.createElement('div');
+      b.className = 'lsc-bubble';
+      const sz = 2 + Math.random() * 8;
+      b.style.cssText = [
+        `left:${Math.random()*100}%`,
         `width:${sz}px`,
         `height:${sz}px`,
-        `bottom:${Math.random()*25}%`,
-        `animation-duration:${9+Math.random()*18}s`,
-        `animation-delay:${Math.random()*18}s`,
-        `--md:${(Math.random()>.5?1:-1)*(12+Math.random()*35)}px`,
+        `bottom:${Math.random()*40}%`,
+        `animation-duration:${7+Math.random()*16}s`,
+        `animation-delay:${Math.random()*12}s`,
       ].join(';');
-      scene.appendChild(m);
+      scene.querySelector('.ldr-scene-pan').appendChild(b);
     }
   }
 
   const stages = [
-    { pct:15,  label:'Initialising…' },
-    { pct:38,  label:'Loading Teyvat…' },
-    { pct:62,  label:'Fetching Character…' },
-    { pct:82,  label:'Syncing Journal…' },
-    { pct:100, label:'Entering…' },
+    { pct:12,  label:'Convening the court…' },
+    { pct:34,  label:'Summoning the Oratrice…' },
+    { pct:58,  label:'Consulting the Iudex…' },
+    { pct:80,  label:'Rendering verdict…' },
+    { pct:100, label:'Entering the archive…' },
   ];
   let si = 0;
   function nextStage() {
@@ -674,20 +638,18 @@ window.addEventListener('load', function () {
     if (barFill)  barFill.style.width  = s.pct + '%';
     if (statusEl) statusEl.textContent = s.label;
     if (si < stages.length) setTimeout(nextStage, 180 + Math.random() * 220);
-    else setTimeout(dismiss, 420);
+    else setTimeout(dismiss, 480);
   }
-  setTimeout(nextStage, 200);
+  setTimeout(nextStage, 250);
 
   function dismiss() {
     loader.classList.add('hidden');
     document.body.style.overflow = '';
     document.getElementById('mainPage')?.classList.add('visible');
   }
-  /* Hard cap — never more than 3.5s */
-  setTimeout(dismiss, 3500);
+  setTimeout(dismiss, 4000);
   document.body.style.overflow = 'hidden';
 })();
-
 </script>
 </body>
 </html>
