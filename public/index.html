@@ -790,7 +790,7 @@
 
     <!-- HEADER -->
     <header>
-        <div class="logo">⚖ AARONWORLD</div>
+        <div class="logo">✦ AARONWORLD</div>
         <nav>
             <a href="#hero">Home</a>
             <a href="#about">About</a>
@@ -825,7 +825,7 @@
                     <p>Here, every project tells a story. Every line of code carries intention. Every design choice reflects a commitment to excellence and artistry.</p>
                     <p>Like the Oratrice Mécanique d'Cardinale, this space seeks truth through creation, balance through design, and harmony through innovation.</p>
                 </div>
-                <div class="about-portrait">⚖</div>
+                <div class="about-portrait">✦</div>
             </div>
         </section>
 
@@ -919,7 +919,7 @@
                     <a href="#" class="social-link" title="Email">✉</a>
                     <a href="#" class="social-link" title="Discord">🎮</a>
                 </div>
-                <div class="seal-container">⚖</div>
+                <div class="seal-container">✦</div>
             </div>
         </section>
     </main>
@@ -936,31 +936,46 @@
         // ===== LOADER =====
         window.addEventListener('load', () => {
             setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                }
             }, 2500);
         });
+
+        // Fallback: Hide loader after 5 seconds regardless
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+        }, 5000);
 
         // ===== CUSTOM CURSOR =====
         const cursor = document.getElementById('cursor');
         let mouseX = 0, mouseY = 0;
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            cursor.style.left = (mouseX - 10) + 'px';
-            cursor.style.top = (mouseY - 10) + 'px';
-        });
+        if (cursor) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursor.style.left = (mouseX - 10) + 'px';
+                cursor.style.top = (mouseY - 10) + 'px';
+            });
 
-        // Hide default cursor
-        document.body.style.cursor = 'none';
+            // Hide default cursor
+            document.body.style.cursor = 'none';
+        }
 
         // ===== HYDRO METER =====
         const hydroFill = document.getElementById('hydro-fill');
-        window.addEventListener('scroll', () => {
-            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrolled = (window.scrollY / scrollHeight) * 100;
-            hydroFill.style.height = scrolled + '%';
-        });
+        if (hydroFill) {
+            window.addEventListener('scroll', () => {
+                const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrolled = (window.scrollY / scrollHeight) * 100;
+                hydroFill.style.height = scrolled + '%';
+            });
+        }
 
         // ===== AUDIO ENGINE =====
         class AudioEngine {
@@ -1076,23 +1091,27 @@
         const audioEngine = new AudioEngine();
 
         // Audio toggle button
-        document.getElementById('audio-toggle').addEventListener('click', () => {
-            audioEngine.toggle();
-            const toggle = document.getElementById('audio-toggle');
-            if (audioEngine.isPlaying) {
-                toggle.classList.remove('muted');
-            } else {
-                toggle.classList.add('muted');
-            }
-        });
+        const audioToggle = document.getElementById('audio-toggle');
+        if (audioToggle) {
+            audioToggle.addEventListener('click', () => {
+                audioEngine.toggle();
+                if (audioEngine.isPlaying) {
+                    audioToggle.classList.remove('muted');
+                } else {
+                    audioToggle.classList.add('muted');
+                }
+            });
+        }
 
         // ===== HERO CANVAS - WATER STREAMS =====
         const heroCanvas = document.getElementById('hero-canvas');
-        const heroCtx = heroCanvas.getContext('2d');
+        const heroCtx = heroCanvas ? heroCanvas.getContext('2d') : null;
 
         function resizeCanvas() {
-            heroCanvas.width = window.innerWidth;
-            heroCanvas.height = window.innerHeight;
+            if (heroCanvas) {
+                heroCanvas.width = window.innerWidth;
+                heroCanvas.height = window.innerHeight;
+            }
         }
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
@@ -1156,28 +1175,31 @@
         });
 
         function animateWaterStreams() {
-            heroCtx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+            if (heroCtx && heroCanvas) {
+                heroCtx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
 
-            waterStreams = waterStreams.filter(stream => stream.life > 0);
-            waterStreams.forEach(stream => {
-                stream.update(mouseX, mouseY);
-                stream.draw(heroCtx);
-            });
-
+                waterStreams = waterStreams.filter(stream => stream.life > 0);
+                waterStreams.forEach(stream => {
+                    stream.update(mouseX, mouseY);
+                    stream.draw(heroCtx);
+                });
+            }
             requestAnimationFrame(animateWaterStreams);
         }
         animateWaterStreams();
 
         // ===== RIPPLE CANVAS =====
         const rippleCanvas = document.getElementById('ripple-canvas');
-        const rippleCtx = rippleCanvas.getContext('2d');
+        const rippleCtx = rippleCanvas ? rippleCanvas.getContext('2d') : null;
 
-        rippleCanvas.width = window.innerWidth;
-        rippleCanvas.height = window.innerHeight;
-        window.addEventListener('resize', () => {
+        if (rippleCanvas) {
             rippleCanvas.width = window.innerWidth;
             rippleCanvas.height = window.innerHeight;
-        });
+            window.addEventListener('resize', () => {
+                rippleCanvas.width = window.innerWidth;
+                rippleCanvas.height = window.innerHeight;
+            });
+        }
 
         class Ripple {
             constructor(x, y) {
@@ -1233,28 +1255,31 @@
         });
 
         function animateRipples() {
-            rippleCtx.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
+            if (rippleCtx && rippleCanvas) {
+                rippleCtx.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
 
-            ripples = ripples.filter(ripple => ripple.life > 0);
-            ripples.forEach(ripple => {
-                ripple.update();
-                ripple.draw(rippleCtx);
-            });
-
+                ripples = ripples.filter(ripple => ripple.life > 0);
+                ripples.forEach(ripple => {
+                    ripple.update();
+                    ripple.draw(rippleCtx);
+                });
+            }
             requestAnimationFrame(animateRipples);
         }
         animateRipples();
 
         // ===== PARTICLES CANVAS =====
         const particlesCanvas = document.getElementById('particles-canvas');
-        const particlesCtx = particlesCanvas.getContext('2d');
+        const particlesCtx = particlesCanvas ? particlesCanvas.getContext('2d') : null;
 
-        particlesCanvas.width = window.innerWidth;
-        particlesCanvas.height = window.innerHeight;
-        window.addEventListener('resize', () => {
+        if (particlesCanvas) {
             particlesCanvas.width = window.innerWidth;
             particlesCanvas.height = window.innerHeight;
-        });
+            window.addEventListener('resize', () => {
+                particlesCanvas.width = window.innerWidth;
+                particlesCanvas.height = window.innerHeight;
+            });
+        }
 
         class Particle {
             constructor() {
@@ -1306,13 +1331,14 @@
         const particles = Array.from({ length: 120 }, () => new Particle());
 
         function animateParticles() {
-            particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+            if (particlesCtx && particlesCanvas) {
+                particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
 
-            particles.forEach(particle => {
-                particle.update(mouseX, mouseY);
-                particle.draw(particlesCtx);
-            });
-
+                particles.forEach(particle => {
+                    particle.update(mouseX, mouseY);
+                    particle.draw(particlesCtx);
+                });
+            }
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
