@@ -4,9 +4,7 @@
 
 A cinematic, immersive personal website inspired by **Neuvillette**, the **Oratrice Mécanique d'Cardinale**, and the world of **Genshin Impact's Fontaine**. Built to feel like the opening of an anime movie.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/aaronworld)
-
-🔗 **Live:** [aaronworld.vercel.app](https://aaronworld.vercel.app)
+🔗 **Live:** [Deploy to Vercel](#deployment)
 
 ---
 
@@ -42,7 +40,7 @@ Silver       #c0d8e8  — Body text
 
 ---
 
-## 🚀 Deploy to Vercel
+## 🚀 Deployment
 
 ### Option 1 — One-click (recommended)
 1. Push this repo to GitHub
@@ -119,7 +117,7 @@ Audio requires user interaction to start (browser policy). Click the 🎵 button
 Search for `Aaron` in `index.html` and replace with your name.
 
 ### Update Social Links
-Find the `#covenant` section and update the `href="#"` attributes.
+Find the `#contact` section and update the `href="#"` attributes in `.social-link` elements.
 
 ### Add/Edit Archive Items
 Find `.archive-item` elements in the HTML and edit the title, description, and tag.
@@ -129,6 +127,12 @@ Edit CSS custom properties in `:root {}` near the top of `<style>`.
 
 ### Modify Music
 In the `AudioEngine` class, edit `melodyNotes` array to change the melody.
+
+---
+
+## 🎮 Easter Egg
+
+Try the **Konami Code**: ↑↑↓↓←→←→BA (arrow keys, then B, then A)
 
 ---
 
